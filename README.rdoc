@@ -267,7 +267,9 @@ To use turntable's ConnectionManagement middleware, add below line to your initi
 == Thanks to
 ConnectionProxy, Distributed Migration implementation is inspired by Octopus and DataFabric.
 
-== LICENSE
+== License
+activerecord-turntable is released under the MIT license:
+
 Copyright (c) 2012 Drecom Co.,Ltd.
 
 Permission is hereby granted, free of charge, to any person obtaining
