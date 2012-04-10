@@ -1,0 +1,64 @@
+development:
+  clusters:
+    user_cluster:
+      algorithm: range
+      seq:
+        connection: user_seq_1 
+      shards:
+        - connection: user_shard_1
+          less_than: 10
+        - connection: user_shard_2
+          less_than: 20
+        - connection: user_shard_3
+          less_than: 30
+        - connection: user_shard_1
+          less_than: 40
+        - connection: user_shard_2
+          less_than: 50
+        - connection: user_shard_3
+          less_than: 60
+        - connection: user_shard_1
+          less_than: 70
+        - connection: user_shard_2
+          less_than: 80
+        - connection: user_shard_3
+          less_than: 90
+        - connection: user_shard_1
+          less_than: 100
+        - connection: user_shard_2
+          less_than: 110
+        - connection: user_shard_3
+          less_than: 120
+        - connection: user_shard_1
+          less_than: 200
+        - connection: user_shard_2
+          less_than: 300
+        - connection: user_shard_3
+          less_than: 400
+
+test:
+  clusters:
+    user_cluster:
+      adapter: pure_ruby
+      algorithm: range
+      shards:
+        - connection: user_shard_1
+          less_than: 20000
+        - connection: user_shard_2
+          less_than: 40000
+        - connection: user_shard_3
+          less_than: 10000000
+
+production:
+  clusters:
+    user_cluster:
+      adapter: pure_ruby
+      algorithm: range
+      shards:
+        - connection: user_shard_1
+          less_than: 20000
+        - connection: user_shard_2
+          less_than: 40000
+        - connection: user_shard_3
+          less_than: 10000000
+

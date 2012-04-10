@@ -1,0 +1,25 @@
+*.gem
+.bundle
+Gemfile.lock
+pkg/*
+.DS_Store
+doc
+.yardoc
+
+# For TextMate
+#*.tmproj
+#tmtags
+
+# For emacs:
+*~
+\#*
+.\#*
+
+# For vim:
+*.swp
+
+# For redcar:
+#.redcar
+
+# For rubinius:
+#*.rbc
