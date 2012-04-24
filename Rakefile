@@ -33,7 +33,7 @@ namespace :turntable do
       ActiveRecord::Base.establish_connection RAILS_ENV
       require 'active_record/turntable'
       ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
-      ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, Turntable::Migration::SchemaStatementsExt)
+      ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
       database_configs = [ActiveRecord::Base.configurations[RAILS_ENV]] + ActiveRecord::Base.configurations[RAILS_ENV]["shards"].values + ActiveRecord::Base.configurations[RAILS_ENV]["seq"].values
 
       database_configs.each do |dbconf|
