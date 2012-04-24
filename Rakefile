@@ -24,7 +24,11 @@ namespace :turntable do
     task :create => :load_config do
       database_configs = [ActiveRecord::Base.configurations[RAILS_ENV]] + ActiveRecord::Base.configurations[RAILS_ENV]["shards"].values + ActiveRecord::Base.configurations[RAILS_ENV]["seq"].values
       database_configs.each do |dbconf|
-        %x{ echo "CREATE DATABASE #{dbconf["database"]}" | mysql -u #{dbconf["username"]} -p#{dbconf["password"]} -h #{dbconf["host"]} }
+        command = "mysql "
+        command << "-u #{dbconf["username"]} " if dbconf["username"]
+        command << "-p#{dbconf["password"]} " if dbconf["password"]
+        command << "-h #{dbconf["host"]}" if dbconf["host"]
+        %x{ echo "CREATE DATABASE #{dbconf["database"]}" | #{command} }
       end
     end
 
@@ -92,7 +96,11 @@ namespace :turntable do
     task :drop => :load_config do
       database_configs = [ActiveRecord::Base.configurations[RAILS_ENV]] + ActiveRecord::Base.configurations[RAILS_ENV]["shards"].values + ActiveRecord::Base.configurations[RAILS_ENV]["seq"].values
       database_configs.each do |dbconf|
-        %x{ echo "DROP DATABASE #{dbconf["database"]}" | mysql -u #{dbconf["username"]} -p#{dbconf["password"]} -h #{dbconf["host"]} }
+        command = "mysql "
+        command << "-u #{dbconf["username"]} " if dbconf["username"]
+        command << "-p#{dbconf["password"]} " if dbconf["password"]
+        command << "-h #{dbconf["host"]}" if dbconf["host"]
+        %x{ echo "DROP DATABASE #{dbconf["database"]}" | #{command} }
       end
     end
 
