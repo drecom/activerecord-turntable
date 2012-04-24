@@ -26,10 +26,10 @@ generator creates Rails.root/config/turntable.yml
 
 == ActiveRecord::Turntable terms
 
-*Shard
-*Cluster - a cluster of shards.
-*Master - default ActiveRecord::Base's connection
-*Sequencer - a module that creates global sequence number
+* Shard
+* Cluster - a cluster of shards.
+* Master - default ActiveRecord::Base's connection
+* Sequencer - a module that creates global sequence number
 
 == Example
 
