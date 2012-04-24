@@ -34,8 +34,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       end
 
       it "should target loaded" do
-        @users.each do |user|
-          user.association(:user_status).loaded?.should be_true
+        if ActiveRecord::VERSION::STRING < "3.1"
+          @users.each do |user|
+            user.loaded_user_status?.should be_true
+          end
+        else
+          @users.each do |user|
+            user.association(:user_status).loaded?.should be_true
+          end
         end
       end
 
@@ -60,8 +66,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       end
 
       it "should target loaded" do
-        @user_statuses.each do |user_status|
-          user_status.association(:user).loaded?.should be_true
+        if ActiveRecord::VERSION::STRING < "3.1"
+          @user_statuses.each do |user_status|
+            user_status.loaded_user?.should be_true
+          end
+        else
+          @user_statuses.each do |user_status|
+            user_status.association(:user).loaded?.should be_true
+          end
         end
       end
 
