@@ -12,7 +12,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "activerecord-turntable"
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.rdoc",
+    "CHANGELOG.md"
   ]
 
   s.files         = `git ls-files | grep -v "^spec"`.split("\n")
