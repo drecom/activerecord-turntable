@@ -6,6 +6,8 @@ development:
   clusters:
     user_cluster:
       algorithm: range
+      seq:
+        connection: user_seq_1
       shards:
         - connection: user_shard_1
           less_than: 100
@@ -18,6 +20,8 @@ test:
   clusters:
     user_cluster:
       algorithm: range
+      seq:
+        connection: user_seq_1
       shards:
         - connection: user_shard_1
           less_than: 20000
@@ -30,6 +34,8 @@ production:
   clusters:
     user_cluster:
       algorithm: range
+      seq:
+        connection: user_seq_1
       shards:
         - connection: user_shard_1
           less_than: 20000

@@ -57,6 +57,8 @@ example turntable.yml:
       clusters:
         user_cluster: # <-- cluster name
           algorithm: range # <-- only range or range_bsearch sharding is supported currently.
+          seq:
+            connection: user_seq_1
           shards:
             - connection: user_shard_1 # <-- shard name
               less_than: 100           # <-- shard range(like mysql partitioning)
