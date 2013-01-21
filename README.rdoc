@@ -12,7 +12,7 @@ Currently supports mysql only.
 
 Add 'activerecord-turntable' to Gemfile:
 
-    gem 'activerecord-turntable', '1.0.0'
+    gem 'activerecord-turntable', '1.0.1'
 
 Run a bundle install:
 
