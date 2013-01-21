@@ -112,12 +112,24 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         user_status.destroy
       }.to_not raise_error
-      puts strio.string
       strio.string.should =~ /WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/
     end
 
     it "should warn when creating without shard_key" do
       pending "doesn't need to implemented soon"
+    end
+
+    it "should execute one query when reloading" do
+      user; user_status
+      strio = StringIO.new
+      ActiveRecord::Base.logger = Logger.new(strio)
+
+      expect {
+        user_status.reload
+      }.to_not raise_error
+      puts strio.string
+
+      strio.string.split("\n").select {|stmt| stmt =~ /SELECT/}.should have(1).items
     end
   end
 

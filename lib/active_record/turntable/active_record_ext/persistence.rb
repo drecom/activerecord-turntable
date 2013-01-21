@@ -1,5 +1,27 @@
 module ActiveRecord::Turntable::ActiveRecordExt
   module Persistence
+    ::ActiveRecord::Persistence.class_eval do
+      def reload(options = nil)
+        clear_aggregation_cache
+        clear_association_cache
+
+        ::ActiveRecord::IdentityMap.without do
+          fresh_object = self.class.unscoped {
+            finder_scope = if turntable_enabled? and self.class.primary_key != self.class.turntable_shard_key.to_s
+                             self.class.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
+                           else
+                             self.class
+                           end
+            finder_scope.find(self.id, options)
+          }
+          @attributes.update(fresh_object.instance_variable_get('@attributes'))
+        end
+
+        @attributes_cache = {}
+        self
+      end
+    end
+
     if ActiveRecord::VERSION::STRING < '3.1'
       ::ActiveRecord::Persistence.class_eval do
         def destroy
