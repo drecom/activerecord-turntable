@@ -22,4 +22,5 @@ group :development, :test do
   gem "pry"
   gem "guard-rspec"
   gem "growl"
+  gem 'coveralls', require: false
 end

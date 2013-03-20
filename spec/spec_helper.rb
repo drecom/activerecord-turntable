@@ -6,6 +6,9 @@ require 'bundler/setup'
 require 'activerecord-turntable'
 require 'turntable_helper'
 
+require 'coveralls'
+Coveralls.wear!
+
 MIGRATIONS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), 'migrations'))
 
 # Requires supporting files with custom matchers and macros, etc,
