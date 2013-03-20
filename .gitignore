@@ -6,6 +6,8 @@ pkg/*
 doc
 .yardoc
 coverage
+gemfiles/*.gemfile.lock
+TAGS
 
 # For TextMate
 #*.tmproj
