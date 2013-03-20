@@ -5,6 +5,7 @@ pkg/*
 .DS_Store
 doc
 .yardoc
+coverage
 
 # For TextMate
 #*.tmproj
