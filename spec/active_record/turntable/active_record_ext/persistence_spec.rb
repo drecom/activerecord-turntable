@@ -129,7 +129,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       }.to_not raise_error
       puts strio.string
 
-      strio.string.split("\n").select {|stmt| stmt =~ /SELECT/}.should have(1).items
+      strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }.should have(1).items
     end
   end
 

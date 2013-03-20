@@ -5,7 +5,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
         clear_aggregation_cache
         clear_association_cache
 
-        ::ActiveRecord::IdentityMap.without do
+        block = lambda {
           fresh_object = self.class.unscoped {
             finder_scope = if turntable_enabled? and self.class.primary_key != self.class.turntable_shard_key.to_s
                              self.class.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
@@ -15,6 +15,12 @@ module ActiveRecord::Turntable::ActiveRecordExt
             finder_scope.find(self.id, options)
           }
           @attributes.update(fresh_object.instance_variable_get('@attributes'))
+        }
+
+        if defined?(::ActiveRecord::IdentityMap)
+          ::ActiveRecord::IdentityMap.without(&block)
+        else
+          block.call
         end
 
         @attributes_cache = {}
@@ -60,7 +66,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
           destroy_associations
 
           if persisted?
-            ActiveRecord::IdentityMap.remove(self) if ActiveRecord::IdentityMap.enabled?
+            ActiveRecord::IdentityMap.remove(self) if defined?(ActiveRecord::IdentityMap) and ActiveRecord::IdentityMap.enabled?
             pk         = klass.primary_key
             column     = klass.columns_hash[pk]
             substitute = connection.substitute_at(column, 0)
@@ -82,7 +88,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
           destroy_associations
 
           if persisted?
-            ActiveRecord::IdentityMap.remove(self) if ActiveRecord::IdentityMap.enabled?
+            ActiveRecord::IdentityMap.remove(self) if defined?(ActiveRecord::IdentityMap) and ActiveRecord::IdentityMap.enabled?
             pk         = klass.primary_key
             column     = klass.columns_hash[pk]
             substitute = connection.substitute_at(column, 0)
