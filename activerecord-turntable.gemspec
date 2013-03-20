@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<httpclient>, [">= 0"])
 
   # development dependencies
-  s.add_development_dependency(%q<rake>, ["~> 0.9.2"])
+  s.add_development_dependency(%q<rake>, ["~> 10.0.3"])
   s.add_development_dependency(%q<rspec>, [">= 0"])
   s.add_development_dependency(%q<rr>, [">= 0"])
   s.add_development_dependency(%q<mysql2>, [">= 0"])
@@ -46,4 +46,3 @@ Gem::Specification.new do |s|
     s.add_development_dependency(%q<growl>, [">= 0"])
   end
 end
-
