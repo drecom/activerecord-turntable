@@ -10,5 +10,10 @@ module ActiveRecord::Turntable
         ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
       end
     end
+
+    # Swap QueryCache Middleware
+    initializer "turntable.swap_query_cache_middleware" do |app|
+      app.middleware.swap ActiveRecord::QueryCache, ActiveRecord::Turntable::Rack::QueryCache
+    end
   end
 end

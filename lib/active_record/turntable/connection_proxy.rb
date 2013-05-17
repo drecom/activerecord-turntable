@@ -3,6 +3,9 @@ module ActiveRecord::Turntable
   class ConnectionProxy
     include Mixable
 
+    # for expiring query cache
+    CLEAR_CACHE_METHODS = [:update, :insert, :delete, :exec_insert, :exec_update, :exec_delete, :insert_many]
+
     attr_writer :spec
 
     def initialize(cluster, options = {})
@@ -19,8 +22,6 @@ module ActiveRecord::Turntable
       :change_column, :change_column_default, :rename_column, :add_index,
       :remove_index, :initialize_schema_information,
       :dump_schema_information, :execute_ignore_duplicate, :to => :master_connection
-
-    # delegate :insert_many, :to => :master # ar-extensions bulk insert support
 
     def transaction(options = {}, &block)
       connection.transaction(options, &block)
@@ -53,7 +54,31 @@ module ActiveRecord::Turntable
       end
     end
 
+    def cache
+      enable_query_cache!
+      yield
+    ensure
+      clear_query_cache
+    end
+
+    def enable_query_cache!
+      @model_class.turntable_connections.each do |k,v|
+        v.connection.enable_query_cache!
+      end
+    end
+
+    def clear_query_cache_if_needed(method)
+      clear_query_cache if CLEAR_CACHE_METHODS.include?(method)
+    end
+
+    def clear_query_cache
+      @model_class.turntable_connections.each do |k,v|
+        v.connection.clear_query_cache
+      end
+    end
+
     def method_missing(method, *args, &block)
+      clear_query_cache_if_needed(method)
       if shard_fixed?
         connection.send(method, *args, &block)
       elsif mixable?(method, *args)
