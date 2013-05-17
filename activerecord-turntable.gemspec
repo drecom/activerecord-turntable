@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors     = ["gussan"]
   s.homepage    = "https://github.com/drecom/activerecord-turntable"
   s.summary = %q{ActiveRecord Sharding plugin}
-  s.description = %q{AcviveRecord Sharding plugin}
+  s.description = %q{ActiveRecord Sharding plugin}
 
   s.rubyforge_project = "activerecord-turntable"
   s.extra_rdoc_files = [
