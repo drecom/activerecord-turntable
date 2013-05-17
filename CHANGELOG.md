@@ -1,3 +1,7 @@
+## activerecord-turntable 1.1.1 ##
+
+*   Enable query caching
+
 ## activerecord-turntable 1.1.0 ##
 
 *   AR::Base.clear_active_connections! should be proxied to all shards
