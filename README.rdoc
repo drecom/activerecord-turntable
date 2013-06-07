@@ -1,4 +1,4 @@
-= ActiveRecord::Turntable {<img src="https://secure.travis-ci.org/drecom/activerecord-turntable.png" />}[http://travis-ci.org/drecom/activerecord-turntable] {<img src="https://gemnasium.com/drecom/activerecord-turntable.png" alt="Dependency Status" />}[https://gemnasium.com/drecom/activerecord-turntable] {<img src="https://coveralls.io/repos/drecom/activerecord-turntable/badge.png?branch=master" alt="Coverage Status" />}[https://coveralls.io/r/drecom/activerecord-turntable]
+= ActiveRecord::Turntable {<img src="https://badge.fury.io/rb/activerecord-turntable.png" alt="Gem Version" />}[http://badge.fury.io/rb/activerecord-turntable] {<img src="https://secure.travis-ci.org/drecom/activerecord-turntable.png" />}[http://travis-ci.org/drecom/activerecord-turntable] {<img src="https://gemnasium.com/drecom/activerecord-turntable.png" alt="Dependency Status" />}[https://gemnasium.com/drecom/activerecord-turntable] {<img src="https://coveralls.io/repos/drecom/activerecord-turntable/badge.png?branch=master" alt="Coverage Status" />}[https://coveralls.io/r/drecom/activerecord-turntable]
 
 ActiveRecord::Turntable is a database sharding extension for ActiveRecord.
 
