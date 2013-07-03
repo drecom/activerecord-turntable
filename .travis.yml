@@ -11,4 +11,7 @@ gemfile:
 before_script:
   - bundle exec rake turntable:db:reset
 script: bundle exec rake spec
-
+matrix:
+  exclude:
+    - rvm: 1.9.2
+      gemfile: gemfiles/rails4_0.gemfile
