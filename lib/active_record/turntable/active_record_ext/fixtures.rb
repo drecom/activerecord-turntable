@@ -3,7 +3,13 @@
 #
 require 'active_record/fixtures'
 module ActiveRecord
-  class Fixtures
+  if ActiveRecord::VERSION::STRING > "4.0"
+    TURNTABLE_AR_FIXTURE = FixtureSet
+  else
+    TURNTABLE_AR_FIXTURE = Fixtures
+  end
+
+  class TURNTABLE_AR_FIXTURE
     def self.create_fixtures(fixtures_directory, table_names, class_names = {})
       table_names = [table_names].flatten.map { |n| n.to_s }
       table_names.each { |n|
@@ -24,7 +30,7 @@ module ActiveRecord
           fixture_files = files_to_read.map do |path|
             table_name = path.tr '/', '_'
 
-            fixtures_map[path] = ActiveRecord::Fixtures.new(
+            fixtures_map[path] = ActiveRecord::TURNTABLE_AR_FIXTURE.new(
               connection,
               table_name,
               class_names[table_name.to_sym] || table_name.classify,
