@@ -160,26 +160,91 @@ describe ActiveRecord::Turntable::ConnectionProxy do
   end
 
   context "When calling exists? with shard_key" do
+    before do
+      establish_connection_to("test")
+      truncate_shard
+      @user1 = User.new
+      @user1.id = 1
+      @user1.nickname = 'user1'
+      @user1.save!
+      @user2 = User.new
+      @user2.id = 30000
+      @user2.nickname = 'user2'
+      @user2.save!
+    end
+
     subject { User.exists?(id: 1) }
     it { should be_true }
   end
 
   context "When calling exists? with non-existed shard_key" do
+    before do
+      establish_connection_to("test")
+      truncate_shard
+      @user1 = User.new
+      @user1.id = 1
+      @user1.nickname = 'user1'
+      @user1.save!
+      @user2 = User.new
+      @user2.id = 30000
+      @user2.nickname = 'user2'
+      @user2.save!
+    end
+
     subject { User.exists?(id: 3) }
     it { should be_false }
   end
 
   context "When calling exists? with non shard_key" do
+    before do
+      establish_connection_to("test")
+      truncate_shard
+      @user1 = User.new
+      @user1.id = 1
+      @user1.nickname = 'user1'
+      @user1.save!
+      @user2 = User.new
+      @user2.id = 30000
+      @user2.nickname = 'user2'
+      @user2.save!
+    end
+
     subject { User.exists?(nickname: 'user2') }
     it { should be_true }
   end
 
   context "When calling exists? with non-existed non shard_key" do
+    before do
+      establish_connection_to("test")
+      truncate_shard
+      @user1 = User.new
+      @user1.id = 1
+      @user1.nickname = 'user1'
+      @user1.save!
+      @user2 = User.new
+      @user2.id = 30000
+      @user2.nickname = 'user2'
+      @user2.save!
+    end
+
     subject { User.exists?(nickname: 'user999') }
     it { should be_false }
   end
 
   context "#table_exists?" do
+    before do
+      establish_connection_to("test")
+      truncate_shard
+      @user1 = User.new
+      @user1.id = 1
+      @user1.nickname = 'user1'
+      @user1.save!
+      @user2 = User.new
+      @user2.id = 30000
+      @user2.nickname = 'user2'
+      @user2.save!
+    end
+
     subject { User.connection.table_exists?(:users) }
     it { should be_true }
   end
