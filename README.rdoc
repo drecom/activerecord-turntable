@@ -3,7 +3,9 @@
 ActiveRecord::Turntable is a database sharding extension for ActiveRecord.
 
 == Dependencies
-activerecord(>=3.0.0)
+activerecord(>=4.0.0)
+
+if you are using activerecord 3.x, please use activerecord-turntable version 1.x.x.
 
 == Supported Database
 Currently supports mysql only.
@@ -12,7 +14,7 @@ Currently supports mysql only.
 
 Add 'activerecord-turntable' to Gemfile:
 
-    gem 'activerecord-turntable', '~>1.1.0'
+    gem 'activerecord-turntable', '~>2.0.0.beta'
 
 Run a bundle install:
 
