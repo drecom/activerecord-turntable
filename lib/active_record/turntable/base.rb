@@ -62,12 +62,8 @@ module ActiveRecord::Turntable
       def turntable_replace_connection_pool
         ch = connection_handler
         cp = turntable_cluster.connection_proxy
-        if ActiveRecord::VERSION::STRING >= '3.2.0'
-          ch.connection_pools[cp.spec] = PoolProxy.new(cp)
-          ch.instance_variable_get(:@class_to_pool)[name] = ch.connection_pools[cp.spec]
-        else
-          ch.connection_pools[name] = PoolProxy.new(cp)
-        end
+        pp = PoolProxy.new(cp)
+        ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
       end
 
       def spec_for(config)
