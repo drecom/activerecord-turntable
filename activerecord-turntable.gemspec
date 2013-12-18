@@ -24,8 +24,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = "1.8.16"
 
   # runtime dependencies
-  s.add_runtime_dependency(%q<activerecord>, [">= 3.0.0"])
-  s.add_runtime_dependency(%q<activesupport>, [">=3.0.0"])
+  s.add_runtime_dependency(%q<activerecord>, [">= 4.0.0"])
+  s.add_runtime_dependency(%q<activesupport>, [">=4.0.0"])
   s.add_runtime_dependency(%q<sql_tree>, ["= 0.2.0"])
   s.add_runtime_dependency(%q<bsearch>, ["~> 1.5"])
   s.add_runtime_dependency(%q<httpclient>, [">= 0"])
