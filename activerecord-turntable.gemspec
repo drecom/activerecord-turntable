@@ -4,10 +4,11 @@ require "active_record/turntable/version"
 Gem::Specification.new do |s|
   s.name = "activerecord-turntable"
   s.version = ActiveRecord::Turntable::VERSION
-  s.authors     = ["gussan"]
+  s.authors     = ["gussan", "sue445"]
   s.homepage    = "https://github.com/drecom/activerecord-turntable"
-  s.summary = %q{ActiveRecord Sharding plugin}
-  s.description = %q{ActiveRecord Sharding plugin}
+  s.summary = %q{ActiveRecord sharding extension}
+  s.description = %q{ActiveRecord sharding extension}
+  s.license = "MIT"
 
   s.rubyforge_project = "activerecord-turntable"
   s.extra_rdoc_files = [
@@ -16,33 +17,30 @@ Gem::Specification.new do |s|
     "CHANGELOG.md"
   ]
 
-  s.files         = `git ls-files | grep -v "^spec"`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = `git ls-files`.split($/)
+  s.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ["lib"]
-  s.licenses = ["MIT"]
-  s.rubygems_version = "1.8.16"
 
-  # runtime dependencies
-  s.add_runtime_dependency(%q<activerecord>, [">= 4.0.0"])
-  s.add_runtime_dependency(%q<activesupport>, [">=4.0.0"])
-  s.add_runtime_dependency(%q<sql_tree>, ["= 0.2.0"])
-  s.add_runtime_dependency(%q<bsearch>, ["~> 1.5"])
-  s.add_runtime_dependency(%q<httpclient>, [">= 0"])
 
-  # development dependencies
-  s.add_development_dependency(%q<rake>, ["~> 10.0.3"])
-  s.add_development_dependency(%q<rspec>, [">= 0"])
-  s.add_development_dependency(%q<rr>, [">= 0"])
-  s.add_development_dependency(%q<mysql2>, [">= 0"])
-  s.add_development_dependency(%q<fabrication>, [">= 0"])
-  s.add_development_dependency(%q<faker>, [">= 0"])
-  s.add_development_dependency(%q<activerecord-import>, [">= 0"])
-  s.add_development_dependency(%q<pry>, [">= 0"])
-  s.add_development_dependency(%q<guard-rspec>, [">= 0"])
-  s.add_development_dependency(%q<coveralls>, [">= 0"])
+  s.add_dependency "activerecord",  ">= 4.0.0"
+  s.add_dependency "activesupport", ">= 4.0.0"
+  s.add_dependency "sql_tree",      "= 0.2.0"
+  s.add_dependency "bsearch",       "~> 1.5"
+  s.add_dependency "httpclient",    ">= 0"
+
+  s.add_development_dependency "rake"
+  s.add_development_dependency "rspec", "~> 2.14"
+  s.add_development_dependency "rr"
+  s.add_development_dependency "mysql2"
+  s.add_development_dependency "fabrication"
+  s.add_development_dependency "faker"
+  s.add_development_dependency "activerecord-import"
+  s.add_development_dependency "pry"
+  s.add_development_dependency "guard-rspec"
+  s.add_development_dependency "coveralls"
 
   if RUBY_PLATFORM =~ /darwin/
-    s.add_development_dependency(%q<growl>, [">= 0"])
+    s.add_development_dependency "growl"
   end
 end
