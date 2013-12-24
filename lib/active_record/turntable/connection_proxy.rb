@@ -192,35 +192,25 @@ module ActiveRecord::Turntable
       connection_pool.connected?
     end
 
-    if ActiveRecord::VERSION::STRING > '3.1'
-      %w(columns columns_hash column_defaults primary_keys).each do |name|
-        define_method(name.to_sym) do
-          master.connection_pool.send(name.to_sym)
+    %w(columns columns_hash column_defaults primary_keys).each do |name|
+      define_method(name.to_sym) do
+        master.connection_pool.send(name.to_sym)
+      end
+    end
+
+    %w(table_exists?).each do |name|
+      define_method(name.to_sym) do |*args|
+        master.connection_pool.with_connection do |c|
+          c.schema_cache.send(name.to_sym, *args)
         end
       end
+    end
 
-      if ActiveRecord::VERSION::STRING < '3.2'
-        %w(table_exists?).each do |name|
-          define_method(name.to_sym) do |*args|
-            master.connection_pool.send(name.to_sym, *args)
-          end
-        end
+    def columns(*args)
+      if args.size > 0
+        master.connection_pool.columns[*args]
       else
-        %w(table_exists?).each do |name|
-          define_method(name.to_sym) do |*args|
-            master.connection_pool.with_connection do |c|
-              c.schema_cache.send(name.to_sym, *args)
-            end
-          end
-        end
-      end
-
-      def columns(*args)
-        if args.size > 0
-          master.connection_pool.columns[*args]
-        else
-          master.connection_pool.columns
-        end
+        master.connection_pool.columns
       end
     end
 

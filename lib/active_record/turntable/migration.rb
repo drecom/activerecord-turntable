@@ -1,24 +1,6 @@
 module ActiveRecord::Turntable::Migration
   extend ActiveSupport::Concern
 
-  # AR < 3.1
-  def self.extended(base)
-    class << base
-      def announce_with_turntable(message)
-        announce_without_turntable("#{message} - #{get_current_shard}")
-      end
-
-      alias_method_chain :migrate, :turntable
-      alias_method_chain :announce, :turntable
-      include ShardDefinition
-    end
-    base.class_eval do
-      class_inheritable_accessor :target_shards
-    end
-    ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
-  end
-
-  # AR >= 3.1
   included do
     extend ShardDefinition
     class_attribute :target_shards
@@ -32,7 +14,6 @@ module ActiveRecord::Turntable::Migration
     ::ActiveRecord::Migration::CommandRecorder.send(:include, CommandRecorder)
   end
 
-  # for all
   module ShardDefinition
     def clusters(*cluster_names)
       config = ActiveRecord::Base.turntable_config
@@ -132,4 +113,3 @@ module ActiveRecord::Turntable::Migration
   end
 
 end
-

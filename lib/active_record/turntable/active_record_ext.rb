@@ -17,9 +17,7 @@ module ActiveRecord::Turntable
       ActiveRecord::LogSubscriber.send(:include, LogSubscriber)
       ActiveRecord::Persistence.send(:include, Persistence)
       ActiveRecord::Relation.send(:include, CleverLoad)
-      ActiveRecord::VERSION::STRING < '3.1' ?
-        ActiveRecord::Migration.extend(ActiveRecord::Turntable::Migration) :
-        ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
+      ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
       require 'active_record/turntable/active_record_ext/fixtures'
     end
   end

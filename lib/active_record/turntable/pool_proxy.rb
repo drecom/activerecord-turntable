@@ -31,17 +31,15 @@ module ActiveRecord::Turntable
       @proxy.connected?
     end
 
-    if ActiveRecord::VERSION::STRING > '3.1'
-      %w(columns_hash column_defaults primary_keys).each do |name|
-        define_method(name.to_sym) do
-          @proxy.send(name.to_sym)
-        end
+    %w(columns_hash column_defaults primary_keys).each do |name|
+      define_method(name.to_sym) do
+        @proxy.send(name.to_sym)
       end
+    end
 
-      %w(table_exists? columns).each do |name|
-        define_method(name.to_sym) do |*args|
-          @proxy.send(name.to_sym, *args)
-        end
+    %w(table_exists? columns).each do |name|
+      define_method(name.to_sym) do |*args|
+        @proxy.send(name.to_sym, *args)
       end
     end
 
