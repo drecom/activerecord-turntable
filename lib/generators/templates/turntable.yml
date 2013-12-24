@@ -5,7 +5,7 @@
 development:
   clusters:
     user_cluster:
-      algorithm: range
+      algorithm: range_bsearch
       seq:
         connection: user_seq_1
       shards:
@@ -19,7 +19,7 @@ development:
 test:
   clusters:
     user_cluster:
-      algorithm: range
+      algorithm: range_bsearch
       seq:
         connection: user_seq_1
       shards:
@@ -33,7 +33,7 @@ test:
 production:
   clusters:
     user_cluster:
-      algorithm: range
+      algorithm: range_bsearch
       seq:
         connection: user_seq_1
       shards:
@@ -43,4 +43,3 @@ production:
           less_than: 40000
         - connection: user_shard_3
           less_than: 10000000
-
