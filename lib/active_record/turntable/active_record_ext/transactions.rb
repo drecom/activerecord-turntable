@@ -10,7 +10,13 @@ module ActiveRecord::Turntable
           end
           self.class.connection.shards_transaction([self.turntable_shard]) do
             add_to_transaction
-            status = yield
+            begin
+              status = yield
+            rescue ActiveRecord::Rollback
+              @_start_transaction_state[:level] = (@_start_transaction_state[:level] || 0) - 1
+              status = nil
+            end
+
             raise ActiveRecord::Rollback unless status
           end
           status

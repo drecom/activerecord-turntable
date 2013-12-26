@@ -19,7 +19,6 @@ module ActiveRecord::Turntable
   autoload :Base, 'active_record/turntable/base'
   autoload :Cluster, 'active_record/turntable/cluster'
   autoload :Config, 'active_record/turntable/config'
-  autoload :Compatible, "active_record/turntable/compatible"
   autoload :ConnectionProxy, 'active_record/turntable/connection_proxy'
   autoload :Helpers, 'active_record/turntable/helpers'
   autoload :MasterShard, 'active_record/turntable/master_shard'

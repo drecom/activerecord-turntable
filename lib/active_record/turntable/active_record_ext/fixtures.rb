@@ -3,62 +3,52 @@
 #
 require 'active_record/fixtures'
 module ActiveRecord
-  if ActiveRecord::VERSION::STRING > "4.0"
-    TURNTABLE_AR_FIXTURE = FixtureSet
-  else
-    TURNTABLE_AR_FIXTURE = Fixtures
-  end
-
-  class TURNTABLE_AR_FIXTURE
+  class FixtureSet
     def self.create_fixtures(fixtures_directory, table_names, class_names = {})
-      table_names = [table_names].flatten.map { |n| n.to_s }
-      table_names.each { |n|
-        class_names[n.tr('/', '_').to_sym] = n.classify if n.include?('/')
-      }
+      fixture_set_names = Array(fixture_set_names).map(&:to_s)
+      class_names = class_names.stringify_keys
 
       # FIXME: Apparently JK uses this.
       connection = block_given? ? yield : ActiveRecord::Base.connection
 
-      files_to_read = table_names.reject { |table_name|
-        fixture_is_cached?(connection, table_name)
+      files_to_read = fixture_set_names.reject { |fs_name|
+        fixture_is_cached?(connection, fs_name)
       }
 
       unless files_to_read.empty?
         connection.disable_referential_integrity do
           fixtures_map = {}
 
-          fixture_files = files_to_read.map do |path|
-            table_name = path.tr '/', '_'
-
-            fixtures_map[path] = ActiveRecord::TURNTABLE_AR_FIXTURE.new(
+          fixture_sets = files_to_read.map do |fs_name|
+            fixtures_map[fs_name] = new( # ActiveRecord::FixtureSet.new
               connection,
-              table_name,
-              class_names[table_name.to_sym] || table_name.classify,
-              ::File.join(fixtures_directory, path))
+              fs_name,
+              class_names[fs_name] || default_fixture_model_name(fs_name),
+              ::File.join(fixtures_directory, fs_name))
           end
 
           all_loaded_fixtures.update(fixtures_map)
 
           ActiveRecord::Turntable::Base.force_transaction_all_shards!(:requires_new => true) do
-            fixture_files.each do |ff|
-              conn = ff.model_class.respond_to?(:connection) ? ff.model_class.connection : connection
-              table_rows = ff.table_rows
+            fixture_sets.each do |fs|
+              conn = fs.model_class.respond_to?(:connection) ? fs.model_class.connection : connection
+              table_rows = fs.table_rows
 
               table_rows.keys.each do |table|
                 conn.delete "DELETE FROM #{conn.quote_table_name(table)}", 'Fixture Delete'
               end
 
-              table_rows.each do |table_name,rows|
+              table_rows.each do |fixture_set_name, rows|
                 rows.each do |row|
-                  conn.insert_fixture(row, table_name)
+                  conn.insert_fixture(row, fixture_set_name)
                 end
               end
             end
 
             # Cap primary key sequences to max(pk).
             if connection.respond_to?(:reset_pk_sequence!)
-              table_names.each do |table_name|
-                connection.reset_pk_sequence!(table_name.tr('/', '_'))
+              fixture_sets.each do |fs|
+                connection.reset_pk_sequence!(fs.table_name)
               end
             end
           end
@@ -66,9 +56,8 @@ module ActiveRecord
           cache_fixtures(connection, fixtures_map)
         end
       end
-      cached_fixtures(connection, table_names)
+      cached_fixtures(connection, fixture_set_names)
     end
-
   end
 
   module TestFixtures
@@ -94,11 +83,9 @@ module ActiveRecord
         ActiveRecord::Base.force_connect_all_shards!
         @fixture_connections = enlist_fixture_connections
         @fixture_connections.each do |connection|
-          connection.increment_open_transactions
-          connection.transaction_joinable = false
-          connection.begin_db_transaction
+          connection.begin_transaction joinable: false
         end
-        # Load fixtures for every test.
+      # Load fixtures for every test.
       else
         ActiveRecord::Fixtures.reset_cache
         @@already_loaded_fixtures[self.class] = nil
@@ -110,27 +97,23 @@ module ActiveRecord
     end
 
     def enlist_fixture_connections
-      ActiveRecord::Base.connection_handler.connection_pools.values.map(&:connection) +
+      ActiveRecord::Base.connection_handler.connection_pool_list.map(&:connection) +
         ActiveRecord::Base.turntable_connections.values.map(&:connection)
     end
 
     def teardown_fixtures
-      return unless defined?(ActiveRecord) && !ActiveRecord::Base.configurations.blank?
-
-      unless run_in_transaction?
-        ActiveRecord::Fixtures.reset_cache
-      end
+      return if ActiveRecord::Base.configurations.blank?
 
       # Rollback changes if a transaction is active.
       if run_in_transaction?
         @fixture_connections.each do |connection|
-          if connection.open_transactions != 0
-            connection.rollback_db_transaction
-            connection.decrement_open_transactions
-          end
+          connection.rollback_transaction if connection.transaction_open?
         end
         @fixture_connections.clear
+      else
+        ActiveRecord::FixtureSet.reset_cache
       end
+
       ActiveRecord::Base.clear_active_connections!
     end
   end

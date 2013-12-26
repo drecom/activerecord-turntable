@@ -22,51 +22,41 @@ module ActiveRecord::Turntable
             pk = @connection.primary_key(table)
           end
 
-          # turntable sequencer dump
           if table =~ /\A(.*)_id_seq\z/
-            tbl.print "  create_sequence_for #{$1.inspect}"
+            tbl.print "  create_sequence_for #{remote_prefix_and_suffix($1).inspect}"
           else
-            tbl.print "  create_table #{table.inspect}"
+            tbl.print "  create_table #{remove_prefix_and_suffix(table).inspect}"
           end
-
-          if columns.detect { |c| c.name == pk }
+          pkcol = columns.detect { |c| c.name == pk }
+          if pkcol
             if pk != 'id'
-              tbl.print %Q(, :primary_key => "#{pk}")
+              tbl.print %Q(, primary_key: "#{pk}")
+            elsif pkcol.sql_type == 'uuid'
+              tbl.print ", id: :uuid"
+              tbl.print %Q(, default: "#{pkcol.default_function}") if pkcol.default_function
             end
           else
-            tbl.print ", :id => false"
+            tbl.print ", id: false"
           end
-          tbl.print ", :force => true"
+          tbl.print ", force: true"
           tbl.puts " do |t|"
 
           # then dump all non-primary key columns
           column_specs = columns.map do |column|
-            raise StandardError, "Unknown type '#{column.sql_type}' for column '#{column.name}'" if @types[column.type].nil?
+            raise StandardError, "Unknown type '#{column.sql_type}' for column '#{column.name}'" unless @connection.valid_type?(column.type)
             next if column.name == pk
-            spec = {}
-            spec[:name]      = column.name.inspect
-
-            # AR has an optimisation which handles zero-scale decimals as integers.  This
-            # code ensures that the dumper still dumps the column as a decimal.
-            spec[:type]      = if column.type == :integer && [/^numeric/, /^decimal/].any? { |e| e.match(column.sql_type) }
-                                 'decimal'
-                               else
-                                 column.type.to_s
-                               end
-            spec[:limit]     = column.limit.inspect if column.limit != @types[column.type][:limit] && spec[:type] != 'decimal'
-            spec[:precision] = column.precision.inspect if column.precision
-            spec[:scale]     = column.scale.inspect if column.scale
-            spec[:null]      = 'false' unless column.null
-            spec[:default]   = default_string(column.default) if column.has_default?
-            (spec.keys - [:name, :type]).each{ |k| spec[k].insert(0, "#{k.inspect} => ")}
-            spec
+            @connection.column_spec(column, @types)
           end.compact
 
           # find all migration keys used in this table
-          keys = [:name, :limit, :precision, :scale, :default, :null] & column_specs.map{ |k| k.keys }.flatten
+          keys = @connection.migration_keys
 
           # figure out the lengths for each column based on above keys
-          lengths = keys.map{ |key| column_specs.map{ |spec| spec[key] ? spec[key].length + 2 : 0 }.max }
+          lengths = keys.map { |key|
+            column_specs.map { |spec|
+              spec[key] ? spec[key].length + 2 : 0
+            }.max
+          }
 
           # the string we're going to sprintf our values against, with standardized column widths
           format_string = lengths.map{ |len| "%-#{len}s" }

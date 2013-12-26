@@ -1,3 +1,5 @@
+require 'active_record/log_subscriber'
+
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module LogSubscriber
@@ -10,16 +12,16 @@ module ActiveRecord::Turntable
 
           payload = event.payload
 
-          return if 'SCHEMA' == payload[:name]
+          return if ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(payload[:name])
 
-          name    = '%s (%.1fms)' % [payload[:name], event.duration]
+          name  = "#{payload[:name]} (#{event.duration.round(1)}ms)"
           shard = '[Shard: %s]' % (event.payload[:turntable_shard_name] ? event.payload[:turntable_shard_name] : nil)
-          sql     = payload[:sql].squeeze(' ')
-          binds   = nil
+          sql   = payload[:sql].squeeze(' ')
+          binds = nil
 
           unless (payload[:binds] || []).empty?
             binds = "  " + payload[:binds].map { |col,v|
-              [col.name, v]
+              render_bind(col, v)
             }.inspect
           end
 

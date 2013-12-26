@@ -6,16 +6,16 @@ module ActiveRecord::Turntable::ActiveRecordExt
         clear_association_cache
 
         finder_scope = if turntable_enabled? and self.class.primary_key != self.class.turntable_shard_key.to_s
-                         self.class.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
+                         self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
                        else
-                         self.class
+                         self.class.unscoped
                        end
 
         fresh_object =
           if options && options[:lock]
-            self.class.unscoped { finder_scope.lock.find(id) }
+            finder_scope.lock.find(id)
           else
-            self.class.unscoped { finder_scope.find(id) }
+            finder_scope.find(id)
           end
 
         @attributes.update(fresh_object.instance_variable_get('@attributes'))

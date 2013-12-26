@@ -3,7 +3,6 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      include Compatible
       class_attribute :turntable_connections,
                         :turntable_enabled, :turntable_sequencer_enabled
 
