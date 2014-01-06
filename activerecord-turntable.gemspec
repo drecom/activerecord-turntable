@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "httpclient",    ">= 0"
 
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rack"
   spec.add_development_dependency "rspec", "~> 2.14"
   spec.add_development_dependency "rr"
   spec.add_development_dependency "mysql2"
