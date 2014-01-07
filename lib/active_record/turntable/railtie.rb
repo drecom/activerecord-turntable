@@ -1,6 +1,7 @@
 module ActiveRecord::Turntable
   class Railtie < Rails::Railtie
     rake_tasks do
+      require 'active_record/turntable/active_record_ext/database_tasks'
       load "active_record/turntable/railties/databases.rake"
     end
 
