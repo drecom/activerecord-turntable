@@ -4,7 +4,6 @@ module ActiveRecord::Turntable
 
     autoload :AbstractAdapter, 'active_record/turntable/active_record_ext/abstract_adapter'
     autoload :CleverLoad, 'active_record/turntable/active_record_ext/clever_load'
-    autoload :DatabaseTasks, 'active_record/turntable/active_record_ext/database_tasks'
     autoload :LogSubscriber, 'active_record/turntable/active_record_ext/log_subscriber'
     autoload :Persistence, 'active_record/turntable/active_record_ext/persistence'
     autoload :SchemaDumper, 'active_record/turntable/active_record_ext/schema_dumper'
@@ -15,7 +14,6 @@ module ActiveRecord::Turntable
       include Transactions
       ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, Sequencer)
       ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, AbstractAdapter)
-      ActiveRecord::Tasks::DatabaseTasks.send(:include, DatabaseTasks)
       ActiveRecord::LogSubscriber.send(:include, LogSubscriber)
       ActiveRecord::Persistence.send(:include, Persistence)
       ActiveRecord::Relation.send(:include, CleverLoad)
