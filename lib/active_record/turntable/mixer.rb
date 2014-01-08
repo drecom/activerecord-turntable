@@ -134,7 +134,7 @@ module ActiveRecord::Turntable
                                          { @proxy.cluster.select_shard(shard_keys.first) => query },
                                          method, query, *args, &block)
       elsif tree.group_by or tree.order_by or tree.limit.try(:value).to_i > 1
-        raise CannotSpecifyShardError, "cannot specify shard for query: #{binded_query}"
+        raise CannotSpecifyShardError, "cannot specify shard for query: #{query}"
       elsif shard_keys.present?
         if SQLTree::Node::SelectDeclaration === tree.select.first and
             SQLTree::Node::CountAggregrate === tree.select.first.expression
@@ -162,7 +162,7 @@ module ActiveRecord::Turntable
                                                     method, query, *args, &block
                                                     )
         else
-          raise CannotSpecifyShardError, "cannot specify shard for query: #{binded_query}"
+          raise CannotSpecifyShardError, "cannot specify shard for query: #{query}"
         end
       end
     end
