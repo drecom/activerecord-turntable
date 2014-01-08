@@ -16,7 +16,7 @@ module ActiveRecord::Turntable
         def merge_results(results)
           if results.any? {|r| r.is_a?(ActiveRecord::Result) }
             first_result = results.find {|r| r.present? }
-            return results unless first_result
+            return results.first unless first_result
 
             ActiveRecord::Result.new(
               first_result.columns,

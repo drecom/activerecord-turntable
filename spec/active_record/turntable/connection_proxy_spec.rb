@@ -72,6 +72,21 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
   end
 
+  context "When have no users" do
+    before do
+      establish_connection_to("test")
+      truncate_shard
+    end
+
+    it "User.#count should be zero" do
+      User.count.should be_zero
+    end
+
+    it "User.all should have no item" do
+      User.all.to_a.should have(0).items
+    end
+  end
+
   context "When have 2 Users in different shards" do
     before do
       establish_connection_to("test")
