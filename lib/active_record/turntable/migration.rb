@@ -85,7 +85,7 @@ module ActiveRecord::Turntable::Migration
 
   module SchemaStatementsExt
     def create_sequence_for(table_name, options = { })
-      options = options.reverse_merge(:options => "ENGINE=MyISAM").merge(:id => false)
+      options = options.merge(:id => false)
 
       # TODO: pkname should be pulled from table definitions
       pkname = "id"
