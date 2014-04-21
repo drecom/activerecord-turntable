@@ -21,7 +21,9 @@ module ActiveRecord::Turntable
       end
 
       def current_sequence_value(sequence_name)
-        res = @klass.connection.seq.connection.execute("SELECT id FROM #{@klass.connection.quote_table_name(sequence_name)} LIMIT 1")
+        conn = @klass.connection.seq.connection
+        conn.execute "UPDATE #{@klass.connection.quote_table_name(sequence_name)} SET id=LAST_INSERT_ID(id)"
+        res = conn.execute("SELECT LAST_INSERT_ID()")
         current_id = res.first.first.to_i
         return current_id
       end
