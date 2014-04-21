@@ -11,8 +11,9 @@ module ActiveRecord::Turntable
 
       def update_record_with_turntable(values, id, id_was, turntable_scope = nil) # :nodoc:
         substitutes, binds = substitute_values values
-        condition_scope = turntable_scope || @klass.unscoped
-        um = condition_scope.where(@klass.arel_table[@klass.primary_key].eq(id_was || id)).arel.compile_update(substitutes, @klass.primary_key)
+        condition_scope = @klass.unscoped.where(@klass.arel_table[@klass.primary_key].eq(id_was || id))
+        condition_scope = condition_scope.merge(turntable_scope) if turntable_scope
+        um = condition_scope.arel.compile_update(substitutes, @klass.primary_key)
 
         @klass.connection.update(
           um,
