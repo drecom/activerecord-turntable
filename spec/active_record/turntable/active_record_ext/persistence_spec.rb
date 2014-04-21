@@ -74,13 +74,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
     context "on update once" do
       it "callback should be called once" do
-        mock(user).on_update.times(1)
+        expect(user).to receive(:on_update).once
         user.save
       end
     end
     context "on destroy once" do
       it "callback should be called once" do
-        mock(user).on_destroy.times(1)
+        expect(user).to receive(:on_destroy).once
         user.destroy
       end
     end
@@ -116,7 +116,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     end
 
     it "should warn when creating without shard_key" do
-      pending "doesn't need to implemented soon"
+      skip "doesn't need to implemented soon"
     end
 
     it "should execute one query when reloading" do

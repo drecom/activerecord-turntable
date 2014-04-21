@@ -36,17 +36,17 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       it "should target loaded" do
         if ActiveRecord::VERSION::STRING < "3.1"
           @users.each do |user|
-            user.loaded_user_status?.should be_true
+            user.loaded_user_status?.should be_truthy
           end
         else
           @users.each do |user|
-            user.association(:user_status).loaded?.should be_true
+            user.association(:user_status).loaded?.should be_truthy
           end
         end
       end
 
       it "should assigned reverse relation" do
-        pending "should be implemented"
+        skip "should be implemented"
       end
     end
   end
@@ -68,26 +68,24 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       it "should target loaded" do
         if ActiveRecord::VERSION::STRING < "3.1"
           @user_statuses.each do |user_status|
-            user_status.loaded_user?.should be_true
+            user_status.loaded_user?.should be_truthy
           end
         else
           @user_statuses.each do |user_status|
-            user_status.association(:user).loaded?.should be_true
+            user_status.association(:user).loaded?.should be_truthy
           end
         end
       end
 
       it "should assigned reverse relation" do
-        pending "should be implemented"
+        skip "should be implemented"
       end
     end
   end
 
   context "When a model has has_many relation" do
     it "should send query only 2 times." do
-      pending "not implemented yet"
+      skip "not implemented yet"
     end
   end
-
-
 end

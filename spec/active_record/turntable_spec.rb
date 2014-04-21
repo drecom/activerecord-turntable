@@ -8,7 +8,7 @@ describe ActiveRecord::Turntable do
   context "#config_file" do
     it "should return Rails.root/config/turntable.yml default" do
       unless defined?(::Rails); class ::Rails; end; end
-      stub(Rails).root { "/path/to/rails_root" }
+      Rails.stub(:root) { "/path/to/rails_root" }
       ActiveRecord::Base.turntable_config_file = nil
       ActiveRecord::Base.turntable_config_file.should == "/path/to/rails_root/config/turntable.yml"
     end

@@ -17,11 +17,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "AR3.1" do
     it "should proxies columns" do
-      pending "spec not implemented yet"
+      skip "spec not implemented yet"
     end
 
     it "should proxies columns_hash" do
-      pending "spec not implemented yet"
+      skip "spec not implemented yet"
     end
   end
 
@@ -189,7 +189,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     subject { User.exists?(id: 1) }
-    it { should be_true }
+    it { should be_truthy }
   end
 
   context "When calling exists? with non-existed shard_key" do
@@ -207,7 +207,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     subject { User.exists?(id: 3) }
-    it { should be_false }
+    it { should be_falsey }
   end
 
   context "When calling exists? with non shard_key" do
@@ -225,7 +225,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     subject { User.exists?(nickname: 'user2') }
-    it { should be_true }
+    it { should be_truthy }
   end
 
   context "When calling exists? with non-existed non shard_key" do
@@ -243,7 +243,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     subject { User.exists?(nickname: 'user999') }
-    it { should be_false }
+    it { should be_falsey }
   end
 
   context "#table_exists?" do
@@ -261,6 +261,6 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     subject { User.connection.table_exists?(:users) }
-    it { should be_true }
+    it { should be_truthy }
   end
 end
