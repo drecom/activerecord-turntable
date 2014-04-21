@@ -5,6 +5,12 @@ module ActiveRecord::Turntable
     module LogSubscriber
       extend ActiveSupport::Concern
 
+      included do
+        alias_method_chain :sql, :turntable
+      end
+
+      protected
+
       def sql_with_turntable(event)
         self.class.runtime += event.duration
         return unless logger.debug?
