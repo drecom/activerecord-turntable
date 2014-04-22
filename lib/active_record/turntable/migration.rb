@@ -85,11 +85,14 @@ module ActiveRecord::Turntable::Migration
 
   module SchemaStatementsExt
     def create_sequence_for(table_name, options = { })
+      options = options.merge(:id => false)
+
       # TODO: pkname should be pulled from table definitions
       pkname = "id"
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
-      create_table(sequence_table_name, options)
-      execute "ALTER TABLE #{quote_table_name(sequence_table_name)} MODIFY id bigint(20) DEFAULT NULL auto_increment NOT NULL;"
+      create_table(sequence_table_name, options) do |t|
+        t.integer :id, :limit => 8
+      end
       execute "INSERT INTO #{quote_table_name(sequence_table_name)} (`id`) VALUES (0)"
     end
 
