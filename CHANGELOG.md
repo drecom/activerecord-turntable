@@ -1,3 +1,7 @@
+## activerecord-turntable 1.1.2 ##
+
+*   Increase sequence table performance (by hanabokuro)
+
 ## activerecord-turntable 1.1.1 ##
 
 *   Enable query caching
