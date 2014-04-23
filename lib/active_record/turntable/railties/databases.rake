@@ -12,6 +12,7 @@ db_namespace = namespace :db do
       shard_configs.merge!(config["seq"]) if config["seq"]
       if shard_configs
         shard_configs.each do |name, config|
+          next unless config["database"]
           filename = ENV['SCHEMA'] || "#{Rails.root}/db/schema-#{name}.rb"
           File.open(filename, "w:utf-8") do |file|
             ActiveRecord::Base.establish_connection(config)
@@ -30,6 +31,7 @@ db_namespace = namespace :db do
       shard_configs.merge!(config["seq"]) if config["seq"]
       if shard_configs
         shard_configs.each do |name, config|
+          next unless config["database"]
           ActiveRecord::Base.establish_connection(config)
           file = ENV['SCHEMA'] || "#{Rails.root}/db/schema-#{name}.rb"
           if File.exists?(file)
@@ -51,6 +53,7 @@ db_namespace = namespace :db do
       shard_configs.merge!(config["seq"]) if config["seq"]
       if shard_configs
         shard_configs.each do |name, config|
+          next unless config["database"]
           ActiveRecord::Base.establish_connection(config)
           filename = File.join(ActiveRecord::Tasks::DatabaseTasks.db_dir, "structure_#{name}.sql")
           ActiveRecord::Tasks::DatabaseTasks.structure_dump(config, filename)
@@ -73,6 +76,7 @@ db_namespace = namespace :db do
       shard_configs.merge!(config["seq"]) if config["seq"]
       if shard_configs
         shard_configs.each do |name, config|
+          next unless config["database"]
           ActiveRecord::Base.establish_connection(config)
           filename = File.join(ActiveRecord::Tasks::DatabaseTasks.db_dir, "structure_#{name}.sql")
           ActiveRecord::Tasks::DatabaseTasks.structure_load(config, filename)
@@ -90,6 +94,7 @@ db_namespace = namespace :db do
       shard_configs.merge!(config["seq"]) if config["seq"]
       if shard_configs
         shard_configs.each do |name, config|
+          next unless config["database"]
           ActiveRecord::Tasks::DatabaseTasks.purge config
         end
       end

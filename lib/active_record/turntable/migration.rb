@@ -52,10 +52,11 @@ module ActiveRecord::Turntable::Migration
       config[Rails.env||"development"]["shards"][shard]
     end
     seqs = config[Rails.env||"development"]["seq"]
-    shards_conf += seqs.values
+    shards_conf += seqs.values if seqs
     shards_conf << config[Rails.env||"development"]
     shards_conf.each_with_index do |conf, idx|
-      @@current_shard = (shards[idx] || seqs.keys[idx - shards.size] || "master")
+      next unless conf["database"]
+      @@current_shard = shards[idx] || (seqs && seqs.keys[idx - shards.size]) || "master"
       ActiveRecord::Base.establish_connection(conf)
       if !ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name())
         ActiveRecord::Base.connection.initialize_schema_migrations_table

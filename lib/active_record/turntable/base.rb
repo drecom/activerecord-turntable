@@ -83,10 +83,10 @@ module ActiveRecord::Turntable
         end
       end
 
-      def sequencer
+      def sequencer(sequence_name, *args)
         class_attribute :turntable_sequencer
         self.turntable_sequencer_enabled = true
-        self.turntable_sequencer = ActiveRecord::Turntable::Sequencer.build(self)
+        self.turntable_sequencer = ActiveRecord::Turntable::Sequencer.build(self, sequence_name, *args)
       end
 
       def turntable_enabled?
