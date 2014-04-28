@@ -59,11 +59,11 @@ module ActiveRecord::Turntable
       end
 
       def turntable_replace_connection_pool
-        self.remove_connection
         ch = connection_handler
         cp = turntable_cluster.connection_proxy
         pp = PoolProxy.new(cp)
         ch.class_to_pool.clear if defined?(ch.class_to_pool)
+        ch.send(:owner_to_pool)[name].try(:disconnect!)
         ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
       end
 
@@ -85,6 +85,7 @@ module ActiveRecord::Turntable
 
       def sequencer(sequence_name, *args)
         class_attribute :turntable_sequencer
+
         self.turntable_sequencer_enabled = true
         self.turntable_sequencer = ActiveRecord::Turntable::Sequencer.build(self, sequence_name, *args)
       end
