@@ -122,7 +122,7 @@ module ActiveRecord::Turntable
     end
 
     def turntable_shard
-      turntable_cluster.select_shard(self.send(turntable_shard_key))
+      turntable_cluster.shard_for(self.send(turntable_shard_key))
     end
   end
 end

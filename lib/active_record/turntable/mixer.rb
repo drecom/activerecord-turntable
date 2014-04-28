@@ -131,7 +131,7 @@ module ActiveRecord::Turntable
 
       if shard_keys.size == 1 # shard
         return Fader::SpecifiedShard.new(@proxy,
-                                         { @proxy.cluster.select_shard(shard_keys.first) => query },
+                                         { @proxy.cluster.shard_for(shard_keys.first) => query },
                                          method, query, *args, &block)
       elsif tree.group_by or tree.order_by or tree.limit.try(:value).to_i > 1
         raise CannotSpecifyShardError, "cannot specify shard for query: #{query}"
@@ -143,7 +143,7 @@ module ActiveRecord::Turntable
                                                      method, query, *args, &block)
         else
           return Fader::SelectShardsMergeResult.new(@proxy,
-                                                    Hash[shard_keys.map {|k| [@proxy.cluster.select_shard(k), query] }],
+                                                    Hash[shard_keys.map {|k| [@proxy.cluster.shard_for(k), query] }],
                                                     method, query, *args, &block
                                                     )
         end
@@ -170,7 +170,7 @@ module ActiveRecord::Turntable
     def build_update_fader(tree, method, query, *args, &block)
       shard_keys = find_shard_keys(tree.where, @proxy.cluster.klass.table_name, @proxy.cluster.klass.turntable_shard_key.to_s)
       shards_with_query = if shard_keys.present?
-                            build_shards_with_same_query(shard_keys.map {|k| @proxy.cluster.select_shard(k) }, query)
+                            build_shards_with_same_query(shard_keys.map {|k| @proxy.cluster.shard_for(k) }, query)
                           else
                             build_shards_with_same_query(@proxy.shards.values, query)
                           end
@@ -189,7 +189,7 @@ module ActiveRecord::Turntable
           "(#{val.map { |v| @proxy.connection.quote(v.value)}.join(', ')})"
         end.join(', ')
         sql.gsub!('("\0")') { value_sql }
-        shards_with_query[@proxy.cluster.select_shard(k)] = sql
+        shards_with_query[@proxy.cluster.shard_for(k)] = sql
       end
       Fader::InsertShardsMergeResult.new(@proxy, shards_with_query, method, query, *args, &block)
     end
