@@ -182,6 +182,21 @@ module ActiveRecord::Turntable
       end
     end
 
+    def with_master_and_all(continue_on_error = false)
+      ([@cluster.master] + @cluster.shards.values).map do |shard|
+        begin
+          with_shard(shard) {
+            yield
+          }
+        rescue Exception => err
+          unless continue_on_error
+            raise err
+          end
+          err
+        end
+      end
+    end
+
     def with_master(&block)
       with_shard(@cluster.master) do
         yield
