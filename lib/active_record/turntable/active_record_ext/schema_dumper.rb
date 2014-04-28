@@ -23,7 +23,7 @@ module ActiveRecord::Turntable
           end
 
           if table =~ /\A(.*)_id_seq\z/
-            tbl.print "  create_sequence_for #{remote_prefix_and_suffix($1).inspect}"
+            tbl.print "  create_sequence_for #{remove_prefix_and_suffix($1).inspect}"
           else
             tbl.print "  create_table #{remove_prefix_and_suffix(table).inspect}"
           end
