@@ -188,9 +188,8 @@ module ActiveRecord::Turntable
       end
     end
 
-    def connected?
-      connection_pool.connected?
-    end
+    delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
+               :spec, :connections, :size, :reaper, :table_exists?, to: :connection_pool
 
     %w(columns columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
