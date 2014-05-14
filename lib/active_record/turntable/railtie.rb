@@ -14,7 +14,7 @@ module ActiveRecord::Turntable
 
     # Swap QueryCache Middleware
     initializer "turntable.swap_query_cache_middleware" do |app|
-      app.middleware.swap ActiveRecord::QueryCache, ActiveRecord::Turntable::Rack::QueryCache
+      app.middleware.insert_after ActiveRecord::QueryCache, ActiveRecord::Turntable::Rack::QueryCache
     end
   end
 end
