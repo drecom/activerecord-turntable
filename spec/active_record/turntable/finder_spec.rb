@@ -16,11 +16,11 @@ describe "ActiveRecord::FinderMethods" do
     end
 
     it "#find(1) should be == user" do
-      User.find(1).should == @user
+      expect(User.find(1)).to eq(@user)
     end
 
     it "#find(2) should raise error" do
-      lambda { User.find(2) }.should raise_error
+      expect { User.find(2) }.to raise_error
     end
   end
 end

@@ -29,19 +29,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
         @users = User.clever_load!(:user_status)
         puts @strio.string
       end
-      it "should send merged user_status select query" do
-        @strio.string.should =~ //
-      end
 
       it "should target loaded" do
-        if ActiveRecord::VERSION::STRING < "3.1"
-          @users.each do |user|
-            user.loaded_user_status?.should be_truthy
-          end
-        else
-          @users.each do |user|
-            user.association(:user_status).loaded?.should be_truthy
-          end
+        @users.each do |user|
+          expect(user.association(:user_status).loaded?).to be_truthy
         end
       end
 
@@ -61,19 +52,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
         puts @strio.string
       end
 
-      it "should send merged user_status select query" do
-        @strio.string.should =~ //
-      end
-
       it "should target loaded" do
-        if ActiveRecord::VERSION::STRING < "3.1"
-          @user_statuses.each do |user_status|
-            user_status.loaded_user?.should be_truthy
-          end
-        else
-          @user_statuses.each do |user_status|
-            user_status.association(:user).loaded?.should be_truthy
-          end
+        @user_statuses.each do |user_status|
+          expect(user_status.association(:user).loaded?).to be_truthy
         end
       end
 

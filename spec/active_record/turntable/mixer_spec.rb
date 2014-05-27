@@ -24,9 +24,9 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.send(:divide_insert_values, tree, "id")
         }
 
-        it { should be_instance_of(Hash) }
-        it { should have_key(1) }
-        it { [1].should have(1).item }
+        it { is_expected.to be_instance_of(Hash) }
+        it { is_expected.to have_key(1) }
+        it { expect([1]).to have(1).item }
       end
 
       context "When call divide_insert_values with Bulk INSERT and shard_key 'id'" do
@@ -35,11 +35,11 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.send(:divide_insert_values, tree, "id")
         }
 
-        it { should be_instance_of(Hash) }
-        it { should have_key(3) }
-        it { [1].should have(1).item }
-        it { [2].should have(1).item }
-        it { [3].should have(1).item }
+        it { is_expected.to be_instance_of(Hash) }
+        it { is_expected.to have_key(3) }
+        it { expect([1]).to have(1).item }
+        it { expect([2]).to have(1).item }
+        it { expect([3]).to have(1).item }
       end
     end
 
@@ -50,8 +50,8 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.find_shard_keys(tree.where, "users", "id")
         }
 
-        it { should be_instance_of Array }
-        it { should == [1] }
+        it { is_expected.to be_instance_of Array }
+        it { is_expected.to eq([1]) }
       end
     end
 
@@ -62,8 +62,8 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.find_shard_keys(tree.where, "users", "id")
         }
 
-        it { should be_instance_of Array }
-        it { should == [1] }
+        it { is_expected.to be_instance_of Array }
+        it { is_expected.to eq([1]) }
       end
     end
 
@@ -74,8 +74,8 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.find_shard_keys(tree.where, "users", "id")
         }
 
-        it { should be_instance_of Array }
-        it { should == [1] }
+        it { is_expected.to be_instance_of Array }
+        it { is_expected.to eq([1]) }
       end
 
       context "When call find_shard_keys with shardkey collection condition" do
@@ -84,8 +84,8 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.find_shard_keys(tree.where, "users", "id")
         }
 
-        it { should be_instance_of Array }
-        it { should == [1,2,3,4,5] }
+        it { is_expected.to be_instance_of Array }
+        it { is_expected.to eq([1,2,3,4,5]) }
       end
 
       context "When call find_shard_keys with not determine shardkey condition" do
@@ -94,8 +94,8 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.find_shard_keys(tree.where, "users", "id")
         }
 
-        it { should be_instance_of Array }
-        it { should == [] }
+        it { is_expected.to be_instance_of Array }
+        it { is_expected.to eq([]) }
       end
 
       context "When call find_shard_keys with except table definition SQL" do
@@ -104,8 +104,8 @@ describe ActiveRecord::Turntable::Mixer do
           @mixer.find_shard_keys(tree.where, "users", "id")
         }
 
-        it { should be_instance_of Array }
-        it { should == [] }
+        it { is_expected.to be_instance_of Array }
+        it { is_expected.to eq([]) }
       end
     end
 
