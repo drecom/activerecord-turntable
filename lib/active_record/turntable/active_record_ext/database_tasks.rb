@@ -38,11 +38,14 @@ module ActiveRecord
       end
 
       def current_turntable_cluster_configurations(*environments)
-        environments.inject({}) do |configurations, environ|
+        configurations = []
+        environments.each do |environ|
           config = ActiveRecord::Base.configurations[environ]
-          configurations.merge!(config["shards"]) if config["shards"]
-          configurations.merge!(config["seq"]) if config["seq"]
+          %w(shards seq).each do |name|
+            configurations += config[name].to_a
+          end
         end
+        configurations
       end
     end
   end
