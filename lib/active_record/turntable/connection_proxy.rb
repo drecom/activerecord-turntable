@@ -92,13 +92,8 @@ module ActiveRecord::Turntable
       end
     end
 
-    # for 3.2.2
     def to_sql(arel, binds = [])
-      if master.connection.method(:to_sql).arity < 0
-        master.connection.to_sql(arel, binds)
-      else
-        master.connection.to_sql(arel)
-      end
+      master.connection.to_sql(arel, binds)
     end
 
     def cluster
