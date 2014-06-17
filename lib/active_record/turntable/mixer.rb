@@ -179,9 +179,16 @@ module ActiveRecord::Turntable
                           else
                             build_shards_with_same_query(@proxy.shards.values, query)
                           end
-      Fader::UpdateShardsMergeResult.new(@proxy,
-                                         shards_with_query,
-                                         method, query, *args, &block)
+
+      if shards_with_query.size == 1
+        Fader::SpecifiedShard.new(@proxy,
+                                  shards_with_query,
+                                  method, query, *args, &block)
+      else
+        Fader::UpdateShardsMergeResult.new(@proxy,
+                                           shards_with_query,
+                                           method, query, *args, &block)
+      end
     end
 
     def build_insert_fader(tree, method, query, *args, &block)
