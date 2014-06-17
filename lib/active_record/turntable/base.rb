@@ -10,7 +10,7 @@ module ActiveRecord::Turntable
       self.turntable_enabled = false
       self.turntable_sequencer_enabled = false
       class << self
-        delegate :shards_transaction, :to => :connection
+        delegate :shards_transaction, :with_all, :to => :connection
       end
     end
 
