@@ -37,7 +37,7 @@ module ActiveRecord::Turntable
 
     begin
       require 'activerecord-import'
-      require 'activerecord-import/import'
+      require 'activerecord-import/base'
       (class << ActiveRecord::Base; self; end).send(:include, ActiverecordImportExt)
     rescue LoadError
     end
