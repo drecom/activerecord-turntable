@@ -115,6 +115,18 @@ module ActiveRecord::Turntable
         }
         self.connection.with_recursive_shards(shard.name, *klasses, &block)
       end
+
+      def with_shard(any_shard)
+        shard = case any_shard
+                when Numeric
+                  turntable_cluster.shard_for(any_shard)
+                when ActiveRecord::Base
+                  turntable_cluster.shard_for(any_shard.send(any_shard.turntable_shard_key))
+                else
+                  shard_or_key
+                end
+        connection.with_shard(shard) { yield }
+      end
     end
 
     def shards_transaction(options = {}, &block)
