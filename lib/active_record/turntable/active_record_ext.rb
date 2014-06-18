@@ -13,6 +13,7 @@ module ActiveRecord::Turntable
       autoload :Sequencer
       autoload :Relation
       autoload :Transactions
+      autoload :AssociationPreloader
     end
 
     included do
@@ -26,6 +27,7 @@ module ActiveRecord::Turntable
       ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
         include ConnectionHandlerExtension
       end
+      ActiveRecord::Associations::Preloader::Association.send(:include, AssociationPreloader)
       require 'active_record/turntable/active_record_ext/fixtures'
       require 'active_record/turntable/active_record_ext/migration_proxy'
       require 'active_record/turntable/active_record_ext/activerecord_import_ext'
