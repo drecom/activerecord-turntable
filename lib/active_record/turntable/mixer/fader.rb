@@ -29,7 +29,7 @@ module ActiveRecord::Turntable
       end
 
       def execute
-        raise ActiveRecord::Turntable::NotImplementedError, "Called abstract method"
+        raise NotImplementedError, "Called abstract method"
       end
     end
   end

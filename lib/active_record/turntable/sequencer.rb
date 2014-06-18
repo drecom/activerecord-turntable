@@ -43,11 +43,11 @@ module ActiveRecord::Turntable
     end
 
     def next_sequence_value
-      raise ActiveRecord::Turntable::NotImplementedError
+      raise NotImplementedError
     end
 
     def current_sequence_value
-      raise ActiveRecord::Turntable::NotImplementedError
+      raise NotImplementedError
     end
 
     private
