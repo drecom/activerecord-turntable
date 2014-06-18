@@ -28,6 +28,7 @@ module ActiveRecord::Turntable
       end
       require 'active_record/turntable/active_record_ext/fixtures'
       require 'active_record/turntable/active_record_ext/migration_proxy'
+      require 'active_record/turntable/active_record_ext/activerecord_import_ext'
     end
   end
 end
