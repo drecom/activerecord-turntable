@@ -4,10 +4,22 @@ ActiveRecord::SchemaDumper.send(:include, ActiveRecord::Turntable::ActiveRecordE
 # TODO: implement schema:cache:xxxx
 
 db_namespace = namespace :db do
+  namespace :create do
+    task :all => :load_config do
+      ActiveRecord::Tasks::DatabaseTasks.create_all_turntable_cluster
+    end
+  end
+
   desc 'Create current turntable databases config/database.yml for the current Rails.env'
   task :create => [:load_config] do
     unless ENV['DATABASE_URL']
       ActiveRecord::Tasks::DatabaseTasks.create_current_turntable_cluster
+    end
+  end
+
+  namespace :drop do
+    task :all => :load_config do
+      ActiveRecord::Tasks::DatabaseTasks.drop_all_turntable_cluster
     end
   end
 
@@ -24,12 +36,33 @@ db_namespace = namespace :db do
 
     ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
       puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-      ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil) do |migration|
-        migration.target_shard?(name)
-      end
+      ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
       db_namespace['_dump'].invoke
     end
   end
+
+  desc 'Rolls the turntable cluster schema back to the previous version (specify steps w/ STEP=n).'
+  task :rollback => [:environment, :load_config] do
+    step = ENV['STEP'] ? ENV['STEP'].to_i : 1
+
+    ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+      puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+      ActiveRecord::Migrator.rollback(ActiveRecord::Migrator.migrations_paths, step)
+    end
+    db_namespace['_dump'].invoke
+  end
+
+  # desc 'Pushes the turntable cluster schema to the next version (specify steps w/ STEP=n).'
+  task :forward => [:environment, :load_config] do
+    step = ENV['STEP'] ? ENV['STEP'].to_i : 1
+
+    ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+      puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+      ActiveRecord::Migrator.forward(ActiveRecord::Migrator.migrations_paths, step)
+    end
+    db_namespace['_dump'].invoke
+  end
+
 
   namespace :schema do
     task :dump do

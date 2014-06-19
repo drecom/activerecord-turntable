@@ -5,6 +5,7 @@ module ActiveRecord::Turntable::Migration
     extend ShardDefinition
     class_attribute :target_shards, :current_shard
     alias_method_chain :announce, :turntable
+    alias_method_chain :exec_migration, :turntable
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
     ::ActiveRecord::Migration::CommandRecorder.send(:include, CommandRecorder)
   end
@@ -37,6 +38,10 @@ module ActiveRecord::Turntable::Migration
 
   def announce_with_turntable(message)
     announce_without_turntable("#{message} - Shard: #{current_shard}")
+  end
+
+  def exec_migration_with_turntable(*args)
+    exec_migration_without_turntable(*args) if target_shard?(current_shard)
   end
 
   module SchemaStatementsExt
