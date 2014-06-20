@@ -11,8 +11,9 @@ module ActiveRecord::Turntable
     def initialize(cluster, options = {})
       @cluster      =  cluster
       @model_class  =  cluster.klass
-      @current_shard =  (cluster.master || cluster.shards.first[1])
-      @fixed_shard  = false
+      @default_current_shard =  (cluster.master || cluster.shards.first[1])
+      Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
+      Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
     end
 
@@ -109,7 +110,11 @@ module ActiveRecord::Turntable
     end
 
     def fixed_shard
-      @fixed_shard
+      Thread.current[:turntable_fixed_shard][object_id]
+    end
+
+    def fixed_shard=(shard)
+      Thread.current[:turntable_fixed_shard][object_id] = shard
     end
 
     def master
@@ -125,29 +130,29 @@ module ActiveRecord::Turntable
     end
 
     def current_shard
-      @current_shard
+      Thread.current[:turntable_current_shard][object_id] ||= @default_current_shard
     end
 
     def current_shard=(shard)
       logger.debug { "Chainging #{@model_class}'s shard to #{shard.name}"}
-      @current_shard = shard
+      Thread.current[:turntable_current_shard][object_id] = shard
     end
 
     def connection
-      @current_shard.connection
+      current_shard.connection
     end
 
     def connection_pool
-      @current_shard.connection_pool
+      current_shard.connection_pool
     end
 
     def with_shard(shard)
       old_shard, old_fixed = current_shard, fixed_shard
       self.current_shard = shard
-      @fixed_shard = shard
+      self.fixed_shard = shard
       yield
     ensure
-      @fixed_shard = old_fixed
+      self.fixed_shard = old_fixed
       self.current_shard = old_shard
     end
 
