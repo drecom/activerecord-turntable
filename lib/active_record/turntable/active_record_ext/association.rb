@@ -6,12 +6,9 @@ module ActiveRecord::Turntable
       extend ActiveSupport::Concern
 
       included do
-        case self.to_s
-        when "ActiveRecord::Associations::SingularAssociation"
-          include SingularAssociationExt
-        when "ActiveRecord::Associations::CollectionAssociation"
-          include CollectionAssociationExt
-        end
+        ActiveRecord::Associations::SingularAssociation.send(:include, SingularAssociationExt)
+        ActiveRecord::Associations::CollectionAssociation.send(:include, CollectionAssociationExt)
+        ActiveRecord::Associations::Builder::Association.valid_options += [:foreign_shard_key]
       end
 
       module SingularAssociationExt
@@ -25,8 +22,8 @@ module ActiveRecord::Turntable
 
         def find_target_with_turntable
           current_scope = scope
-          if same_association_shard_key?
-            current_scope = current_scope.where(klass.turntable_shard_key => owner.send(owner.turntable_shard_key))
+          if should_use_shard_key?
+            current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
           end
           current_scope.first.tap { |record| set_inverse_instance(record) }
         end
@@ -47,18 +44,29 @@ module ActiveRecord::Turntable
               reflection.klass.find_by_sql(custom_finder_sql)
             else
               current_scope = scope
-              if same_association_shard_key?
-                current_scope = current_scope.where(klass.turntable_shard_key => owner.send(owner.turntable_shard_key))
+              if should_use_shard_key?
+                current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
               end
               current_scope.to_a
             end
           records.each { |record| set_inverse_instance(record) }
           records
         end
+
+      end
+
+      private
+
+      def foreign_shard_key
+        options[:foreign_shard_key] || owner.turntable_shard_key
+      end
+
+      def should_use_shard_key?
+        same_association_shard_key? || !!options[:foreign_shard_key]
       end
 
       def same_association_shard_key?
-        owner.class.turntable_enabled? && klass.turntable_enabled? && owner.turntable_shard_key == klass.turntable_shard_key
+        owner.class.turntable_enabled? && klass.turntable_enabled? && foreign_shard_key == klass.turntable_shard_key
       end
     end
   end
