@@ -50,8 +50,8 @@ module ActiveRecord::Turntable
 
       def force_connect_all_shards!
         conf = configurations[Rails.env]
-        shards = []
-        shards += conf["shards"] if conf["shards"]
+        shards = {}
+        shards = shards.merge(conf["shards"]) if conf["shards"]
         shards = shards.merge(conf["seq"]) if conf["seq"]
         shards.each do |name, config|
           turntable_connections[name] ||=
