@@ -3,10 +3,11 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :turntable_connections,
+      class_attribute :turntable_connections, :turntable_clusters,
                         :turntable_enabled, :turntable_sequencer_enabled
 
       self.turntable_connections = {}
+      self.turntable_clusters = Hash.new {|h,k| h[k]={}}
       self.turntable_enabled = false
       self.turntable_sequencer_enabled = false
       class << self
@@ -27,7 +28,10 @@ module ActiveRecord::Turntable
                                    turntable_config[:clusters][cluster_name],
                                    options
                                  )
+        self.turntable_clusters[cluster_name][self] = turntable_cluster
+
         turntable_replace_connection_pool
+        turntable_define_cluster_methods(cluster_name)
       end
 
       def force_transaction_all_shards!(options={}, &block)
@@ -127,6 +131,41 @@ module ActiveRecord::Turntable
                   shard_or_key
                 end
         connection.with_shard(shard) { yield }
+      end
+
+      private
+
+      def turntable_define_cluster_methods(cluster_name)
+        turntable_define_cluster_class_methods(cluster_name)
+      end
+
+      def turntable_define_cluster_class_methods(cluster_name)
+        (class << ActiveRecord::Base; self; end).class_eval <<-EOD
+          unless respond_to?(:#{cluster_name}_transaction)
+            def #{cluster_name}_transaction(shards = [], options = {})
+              cluster = turntable_clusters[#{cluster_name.inspect}].values.first
+              cluster.shards_transaction(shards, options) { yield }
+            end
+          end
+
+          unless respond_to?(:all_cluster_transaction)
+            def all_cluster_transaction(options = {})
+              clusters = turntable_clusters.values.map { |v| v.values.first }
+              recursive_cluster_transaction(clusters) { yield }
+            end
+
+            def recursive_cluster_transaction(clusters, options = {}, &block)
+              current_cluster = clusters.shift
+              current_cluster.shards_transaction do
+                if clusters.present?
+                  recursive_cluster_transaction(clusters, options, &block)
+                else
+                  yield
+                end
+              end
+            end
+          end
+        EOD
       end
     end
 

@@ -17,42 +17,17 @@ module ActiveRecord::Turntable
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
     end
 
-    delegate :logger, :to => ActiveRecord::Base
+    delegate :logger, to: ActiveRecord::Base
+
+    delegate :shards_transaction, to: :cluster
 
     delegate :create_table, :rename_table, :drop_table, :add_column, :remove_colomn,
       :change_column, :change_column_default, :rename_column, :add_index,
       :remove_index, :initialize_schema_information,
-      :dump_schema_information, :execute_ignore_duplicate, :to => :master_connection
+      :dump_schema_information, :execute_ignore_duplicate, to: :master_connection
 
     def transaction(options = {}, &block)
       connection.transaction(options, &block)
-    end
-
-    def shards_transaction(shards, options = {}, in_recursion = false, &block)
-      shards = in_recursion ? shards : Array.wrap(shards).dup
-      shard_or_object = shards.shift
-      shard = to_shard(shard_or_object)
-      if shards.present?
-        shard.connection.transaction(options) do
-          shards_transaction(shards, options, true, &block)
-        end
-      else
-        shard.connection.transaction(options) do
-          block.call
-        end
-      end
-    end
-
-    def to_shard(shard_or_object)
-      case shard_or_object
-      when ActiveRecord::Turntable::Shard
-        shard_or_object
-      when ActiveRecord::Base
-        shard_or_object.turntable_shard
-      else
-        raise ActiveRecord::Turntable::Error,
-                "transaction cannot call to object: #{shard_or_object}"
-      end
     end
 
     def cache
