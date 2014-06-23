@@ -12,8 +12,6 @@ module ActiveRecord::Turntable
       @cluster      =  cluster
       @model_class  =  cluster.klass
       @default_current_shard =  (cluster.master || cluster.shards.first[1])
-      Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
-      Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
     end
 
@@ -85,11 +83,11 @@ module ActiveRecord::Turntable
     end
 
     def fixed_shard
-      Thread.current[:turntable_fixed_shard][object_id]
+      fixed_shard_entry[object_id]
     end
 
     def fixed_shard=(shard)
-      Thread.current[:turntable_fixed_shard][object_id] = shard
+      fixed_shard_entry[object_id] = shard
     end
 
     def master
@@ -105,12 +103,12 @@ module ActiveRecord::Turntable
     end
 
     def current_shard
-      Thread.current[:turntable_current_shard][object_id] ||= @default_current_shard
+      current_shard_entry[object_id] ||= @default_current_shard
     end
 
     def current_shard=(shard)
       logger.debug { "Chainging #{@model_class}'s shard to #{shard.name}"}
-      Thread.current[:turntable_current_shard][object_id] = shard
+      current_shard_entry[object_id] = shard
     end
 
     def connection
@@ -217,6 +215,16 @@ module ActiveRecord::Turntable
 
     def spec
       @spec ||= master.connection_pool.spec
+    end
+
+    private
+
+    def fixed_shard_entry
+      Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
+    end
+
+    def current_shard_entry
+      Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
     end
   end
 end
