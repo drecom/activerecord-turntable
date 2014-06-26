@@ -30,7 +30,7 @@ module ActiveRecord::Turntable
       begin
         tree = SQLTree[binded_query]
       rescue Exception => err
-        logger.warn { "[ActiveRecord::Turntable][BUG] Error on Parsing SQL: #{binded_query}, on_method: #{method_name}" }
+        logger.warn { "[ActiveRecord::Turntable] Error on Parsing SQL: #{binded_query}, on_method: #{method_name}" }
         raise err
       end
 
@@ -48,7 +48,7 @@ module ActiveRecord::Turntable
                            method, query, *args, &block)
       end
     rescue Exception => err
-      logger.warn { "[ActiveRecord::Turntable][BUG] Error on Building Fader: #{binded_query}, on_method: #{method_name}" }
+      logger.warn { "[ActiveRecord::Turntable] Error on Building Fader: #{binded_query}, on_method: #{method_name}" }
       raise err
     end
 
@@ -93,7 +93,7 @@ module ActiveRecord::Turntable
         []
       else
         raise ActiveRecord::Turntable::UnknownOperatorError,
-          "[ActiveRecord::Turntable][BUG] Found Unknown SQL Operator:'#{tree.operator if tree.respond_to?(:operaor)}', Please report this bug."
+          "[ActiveRecord::Turntable] Found Unknown SQL Operator:'#{tree.operator if tree.respond_to?(:operaor)}', Please report this bug."
       end
     end
 
