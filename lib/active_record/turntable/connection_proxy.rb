@@ -107,7 +107,7 @@ module ActiveRecord::Turntable
     end
 
     def current_shard=(shard)
-      logger.debug { "Chainging #{@model_class}'s shard to #{shard.name}"}
+      logger.debug { "Changing #{@model_class}'s shard to #{shard.name}"}
       current_shard_entry[object_id] = shard
     end
 
