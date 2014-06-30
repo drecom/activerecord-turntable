@@ -138,6 +138,12 @@ module ActiveRecord::Turntable
         return Fader::SpecifiedShard.new(@proxy,
                                          { @proxy.cluster.shard_for(shard_keys.first) => query },
                                          method, query, *args, &block)
+      elsif SQLTree::Node::SelectDeclaration === tree.select.first and
+              tree.select.first.to_sql == '1 AS "one"'  # for `SELECT 1 AS one` (AR::Base.exists?)
+        return Fader::SelectShardsMergeResult.new(@proxy,
+                                                  build_shards_with_same_query(@proxy.shards.values, query),
+                                                  method, query, *args, &block
+                                                  )
       elsif tree.group_by or tree.order_by or tree.limit.try(:value).to_i > 0
         raise CannotSpecifyShardError, "cannot specify shard for query: #{query}"
       elsif shard_keys.present?
