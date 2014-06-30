@@ -145,7 +145,7 @@ module ActiveRecord::Turntable
                                                   method, query, *args, &block
                                                   )
       elsif tree.group_by or tree.order_by or tree.limit.try(:value).to_i > 0
-        raise CannotSpecifyShardError, "cannot specify shard for query: #{query}"
+        raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
       elsif shard_keys.present?
         if SQLTree::Node::SelectDeclaration === tree.select.first and
             SQLTree::Node::CountAggregrate === tree.select.first.expression
@@ -173,7 +173,7 @@ module ActiveRecord::Turntable
                                                     method, query, *args, &block
                                                     )
         else
-          raise CannotSpecifyShardError, "cannot specify shard for query: #{query}"
+          raise CannotSpecifyShardError, "cannot specify shard for query: #{query.to_sql}"
         end
       end
     end

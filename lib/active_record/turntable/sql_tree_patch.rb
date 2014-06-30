@@ -46,7 +46,7 @@ module SQLTree::Node
       sql << " GROUP BY " << group_by.map { |g| g.to_sql(options) }.join(', ') if group_by
       sql << " ORDER BY " << order_by.map { |o| o.to_sql(options) }.join(', ') if order_by
       sql << " HAVING "   << having.to_sql(options) if having
-      sql << " LIMIT "    << limit.map {|f| f.to_sql(options) }.join(', ') if limit
+      sql << " LIMIT "    << Array(limit).map {|f| f.to_sql(options) }.join(', ') if limit
       sql << " OFFSET "   << offset.to_sql(options) if offset
       return sql
     end
