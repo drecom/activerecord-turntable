@@ -161,6 +161,10 @@ module ActiveRecord::Turntable
       else # scan all shards
         if SQLTree::Node::SelectDeclaration === tree.select.first and
             SQLTree::Node::CountAggregrate === tree.select.first.expression
+
+          if raise_on_not_specified_shard_query?
+            raise CannotSpecifyShardError, "[Performance Notice] PLEASE FIX: #{query.to_sql}"
+          end
           return Fader::CalculateShardsSumResult.new(@proxy,
                                                      build_shards_with_same_query(@proxy.shards.values, query),
                                                      method, query, *args, &block)
@@ -168,6 +172,9 @@ module ActiveRecord::Turntable
             SQLTree::Node::Expression::Value === tree.select.first.expression or
             SQLTree::Node::Expression::Variable === tree.select.first.expression
 
+          if raise_on_not_specified_shard_query?
+            raise CannotSpecifyShardError, "[Performance Notice] PLEASE FIX: #{query.to_sql}"
+          end
           return Fader::SelectShardsMergeResult.new(@proxy,
                                                     build_shards_with_same_query(@proxy.shards.values, query),
                                                     method, query, *args, &block
@@ -210,6 +217,10 @@ module ActiveRecord::Turntable
         shards_with_query[@proxy.cluster.shard_for(k)] = sql
       end
       Fader::InsertShardsMergeResult.new(@proxy, shards_with_query, method, query, *args, &block)
+    end
+
+    def raise_on_not_specified_shard_query?
+      ActiveRecord::Base.turntable_config[:raise_on_not_specified_shard_query]
     end
   end
 end
