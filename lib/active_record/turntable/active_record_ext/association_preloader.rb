@@ -11,13 +11,21 @@ module ActiveRecord::Turntable
 
       def records_for_with_turntable(ids)
         returning_scope = records_for_without_turntable(ids)
-        if sharded_by_same_key? && owners_have_same_shard_key?
-          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.first.send(klass.turntable_shard_key))
+        if should_use_shard_key? && owners_have_same_shard_key?
+          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.first.send(foreign_shard_key))
         end
         returning_scope
       end
 
       private
+
+      def foreign_shard_key
+        options[:foreign_shard_key] || model.turntable_shard_key
+      end
+
+      def should_use_shard_key?
+        sharded_by_same_key? || !!options[:foreign_shard_key]
+      end
 
       def sharded_by_same_key?
         model.turntable_enabled? &&
@@ -26,7 +34,7 @@ module ActiveRecord::Turntable
       end
 
       def owners_have_same_shard_key?
-        owners.map(&klass.turntable_shard_key).uniq.size == 1
+        owners.map(&foreign_shard_key).uniq.size == 1
       end
     end
   end
