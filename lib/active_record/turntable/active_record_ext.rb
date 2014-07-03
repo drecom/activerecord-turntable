@@ -15,6 +15,7 @@ module ActiveRecord::Turntable
       autoload :Transactions
       autoload :AssociationPreloader
       autoload :Association
+      autoload :LockingOptimistic
     end
 
     included do
@@ -23,6 +24,7 @@ module ActiveRecord::Turntable
       ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, AbstractAdapter)
       ActiveRecord::LogSubscriber.send(:include, LogSubscriber)
       ActiveRecord::Persistence.send(:include, Persistence)
+      ActiveRecord::Locking::Optimistic.send(:include, LockingOptimistic)
       ActiveRecord::Relation.send(:include, CleverLoad, Relation)
       ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
       ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
