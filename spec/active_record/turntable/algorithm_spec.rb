@@ -12,6 +12,14 @@ describe ActiveRecord::Turntable::Algorithm do
         expect(algorithm.calculate(1)).to eq("user_shard_1")
       end
 
+      it "called with 19999 returns user_shard_1" do
+        expect(algorithm.calculate(19999)).to eq("user_shard_1")
+      end
+
+      it "called with 20000 returns user_shard_2" do
+        expect(algorithm.calculate(20000)).to eq("user_shard_2")
+      end
+
       it "called with 100000 returns user_shard_3" do
         expect(algorithm.calculate(100000)).to eq("user_shard_3")
       end
@@ -41,6 +49,14 @@ describe ActiveRecord::Turntable::Algorithm do
     context "#calculate" do
       it "called with 1 returns user_shard_1" do
         expect(algorithm.calculate(1)).to eq("user_shard_1")
+      end
+
+      it "called with 19999 returns user_shard_1" do
+        expect(algorithm.calculate(19999)).to eq("user_shard_1")
+      end
+
+      it "called with 20000 returns user_shard_2" do
+        expect(algorithm.calculate(20000)).to eq("user_shard_2")
       end
 
       it "called with 100000 returns user_shard_3" do
