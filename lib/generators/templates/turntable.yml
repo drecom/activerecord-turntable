@@ -8,7 +8,7 @@ development:
       algorithm: range_bsearch
       seq:
         user_seq:
-          connection: user_seq_1
+          connection: user_seq
       shards:
         - connection: user_shard_1
           less_than: 100
@@ -23,7 +23,7 @@ test:
       algorithm: range_bsearch
       seq:
         user_seq:
-          connection: user_seq_1
+          connection: user_seq
       shards:
         - connection: user_shard_1
           less_than: 20000
@@ -38,7 +38,7 @@ production:
       algorithm: range_bsearch
       seq:
         user_seq:
-          connection: user_seq_1
+          connection: user_seq
       shards:
         - connection: user_shard_1
           less_than: 20000
