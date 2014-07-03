@@ -74,44 +74,51 @@ module ActiveRecord::Turntable::ActiveRecordExt
         relation
       end
 
-      if ActiveRecord::VERSION::STRING < "4.1"
-        def update_record(attribute_names = @attributes.keys)
-          attributes_with_values = arel_attributes_with_values_for_update(attribute_names)
-          if attributes_with_values.empty?
-            0
-          else
-            klass = self.class
-            column_hash = klass.connection.schema_cache.columns_hash klass.table_name
-            db_columns_with_values = attributes_with_values.map { |attr,value|
-              real_column = column_hash[attr.name]
-              [real_column, value]
-            }
-            bind_attrs = attributes_with_values.dup
-            bind_attrs.keys.each_with_index do |column, i|
-              real_column = db_columns_with_values[i].first
-              bind_attrs[column] = klass.connection.substitute_at(real_column, i)
+      ar_version = ActiveRecord::VERSION::STRING
+      if ar_version < "4.1"
+        method_name = ar_version < "4.0.6" ? "update_record" : "_update_record"
+        class_eval <<-EOD
+          def #{method_name}(attribute_names = @attributes.keys)
+            attributes_with_values = arel_attributes_with_values_for_update(attribute_names)
+            if attributes_with_values.empty?
+              0
+            else
+              klass = self.class
+              column_hash = klass.connection.schema_cache.columns_hash klass.table_name
+              db_columns_with_values = attributes_with_values.map { |attr,value|
+                real_column = column_hash[attr.name]
+                [real_column, value]
+              }
+              bind_attrs = attributes_with_values.dup
+              bind_attrs.keys.each_with_index do |column, i|
+                real_column = db_columns_with_values[i].first
+                bind_attrs[column] = klass.connection.substitute_at(real_column, i)
+              end
+              condition_scope = klass.unscoped.where(klass.arel_table[klass.primary_key].eq(id_was || id))
+              if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+                condition_scope = condition_scope.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+              end
+              stmt = condition_scope.arel.compile_update(bind_attrs)
+              klass.connection.update stmt, 'SQL', db_columns_with_values
             end
-            condition_scope = klass.unscoped.where(klass.arel_table[klass.primary_key].eq(id_was || id))
-            if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-              condition_scope = condition_scope.where(klass.turntable_shard_key => self.send(turntable_shard_key))
-            end
-            stmt = condition_scope.arel.compile_update(bind_attrs)
-            klass.connection.update stmt, 'SQL', db_columns_with_values
           end
-        end
+        EOD
       else
-        def update_record(attribute_names = @attributes.keys)
-          klass = self.class
-          attributes_values = arel_attributes_with_values_for_update(attribute_names)
-          if attributes_values.empty?
-            0
-          else
-            scope = if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-              klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+        method_name = ar_version < "4.1.2" ? "update_record" : "_update_record"
+        class_eval <<-EOD
+          def #{method_name}(attribute_names = @attributes.keys)
+            klass = self.class
+            attributes_values = arel_attributes_with_values_for_update(attribute_names)
+            if attributes_values.empty?
+              0
+            else
+              scope = if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+                klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+              end
+              klass.unscoped.#{method_name} attributes_values, id, id_was, scope
             end
-            klass.unscoped.update_record attributes_values, id, id_was, scope
           end
-        end
+        EOD
       end
     end
   end
