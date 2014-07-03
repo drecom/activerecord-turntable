@@ -43,7 +43,7 @@ namespace :turntable do
       ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
 
       configurations = [ActiveRecord::Base.configurations[RAILS_ENV]]
-      configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).values.uniq
+      configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).map {|v| v[1]}.flatten.uniq
 
       configurations.each do |configuration|
         ActiveRecord::Base.establish_connection configuration
