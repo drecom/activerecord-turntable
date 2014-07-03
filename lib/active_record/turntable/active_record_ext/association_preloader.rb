@@ -11,8 +11,8 @@ module ActiveRecord::Turntable
 
       def records_for_with_turntable(ids)
         returning_scope = records_for_without_turntable(ids)
-        if should_use_shard_key? && owners_have_same_shard_key?
-          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.first.send(foreign_shard_key))
+        if should_use_shard_key?
+          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.map(&foreign_shard_key).uniq)
         end
         returning_scope
       end
@@ -31,10 +31,6 @@ module ActiveRecord::Turntable
         model.turntable_enabled? &&
           klass.turntable_enabled? &&
           model.turntable_shard_key == klass.turntable_shard_key
-      end
-
-      def owners_have_same_shard_key?
-        owners.map(&foreign_shard_key).uniq.size == 1
       end
     end
   end
