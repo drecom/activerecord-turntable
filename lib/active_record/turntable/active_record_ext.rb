@@ -35,6 +35,7 @@ module ActiveRecord::Turntable
       require 'active_record/turntable/active_record_ext/fixtures'
       require 'active_record/turntable/active_record_ext/migration_proxy'
       require 'active_record/turntable/active_record_ext/activerecord_import_ext'
+      require 'active_record/turntable/active_record_ext/acts_as_archive_extension'
     end
   end
 end

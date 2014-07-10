@@ -120,6 +120,8 @@ module ActiveRecord::Turntable
     end
 
     def with_shard(shard)
+      shard = cluster.to_shard(shard)
+
       old_shard, old_fixed = current_shard, fixed_shard
       self.current_shard = shard
       self.fixed_shard = shard

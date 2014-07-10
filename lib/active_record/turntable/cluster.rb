@@ -93,6 +93,8 @@ module ActiveRecord::Turntable
         shard_or_object.turntable_shard
       when Numeric, String
         shard_for(shard_or_object)
+      when Symbol
+        shards[shard_or_object]
       else
         binding.pry
         raise ActiveRecord::Turntable::TurntableError,
