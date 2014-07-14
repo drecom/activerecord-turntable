@@ -1,11 +1,13 @@
 module ActiveRecord::Turntable
   class Sequencer
     class Barrage < Sequencer
+      @@unique_barrage_instance = {}
+
       def initialize(klass, options = {})
         require 'barrage'
         @klass = klass
         @options = options["options"]
-        @barrage = ::Barrage.new(@options)
+        @barrage = get_barrage_instance
       end
 
       def next_sequence_value(sequence_name)
@@ -14,6 +16,12 @@ module ActiveRecord::Turntable
 
       def current_sequence_value(sequence_name)
         @barrage.current
+      end
+
+      private
+
+      def get_barrage_instance
+        @@unique_barrage_instance[@options] ||= ::Barrage.new(@options)
       end
     end
   end
