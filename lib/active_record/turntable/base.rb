@@ -68,7 +68,6 @@ module ActiveRecord::Turntable
         cp = turntable_cluster.connection_proxy
         pp = PoolProxy.new(cp)
         ch.class_to_pool.clear if defined?(ch.class_to_pool)
-        ch.send(:owner_to_pool)[name].try(:disconnect!)
         ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
       end
 
