@@ -4,7 +4,7 @@
 require 'active_record/fixtures'
 module ActiveRecord
   class FixtureSet
-    def self.create_fixtures(fixtures_directory, table_names, class_names = {})
+    def self.create_fixtures(fixtures_directory, table_names, class_names = {}, config = ActiveRecord::Base)
       fixture_set_names = Array(fixture_set_names).map(&:to_s)
       class_names = class_names.stringify_keys
 
@@ -61,7 +61,7 @@ module ActiveRecord
   end
 
   module TestFixtures
-    def setup_fixtures
+    def setup_fixtures(config = ActiveRecord::Base)
       return unless !ActiveRecord::Base.configurations.blank?
 
       if pre_loaded_fixtures && !use_transactional_fixtures
@@ -77,7 +77,7 @@ module ActiveRecord
         if @@already_loaded_fixtures[self.class]
           @loaded_fixtures = @@already_loaded_fixtures[self.class]
         else
-          @loaded_fixtures = load_fixtures
+          @loaded_fixtures = turntable_load_fixtures(config)
           @@already_loaded_fixtures[self.class] = @loaded_fixtures
         end
         ActiveRecord::Base.force_connect_all_shards!
@@ -89,11 +89,11 @@ module ActiveRecord
       else
         ActiveRecord::Fixtures.reset_cache
         @@already_loaded_fixtures[self.class] = nil
-        @loaded_fixtures = load_fixtures
+        @loaded_fixtures = turntable_load_fixtures(config)
       end
 
       # Instantiate fixtures for every test if requested.
-      instantiate_fixtures if use_instantiated_fixtures
+      turntable_instantiate_fixtures(config) if use_instantiated_fixtures
     end
 
     def enlist_fixture_connections
@@ -116,5 +116,28 @@ module ActiveRecord
 
       ActiveRecord::Base.clear_active_connections!
     end
+
+    private
+
+    def turntable_load_fixtures(config)
+      if ActiveRecord::Turntable.rails41_later?
+        load_fixtures(config)
+      elsif ActiveRecord::Turntable.rails4?
+        load_fixtures
+      else
+        raise NotImplementedError
+      end
+    end
+
+    def turntable_instantiate_fixtures(config)
+      if ActiveRecord::Turntable.rails41_later?
+        instantiate_fixtures(config)
+      elsif ActiveRecord::Turntable.rails4?
+        instantiate_fixtures
+      else
+        raise NotImplementedError
+      end
+    end
+
   end
 end
