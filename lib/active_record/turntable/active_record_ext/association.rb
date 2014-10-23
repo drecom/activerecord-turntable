@@ -25,7 +25,9 @@ module ActiveRecord::Turntable
           if should_use_shard_key?
             current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
           end
-          current_scope.first.tap { |record| set_inverse_instance(record) }
+          if record = current_scope.take
+            set_inverse_instance record
+          end
         end
       end
 
