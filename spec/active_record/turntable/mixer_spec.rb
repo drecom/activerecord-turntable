@@ -6,7 +6,7 @@ describe ActiveRecord::Turntable::Mixer do
   end
 
   before do
-    establish_connection_to("test")
+    establish_connection_to(:test)
     truncate_shard
     @cluster = ActiveRecord::Turntable::Cluster.new(User, ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
     @connection_proxy = ActiveRecord::Turntable::ConnectionProxy.new(@cluster)

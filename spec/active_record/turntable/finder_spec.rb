@@ -7,7 +7,7 @@ describe "ActiveRecord::FinderMethods" do
 
   context "User insert with id" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       ActiveRecord::Base.logger = Logger.new(STDOUT)
       @user = User.new
@@ -24,4 +24,3 @@ describe "ActiveRecord::FinderMethods" do
     end
   end
 end
-

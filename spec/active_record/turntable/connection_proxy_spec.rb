@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When initialized" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
     end
     let(:cluster) { ActiveRecord::Turntable::Cluster.new(User, ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
@@ -27,7 +27,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "User insert with id" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       ActiveRecord::Base.logger = Logger.new(STDOUT)
     end
@@ -74,7 +74,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When have no users" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
     end
 
@@ -89,7 +89,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When have 2 Users in different shards" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -129,7 +129,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling with_all" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -176,7 +176,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -194,7 +194,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with non-existed shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -212,7 +212,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with non shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -230,7 +230,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with non-existed non shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -248,7 +248,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "#table_exists?" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1

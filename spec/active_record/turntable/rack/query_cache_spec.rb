@@ -6,7 +6,7 @@ describe ActiveRecord::Turntable::Rack::QueryCache do
   end
 
   before do
-    establish_connection_to("test")
+    establish_connection_to(:test)
     truncate_shard
   end
 

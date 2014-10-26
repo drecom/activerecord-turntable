@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::Cluster do
 
   context "When initialized" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
     end
 

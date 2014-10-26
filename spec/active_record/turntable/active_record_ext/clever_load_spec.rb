@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
   end
 
   before(:each) do
-    establish_connection_to("test")
+    establish_connection_to(:test)
     truncate_shard
 
     @user1 = User.new({:nickname => 'user1'})
