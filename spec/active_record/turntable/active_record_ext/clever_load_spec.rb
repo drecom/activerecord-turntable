@@ -18,16 +18,12 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
     @user2.id = 2
     @user2.save
     @user2_status = @user2.create_user_status(:hp => 20, :mp => 10)
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
   end
 
   context "When a model has has_one relation" do
     context "When call clever_load!" do
       before(:each) do
-        @strio = StringIO.new
-        ActiveRecord::Base.logger = Logger.new(@strio)
         @users = User.clever_load!(:user_status)
-        puts @strio.string
       end
 
       it "should target loaded" do
@@ -45,11 +41,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
   context "When a model has belongs_to relation" do
     context "When call clever_load!" do
       before(:each) do
-        @strio = StringIO.new
-        @strio = StringIO.new
-        ActiveRecord::Base.logger = Logger.new(@strio)
         @user_statuses = UserStatus.clever_load!(:user)
-        puts @strio.string
       end
 
       it "should target loaded" do
