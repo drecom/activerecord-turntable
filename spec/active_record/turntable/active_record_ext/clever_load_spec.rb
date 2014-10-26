@@ -33,7 +33,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       end
 
       it "should assigned reverse relation" do
-        skip "should be implemented"
+        expect(@users).to all(satisfy { |u|
+          u.user_status.association(:user).loaded?
+        })
       end
     end
   end
@@ -51,7 +53,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       end
 
       it "should assigned reverse relation" do
-        skip "should be implemented"
+        expect(@user_statuses).to all(satisfy { |us|
+          us.user.association(:user_status).loaded?
+        })
       end
     end
   end
