@@ -12,7 +12,7 @@ module TurntableHelper
       Object.const_set('RAILS_ENV', env.to_s)
       Object.const_set('Rails', Object.new)
       allow(Rails).to receive(:env) { ActiveSupport::StringInquirer.new(RAILS_ENV) }
-      ActiveRecord::Base.logger = Logger.new(STDOUT)
+      ActiveRecord::Base.logger = Logger.new("/dev/null")
     }
     ActiveRecord::Base.establish_connection(env)
   end

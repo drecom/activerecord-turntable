@@ -9,7 +9,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   before(:each) do
     establish_connection_to(:test)
     truncate_shard
+  end
+
+  around(:each) do |example|
+    old = ActiveRecord::Base.logger
     ActiveRecord::Base.logger = Logger.new(STDOUT)
+    example.run
+    ActiveRecord::Base.logger = old
   end
 
   let(:user) {
