@@ -4,7 +4,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
     included do
       class << ActiveRecord::Base
-        delegate :clever_load!, :to => :scoped
+        delegate :clever_load!, :to => :all
       end
     end
 
