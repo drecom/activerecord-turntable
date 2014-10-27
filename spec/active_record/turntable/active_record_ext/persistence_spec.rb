@@ -130,10 +130,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect {
-        user_status.reload
-      }.to_not raise_error
-      puts strio.string
+      expect { user_status.reload }.to_not raise_error
 
       expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
