@@ -20,10 +20,8 @@ module ActiveRecord::Turntable
     cattr_reader :sequences, :tables
 
     def self.build(klass, sequence_name = nil)
-      unless sequence_name
-        sequence_name = ActiveRecord::Base.turntable_config["clusters"][klass.turntable_cluster_name.to_s]["seq"]["connection"]
-      end
-      seq_config = ActiveRecord::Base.configurations[Rails.env]["seq"][sequence_name.to_s]
+      sequence_name ||= current_cluster_config_for(klass)["seq"].keys.first
+      seq_config = current_cluster_config_for(klass)["seq"][sequence_name]
       seq_type = (seq_config["seq_type"] ? seq_config["seq_type"].to_sym : :mysql)
       @@tables[klass.table_name] ||= (@@sequences[sequence_name(klass.table_name, klass.primary_key)] ||= @@sequence_types[seq_type].new(klass, seq_config))
     end
@@ -46,6 +44,12 @@ module ActiveRecord::Turntable
 
     def current_sequence_value
       raise ActiveRecord::Turntable::NotImplementedError
+    end
+
+    private
+
+    def self.current_cluster_config_for(klass)
+      ActiveRecord::Base.turntable_config["clusters"][klass.turntable_cluster_name.to_s]
     end
   end
 end
