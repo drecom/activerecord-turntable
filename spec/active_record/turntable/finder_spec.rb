@@ -9,7 +9,6 @@ describe "ActiveRecord::FinderMethods" do
     before do
       establish_connection_to(:test)
       truncate_shard
-      ActiveRecord::Base.logger = Logger.new(STDOUT)
       @user = User.new
       @user.id = 1
       @user.save

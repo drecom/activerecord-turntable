@@ -21,13 +21,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     before do
       establish_connection_to(:test)
       truncate_shard
-      ActiveRecord::Base.logger = Logger.new(STDOUT)
     end
 
     it "should be saved to user_shard_1 with id = 1" do
       user = User.new
       user.id = 1
-      # mock(User.turntable_cluster).select_shard(1) { User.turntable_cluster.shards[:user_shard_1] }
       expect {
         user.save!
       }.not_to raise_error
@@ -36,7 +34,6 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     it "should be saved to user_shard_2 with id = 30000" do
       user = User.new
       user.id = 30000
-      # mock(User.turntable_cluster).select_shard(30000) { User.turntable_cluster.shards[:user_shard_2] }
       expect {
         user.save!
       }.not_to raise_error
@@ -46,12 +43,10 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       user = User.new
       user.id = 30000
       user.nickname = "hogehgoge'00"
-      # mock(User.turntable_cluster).select_shard(30000) { User.turntable_cluster.shards[:user_shard_2] }
       expect {
         user.save!
       }.not_to raise_error
       user.reload
-
     end
 
     it "should should be saved the same string when includes escaped string" do
