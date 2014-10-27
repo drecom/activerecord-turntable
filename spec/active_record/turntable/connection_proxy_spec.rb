@@ -10,9 +10,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       establish_connection_to(:test)
       truncate_shard
     end
+
     let(:cluster) { ActiveRecord::Turntable::Cluster.new(User, ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
     subject { ActiveRecord::Turntable::ConnectionProxy.new(cluster) }
-    its(:master_connection) { should == ActiveRecord::Base.connection }
+
+    its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
   context "User insert with id" do
