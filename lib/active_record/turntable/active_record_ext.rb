@@ -1,16 +1,19 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     extend ActiveSupport::Concern
+    extend ActiveSupport::Autoload
 
-    autoload :AbstractAdapter, 'active_record/turntable/active_record_ext/abstract_adapter'
-    autoload :CleverLoad, 'active_record/turntable/active_record_ext/clever_load'
-    autoload :ConnectionHandlerExtension, 'active_record/turntable/active_record_ext/connection_handler_extension'
-    autoload :LogSubscriber, 'active_record/turntable/active_record_ext/log_subscriber'
-    autoload :Persistence, 'active_record/turntable/active_record_ext/persistence'
-    autoload :SchemaDumper, 'active_record/turntable/active_record_ext/schema_dumper'
-    autoload :Sequencer, 'active_record/turntable/active_record_ext/sequencer'
-    autoload :Relation, 'active_record/turntable/active_record_ext/relation'
-    autoload :Transactions, 'active_record/turntable/active_record_ext/transactions'
+    eager_autoload do
+      autoload :AbstractAdapter
+      autoload :CleverLoad
+      autoload :ConnectionHandlerExtension
+      autoload :LogSubscriber
+      autoload :Persistence
+      autoload :SchemaDumper
+      autoload :Sequencer
+      autoload :Relation
+      autoload :Transactions
+    end
 
     included do
       include Transactions

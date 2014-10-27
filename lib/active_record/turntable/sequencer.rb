@@ -5,9 +5,13 @@
 
 module ActiveRecord::Turntable
   class Sequencer
-    autoload :Api, "active_record/turntable/sequencer/api"
-    autoload :Mysql, "active_record/turntable/sequencer/mysql"
-    autoload :Barrage, "active_record/turntable/sequencer/barrage"
+    extend ActiveSupport::Autoload
+
+    eager_autoload do
+      autoload :Api
+      autoload :Mysql
+      autoload :Barrage
+    end
 
     @@sequence_types = {
       :api => Api,

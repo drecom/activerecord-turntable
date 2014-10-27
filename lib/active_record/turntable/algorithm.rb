@@ -1,7 +1,11 @@
 module ActiveRecord::Turntable
   module Algorithm
-    autoload :Base, "active_record/turntable/algorithm/base"
-    autoload :RangeAlgorithm, "active_record/turntable/algorithm/range_algorithm"
-    autoload :RangeBsearchAlgorithm, "active_record/turntable/algorithm/range_bsearch_algorithm"
+    extend ActiveSupport::Autoload
+
+    eager_autoload do
+      autoload :Base
+      autoload :RangeAlgorithm
+      autoload :RangeBsearchAlgorithm
+    end
   end
 end

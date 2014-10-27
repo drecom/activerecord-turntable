@@ -2,16 +2,18 @@
 module ActiveRecord::Turntable
   class Mixer
     class Fader
-      # 単数shard
-      autoload :SpecifiedShard, "active_record/turntable/mixer/fader/specified_shard"
+      extend ActiveSupport::Autoload
 
-      # 複数shard
-      autoload :SelectShardsMergeResult, "active_record/turntable/mixer/fader/select_shards_merge_result"
-      autoload :InsertShardsMergeResult, "active_record/turntable/mixer/fader/insert_shards_merge_result"
-      autoload :UpdateShardsMergeResult, "active_record/turntable/mixer/fader/update_shards_merge_result"
-
-      # count
-      autoload :CalculateShardsSumResult, "active_record/turntable/mixer/fader/calculate_shards_sum_result"
+      eager_autoload do
+        # single shard
+        autoload :SpecifiedShard
+        # multiple shard merging
+        autoload :SelectShardsMergeResult
+        autoload :InsertShardsMergeResult
+        autoload :UpdateShardsMergeResult
+        # calcurations
+        autoload :CalculateShardsSumResult
+      end
 
       attr_reader :shards_query_hash
       attr_reader :called_method

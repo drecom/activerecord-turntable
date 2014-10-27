@@ -3,7 +3,12 @@ require 'active_record/turntable/sql_tree_patch'
 
 module ActiveRecord::Turntable
   class Mixer
-    autoload :Fader, "active_record/turntable/mixer/fader"
+    extend ActiveSupport::Autoload
+
+    eager_autoload do
+      autoload :Fader
+    end
+
     delegate :logger, :to => ActiveRecord::Base
 
     NOT_USED_FOR_SHARDING_OPERATORS_REGEXP = /\A(NOT IN|IS|IS NOT|BETWEEN|LIKE|\!\=|<<|>>|<>|>\=|<=|[\*\+\-\/\%\|\&><])\z/
