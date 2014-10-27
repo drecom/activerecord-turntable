@@ -6,7 +6,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   end
 
   before(:each) do
-    establish_connection_to("test")
+    establish_connection_to(:test)
     truncate_shard
 
     @user = User.new({:nickname => 'user1'})
