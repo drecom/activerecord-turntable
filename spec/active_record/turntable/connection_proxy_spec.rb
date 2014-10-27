@@ -15,16 +15,6 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     its(:master_connection) { should == ActiveRecord::Base.connection }
   end
 
-  context "AR3.1" do
-    it "should proxies columns" do
-      skip "spec not implemented yet"
-    end
-
-    it "should proxies columns_hash" do
-      skip "spec not implemented yet"
-    end
-  end
-
   context "User insert with id" do
     before do
       establish_connection_to(:test)
