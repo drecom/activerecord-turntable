@@ -2,7 +2,7 @@
 class User < ActiveRecord::Base
   # shard by surrogate_key
   turntable :user_cluster, :id
-  sequencer :user_seq_1
+  sequencer :user_seq
   has_one  :user_status
   has_many :cards_user
 end
@@ -10,7 +10,7 @@ end
 class UserStatus < ActiveRecord::Base
   # shard by other key
   turntable :user_cluster, :user_id
-  sequencer :user_seq_1
+  sequencer :user_seq
   belongs_to :user
 end
 
@@ -20,7 +20,7 @@ end
 
 class CardsUser < ActiveRecord::Base
   turntable :user_cluster, :user_id
-  sequencer :user_seq_1
+  sequencer :user_seq
 
   belongs_to :user
   belongs_to :card

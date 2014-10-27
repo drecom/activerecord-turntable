@@ -16,7 +16,7 @@ module ActiveRecord::Turntable
       @master_shard = MasterShard.new(klass)
 
       # setup sequencer
-      if (seq = (@options[:seq] || @config[:seq]))
+      if (seq = (@options[:seq] || @config[:seq])) && seq[:type] == :mysql
         @seq_shard = SeqShard.new(seq)
       end
 
@@ -59,7 +59,7 @@ module ActiveRecord::Turntable
       raise ActiveRecord::Turntable::CannotSpecifyShardError,
       "[#{klass}] cannot select_shard for key:#{key}"
     end
-    
+
     def select_shard(key)
       ActiveSupport::Deprecation.warn "Cluster#select_shard is deprecated, use shard_for() instead.", caller
       shard_for(key)

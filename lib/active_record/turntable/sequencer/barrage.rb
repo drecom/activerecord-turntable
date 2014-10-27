@@ -4,7 +4,7 @@ module ActiveRecord::Turntable
       def initialize(klass, options = {})
         require 'barrage'
         @klass = klass
-        @options = options
+        @options = options["options"]
         @barrage = ::Barrage.new(@options)
       end
 

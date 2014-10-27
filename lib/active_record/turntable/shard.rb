@@ -50,4 +50,3 @@ module ActiveRecord::Turntable
     end
   end
 end
-

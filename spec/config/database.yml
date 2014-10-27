@@ -1,45 +1,26 @@
-test:
+default: &default
   adapter: mysql2
   username: root
   password:
   host: localhost
   port: 3306
   encoding: utf8
-  database: turntable_master_test
+  database: turntable_test
+
+test:
+  <<: *default
+  database: turntable_test
   seq:
-    user_seq_1:
-      adapter: mysql2
-      username: root
-      password:
-      host: localhost
-      port: 3306
-      encoding: utf8
-      database: turntable_seq_test
-#     seq_type: api
-      api_host: localhost
-      api_port: 9292
+    user_seq:
+      <<: *default
+      database: turntable_user_seq_test
   shards:
     user_shard_1:
-      adapter: mysql2
-      username: root
-      password:
-      host: localhost
-      port: 3306
-      encoding: utf8
-      database: turntable1_test
+      <<: *default
+      database: turntable_user_shard_1_test
     user_shard_2:
-      adapter: mysql2
-      username: root
-      password:
-      host: localhost
-      port: 3306
-      encoding: utf8
-      database: turntable2_test
+      <<: *default
+      database: turntable_user_shard_2_test
     user_shard_3:
-      adapter: mysql2
-      username: root
-      password:
-      host: localhost
-      port: 3306
-      encoding: utf8
-      database: turntable3_test
+      <<: *default
+      database: turntable_user_shard_3_test
