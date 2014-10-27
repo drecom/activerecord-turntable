@@ -24,6 +24,7 @@ module ActiveRecord::Turntable
         include ConnectionHandlerExtension
       end
       require 'active_record/turntable/active_record_ext/fixtures'
+      require 'active_record/turntable/active_record_ext/migration_proxy'
     end
   end
 end

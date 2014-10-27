@@ -4,6 +4,33 @@ ActiveRecord::SchemaDumper.send(:include, ActiveRecord::Turntable::ActiveRecordE
 # TODO: implement schema:cache:xxxx
 
 db_namespace = namespace :db do
+  desc 'Create current turntable databases config/database.yml for the current Rails.env'
+  task :create => [:load_config] do
+    unless ENV['DATABASE_URL']
+      ActiveRecord::Tasks::DatabaseTasks.create_current_turntable_cluster
+    end
+  end
+
+  desc 'Drops current turntable databases for the current Rails.env'
+  task :drop => [:load_config] do
+    unless ENV['DATABASE_URL']
+      ActiveRecord::Tasks::DatabaseTasks.drop_current_turntable_cluster
+    end
+  end
+
+  desc "Migrate turntable databases (options: VERSION=x, VERBOSE=false, SCOPE=blog)."
+  task :migrate => [:environment, :load_config] do
+    ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+
+    ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+      puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+      ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil) do |migration|
+        migration.target_shard?(name)
+      end
+      db_namespace['_dump'].invoke
+    end
+  end
+
   namespace :schema do
     task :dump do
       require 'active_record/schema_dumper'
