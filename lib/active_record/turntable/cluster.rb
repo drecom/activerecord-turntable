@@ -53,11 +53,16 @@ module ActiveRecord::Turntable
       @connection_proxy
     end
 
-    def select_shard(key)
+    def shard_for(key)
       @shards[@algorithm.calculate(key)]
     rescue
       raise ActiveRecord::Turntable::CannotSpecifyShardError,
       "[#{klass}] cannot select_shard for key:#{key}"
+    end
+    
+    def select_shard(key)
+      ActiveSupport::Deprecation.warn "Cluster#select_shard is deprecated, use shard_for() instead.", caller
+      shard_for(key)
     end
 
     def weighted_shards(key = nil)
