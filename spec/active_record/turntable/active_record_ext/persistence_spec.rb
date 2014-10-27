@@ -40,6 +40,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       strio.string.should =~ /WHERE `users`\.`id` = #{user.id}[^\s]*$/
     end
 
+    it "should be saved to target_shard" do
+      expect(user).to be_saved_to(user.turntable_shard)
+    end
+
     it "should change updated_at when updating" do
       user.nickname = "fizzbuzz"
 

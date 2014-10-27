@@ -124,5 +124,9 @@ module ActiveRecord::Turntable
     def turntable_shard
       turntable_cluster.shard_for(self.send(turntable_shard_key))
     end
+
+    def with_shard(shard)
+      self.class.connection.with_shard(shard) { yield }
+    end
   end
 end
