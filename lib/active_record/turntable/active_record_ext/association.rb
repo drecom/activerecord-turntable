@@ -20,13 +20,23 @@ module ActiveRecord::Turntable
 
         private
 
-        def find_target_with_turntable
-          current_scope = scope
-          if should_use_shard_key?
-            current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
+        if ActiveRecord::Turntable.rails41_later?
+          def find_target_with_turntable
+            current_scope = scope
+            if should_use_shard_key?
+              current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
+            end
+            if record = current_scope.take
+              set_inverse_instance record
+            end
           end
-          if record = current_scope.take
-            set_inverse_instance record
+        else
+          def find_target_with_turntable
+            current_scope = scope
+            if should_use_shard_key?
+              current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
+            end
+            current_scope.take.tap { |record| set_inverse_instance(record) }
           end
         end
       end
