@@ -42,11 +42,7 @@ module ActiveRecord::Turntable
       end
       adapter_method = "#{config['adapter']}_connection"
 
-      if ActiveRecord::VERSION::STRING > "4.0"
-        ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
-      else
-        ActiveRecord::Base::ConnectionSpecification.new(config, adapter_method)
-      end
+      ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
     end
   end
 end
