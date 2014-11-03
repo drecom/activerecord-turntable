@@ -5,12 +5,18 @@ module ActiveRecord::Turntable
         if self.class.turntable_enabled?
           status = nil
           if self.new_record? and self.turntable_shard_key.to_s == self.class.primary_key and
-              self.id.nil? and connection.prefetch_primary_key?(self.class.table_name)
-            self.id = connection.next_sequence_value(self.class.sequence_name)
+              self.id.nil? and self.class.connection.prefetch_primary_key?(self.class.table_name)
+            self.id = self.class.connection.next_sequence_value(self.class.sequence_name)
           end
           self.class.connection.shards_transaction([self.turntable_shard]) do
             add_to_transaction
-            status = yield
+            begin
+              status = yield
+            rescue ActiveRecord::Rollback
+              @_start_transaction_state[:level] = (@_start_transaction_state[:level] || 0) - 1
+              status = nil
+            end
+
             raise ActiveRecord::Rollback unless status
           end
           status

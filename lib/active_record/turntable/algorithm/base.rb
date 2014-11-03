@@ -5,7 +5,7 @@ module ActiveRecord::Turntable::Algorithm
     end
 
     def calculate(key)
-      raise ActiveRecord::Turntable::NotImplementedError, "not implemented"
+      raise NotImplementedError, "not implemented"
     end
   end
 end

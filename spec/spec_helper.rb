@@ -2,6 +2,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rubygems'
 require 'bundler/setup'
+require 'rspec/its'
+require 'rspec/collection_matchers'
 
 require 'activerecord-turntable'
 require 'turntable_helper'
@@ -18,8 +20,6 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 RSpec.configure do |config|
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
-
-  config.mock_framework = :rr
 
   config.before(:each) do
   end

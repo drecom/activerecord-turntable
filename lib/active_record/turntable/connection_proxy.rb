@@ -11,47 +11,21 @@ module ActiveRecord::Turntable
     def initialize(cluster, options = {})
       @cluster      =  cluster
       @model_class  =  cluster.klass
-      @current_shard =  (cluster.master || cluster.shards.first[1])
-      @fixed_shard  = false
+      @default_current_shard =  (cluster.master || cluster.shards.first[1])
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
     end
 
-    delegate :logger, :to => ActiveRecord::Base
+    delegate :logger, to: ActiveRecord::Base
+
+    delegate :shards_transaction, to: :cluster
 
     delegate :create_table, :rename_table, :drop_table, :add_column, :remove_colomn,
       :change_column, :change_column_default, :rename_column, :add_index,
       :remove_index, :initialize_schema_information,
-      :dump_schema_information, :execute_ignore_duplicate, :to => :master_connection
+      :dump_schema_information, :execute_ignore_duplicate, to: :master_connection
 
     def transaction(options = {}, &block)
       connection.transaction(options, &block)
-    end
-
-    def shards_transaction(shards, options = {}, in_recursion = false, &block)
-      shards = in_recursion ? shards : Array.wrap(shards).dup
-      shard_or_object = shards.shift
-      shard = to_shard(shard_or_object)
-      if shards.present?
-        shard.connection.transaction(options) do
-          shards_transaction(shards, options, true, &block)
-        end
-      else
-        shard.connection.transaction(options) do
-          block.call
-        end
-      end
-    end
-
-    def to_shard(shard_or_object)
-      case shard_or_object
-      when ActiveRecord::Turntable::Shard
-        shard_or_object
-      when ActiveRecord::Base
-        shard_or_object.turntable_shard
-      else
-        raise ActiveRecord::Turntable::Error,
-                "transaction cannot call to object: #{shard_or_object}"
-      end
     end
 
     def cache
@@ -92,13 +66,8 @@ module ActiveRecord::Turntable
       end
     end
 
-    # for 3.2.2
     def to_sql(arel, binds = [])
-      if master.connection.method(:to_sql).arity < 0
-        master.connection.to_sql(arel, binds)
-      else
-        master.connection.to_sql(arel)
-      end
+      master.connection.to_sql(arel, binds)
     end
 
     def cluster
@@ -114,7 +83,11 @@ module ActiveRecord::Turntable
     end
 
     def fixed_shard
-      @fixed_shard
+      fixed_shard_entry[object_id]
+    end
+
+    def fixed_shard=(shard)
+      fixed_shard_entry[object_id] = shard
     end
 
     def master
@@ -130,29 +103,31 @@ module ActiveRecord::Turntable
     end
 
     def current_shard
-      @current_shard
+      current_shard_entry[object_id] ||= @default_current_shard
     end
 
     def current_shard=(shard)
-      logger.debug { "Chainging #{@model_class}'s shard to #{shard.name}"}
-      @current_shard = shard
+      logger.debug { "Changing #{@model_class}'s shard to #{shard.name}"}
+      current_shard_entry[object_id] = shard
     end
 
     def connection
-      @current_shard.connection
+      current_shard.connection
     end
 
     def connection_pool
-      @current_shard.connection_pool
+      current_shard.connection_pool
     end
 
     def with_shard(shard)
+      shard = cluster.to_shard(shard)
+
       old_shard, old_fixed = current_shard, fixed_shard
       self.current_shard = shard
-      @fixed_shard = shard
+      self.fixed_shard = shard
       yield
     ensure
-      @fixed_shard = old_fixed
+      self.fixed_shard = old_fixed
       self.current_shard = old_shard
     end
 
@@ -182,45 +157,49 @@ module ActiveRecord::Turntable
       end
     end
 
+    def with_master_and_all(continue_on_error = false)
+      ([@cluster.master] + @cluster.shards.values).map do |shard|
+        begin
+          with_shard(shard) {
+            yield
+          }
+        rescue Exception => err
+          unless continue_on_error
+            raise err
+          end
+          err
+        end
+      end
+    end
+
     def with_master(&block)
       with_shard(@cluster.master) do
         yield
       end
     end
 
-    def connected?
-      connection_pool.connected?
+    delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
+               :spec, :connections, :size, :reaper, :table_exists?, to: :connection_pool
+
+    %w(columns columns_hash column_defaults primary_keys).each do |name|
+      define_method(name.to_sym) do
+        master.connection_pool.send(name.to_sym)
+      end
     end
 
-    if ActiveRecord::VERSION::STRING > '3.1'
-      %w(columns columns_hash column_defaults primary_keys).each do |name|
-        define_method(name.to_sym) do
-          master.connection_pool.send(name.to_sym)
+    %w(table_exists?).each do |name|
+      define_method(name.to_sym) do |*args|
+        master.connection_pool.with_connection do |c|
+          c.schema_cache.send(name.to_sym, *args)
         end
       end
+    end
 
-      if ActiveRecord::VERSION::STRING < '3.2'
-        %w(table_exists?).each do |name|
-          define_method(name.to_sym) do |*args|
-            master.connection_pool.send(name.to_sym, *args)
-          end
-        end
+    def columns(*args)
+      if args.size > 0
+        master.connection_pool.columns[*args]
       else
-        %w(table_exists?).each do |name|
-          define_method(name.to_sym) do |*args|
-            master.connection_pool.with_connection do |c|
-              c.schema_cache.send(name.to_sym, *args)
-            end
-          end
-        end
-      end
-
-      def columns(*args)
-        if args.size > 0
-          master.connection_pool.columns[*args]
-        else
-          master.connection_pool.columns
-        end
+        master.connection_pool.columns
       end
     end
 
@@ -238,6 +217,16 @@ module ActiveRecord::Turntable
 
     def spec
       @spec ||= master.connection_pool.spec
+    end
+
+    private
+
+    def fixed_shard_entry
+      Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
+    end
+
+    def current_shard_entry
+      Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
     end
   end
 end

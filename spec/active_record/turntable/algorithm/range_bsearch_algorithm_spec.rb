@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe ActiveRecord::Turntable::Algorithm::RangeAlgorithm do
+describe ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm do
   before(:all) do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
   context "When initialized" do
     before do
-      @alg = ActiveRecord::Turntable::Algorithm::RangeAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
+      @alg = ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
     end
 
     context "#calculate with 1" do

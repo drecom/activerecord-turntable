@@ -3,11 +3,22 @@ module ActiveRecord::Turntable
     class Fader
       class CalculateShardsSumResult < Fader
         def execute
-          @shards_query_hash.map do |shard, query|
+          results = @shards_query_hash.map do |shard, query|
             args = @args.dup
             args[1] = args[1].dup if args[1].present?
             shard.connection.send(@called_method, query, *@args, &@block)
-          end.inject(&:+)
+          end
+          merge_results(results)
+        end
+
+        private
+
+        def merge_results(results)
+          ActiveRecord::Result.new(
+            results.first.columns,
+            results[0].rows.zip(*results[1..-1].map{|r| r.rows}).map {|r| [r.map {|v| v.first}.inject(&:+)]},
+            results.first.column_types
+          )
         end
       end
     end

@@ -1,38 +1,15 @@
 module ActiveRecord::Turntable::Migration
   extend ActiveSupport::Concern
 
-  # AR < 3.1
-  def self.extended(base)
-    class << base
-      def announce_with_turntable(message)
-        announce_without_turntable("#{message} - #{get_current_shard}")
-      end
-
-      alias_method_chain :migrate, :turntable
-      alias_method_chain :announce, :turntable
-      include ShardDefinition
-    end
-    base.class_eval do
-      class_inheritable_accessor :target_shards
-    end
-    ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
-  end
-
-  # AR >= 3.1
   included do
     extend ShardDefinition
-    class_attribute :target_shards
-    def announce_with_turntable(message)
-      announce_without_turntable("#{message} - #{get_current_shard}")
-    end
-
-    alias_method_chain :migrate, :turntable
+    class_attribute :target_shards, :current_shard
     alias_method_chain :announce, :turntable
+    alias_method_chain :exec_migration, :turntable
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
     ::ActiveRecord::Migration::CommandRecorder.send(:include, CommandRecorder)
   end
 
-  # for all
   module ShardDefinition
     def clusters(*cluster_names)
       config = ActiveRecord::Base.turntable_config
@@ -55,32 +32,16 @@ module ActiveRecord::Turntable::Migration
     end
   end
 
-  def get_current_shard
-    "Shard: #{@@current_shard}" if @@current_shard
+  def target_shard?(shard_name)
+    target_shards.blank? or target_shards.include?(shard_name)
   end
 
-  def migrate_with_turntable(direction)
-    config = ActiveRecord::Base.configurations
-    @@current_shard = nil
-    shards = (self.class.target_shards||=[]).flatten.uniq.compact
-    if self.class.target_shards.blank?
-      return migrate_without_turntable(direction)
-    end
+  def announce_with_turntable(message)
+    announce_without_turntable("#{message} - Shard: #{current_shard}")
+  end
 
-    shards_conf = shards.map do |shard|
-      config[Rails.env||"development"]["shards"][shard]
-    end
-    seqs = config[Rails.env||"development"]["seq"]
-    shards_conf += seqs.values
-    shards_conf << config[Rails.env||"development"]
-    shards_conf.each_with_index do |conf, idx|
-      @@current_shard = (shards[idx] || seqs.keys[idx - shards.size] || "master")
-      ActiveRecord::Base.establish_connection(conf)
-      if !ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name())
-        ActiveRecord::Base.connection.initialize_schema_migrations_table
-      end
-      migrate_without_turntable(direction)
-    end
+  def exec_migration_with_turntable(*args)
+    exec_migration_without_turntable(*args) if target_shard?(current_shard)
   end
 
   module SchemaStatementsExt
@@ -132,4 +93,3 @@ module ActiveRecord::Turntable::Migration
   end
 
 end
-

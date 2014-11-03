@@ -18,7 +18,7 @@ module ActiveRecord::Turntable
     end
 
     def load!(config_file, env)
-      @config = YAML.load_file(config_file).with_indifferent_access[env]
+      @config = YAML.load(ERB.new(IO.read(config_file)).result).with_indifferent_access[env]
     end
   end
 end

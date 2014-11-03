@@ -26,3 +26,8 @@ TAGS
 
 # For rubinius:
 #*.rbc
+
+# gtags
+GTAGS
+GRTAGS
+GPATH

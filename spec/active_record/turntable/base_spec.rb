@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::Base do
 
   context "When installed to ActiveRecord::Base" do
     it "ActiveRecord::Base respond_to 'turntable'" do
-      ActiveRecord::Base.should respond_to(:turntable)
+      expect(ActiveRecord::Base).to respond_to(:turntable)
     end
   end
 end

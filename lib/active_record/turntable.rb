@@ -13,23 +13,25 @@ require 'singleton'
 
 module ActiveRecord::Turntable
   extend ActiveSupport::Concern
+  extend ActiveSupport::Autoload
 
-  autoload :ActiveRecordExt, 'active_record/turntable/active_record_ext'
-  autoload :Algorithm, 'active_record/turntable/algorithm'
-  autoload :Base, 'active_record/turntable/base'
-  autoload :Cluster, 'active_record/turntable/cluster'
-  autoload :Config, 'active_record/turntable/config'
-  autoload :Compatible, "active_record/turntable/compatible"
-  autoload :ConnectionProxy, 'active_record/turntable/connection_proxy'
-  autoload :Helpers, 'active_record/turntable/helpers'
-  autoload :MasterShard, 'active_record/turntable/master_shard'
-  autoload :Migration, 'active_record/turntable/migration'
-  autoload :Mixer, 'active_record/turntable/mixer'
-  autoload :PoolProxy, 'active_record/turntable/pool_proxy'
-  autoload :Rack, 'active_record/turntable/rack'
-  autoload :SeqShard, 'active_record/turntable/seq_shard'
-  autoload :Sequencer, 'active_record/turntable/sequencer'
-  autoload :Shard, 'active_record/turntable/shard'
+  eager_autoload do
+    autoload :ActiveRecordExt
+    autoload :Algorithm
+    autoload :Base
+    autoload :Cluster
+    autoload :Config
+    autoload :ConnectionProxy
+    autoload :MasterShard
+    autoload :Migration
+    autoload :Mixer
+    autoload :PoolProxy
+    autoload :Shard
+    autoload :SeqShard
+    autoload :Sequencer
+  end
+  autoload :Rack
+  autoload :Helpers
 
   included do
     include ActiveRecordExt
@@ -52,6 +54,14 @@ module ActiveRecord::Turntable
     def turntable_config
       ActiveRecord::Turntable::Config.instance
     end
+  end
+
+  def self.rails4?
+    ActiveRecord::VERSION::MAJOR == 4
+  end
+
+  def self.rails41_later?
+    rails4? && ActiveRecord::VERSION::MINOR >= 1
   end
 
   require "active_record/turntable/railtie" if defined?(Rails)

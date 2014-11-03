@@ -14,34 +14,27 @@ module ActiveRecord::Turntable
       @proxy = proxy
     end
 
-    def connection
+    def proxy
       @proxy
     end
-
-    def spec
-      @proxy.spec
-    end
-
+    alias_method :connection, :proxy
 
     def with_connection
-      yield @proxy
+      yield proxy
     end
 
-    def connected?
-      @proxy.connected?
-    end
+    delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
+               :spec, :connections, :size, :reaper, :table_exists?, to: :proxy
 
-    if ActiveRecord::VERSION::STRING > '3.1'
-      %w(columns_hash column_defaults primary_keys).each do |name|
-        define_method(name.to_sym) do
-          @proxy.send(name.to_sym)
-        end
+    %w(columns_hash column_defaults primary_keys).each do |name|
+      define_method(name.to_sym) do
+        @proxy.send(name.to_sym)
       end
+    end
 
-      %w(table_exists? columns).each do |name|
-        define_method(name.to_sym) do |*args|
-          @proxy.send(name.to_sym, *args)
-        end
+    %w(table_exists? columns).each do |name|
+      define_method(name.to_sym) do |*args|
+        @proxy.send(name.to_sym, *args)
       end
     end
 

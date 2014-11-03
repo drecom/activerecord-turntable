@@ -15,7 +15,7 @@ module ActiveRecord::Turntable::Algorithm
     end
 
     def calculate_idx(key)
-      @config["shards"].bsearch_lower_boundary { |h|
+      @config["shards"].bsearch_upper_boundary { |h|
         h["less_than"] <=> key
       }
     end

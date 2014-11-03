@@ -1,14 +1,22 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     extend ActiveSupport::Concern
+    extend ActiveSupport::Autoload
 
-    autoload :AbstractAdapter, 'active_record/turntable/active_record_ext/abstract_adapter'
-    autoload :CleverLoad, 'active_record/turntable/active_record_ext/clever_load'
-    autoload :LogSubscriber, 'active_record/turntable/active_record_ext/log_subscriber'
-    autoload :Persistence, 'active_record/turntable/active_record_ext/persistence'
-    autoload :SchemaDumper, 'active_record/turntable/active_record_ext/schema_dumper'
-    autoload :Sequencer, 'active_record/turntable/active_record_ext/sequencer'
-    autoload :Transactions, 'active_record/turntable/active_record_ext/transactions'
+    eager_autoload do
+      autoload :AbstractAdapter
+      autoload :CleverLoad
+      autoload :ConnectionHandlerExtension
+      autoload :LogSubscriber
+      autoload :Persistence
+      autoload :SchemaDumper
+      autoload :Sequencer
+      autoload :Relation
+      autoload :Transactions
+      autoload :AssociationPreloader
+      autoload :Association
+      autoload :LockingOptimistic
+    end
 
     included do
       include Transactions
@@ -16,11 +24,18 @@ module ActiveRecord::Turntable
       ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, AbstractAdapter)
       ActiveRecord::LogSubscriber.send(:include, LogSubscriber)
       ActiveRecord::Persistence.send(:include, Persistence)
-      ActiveRecord::Relation.send(:include, CleverLoad)
-      ActiveRecord::VERSION::STRING < '3.1' ?
-        ActiveRecord::Migration.extend(ActiveRecord::Turntable::Migration) :
-        ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
+      ActiveRecord::Locking::Optimistic.send(:include, LockingOptimistic)
+      ActiveRecord::Relation.send(:include, CleverLoad, Relation)
+      ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
+      ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
+        include ConnectionHandlerExtension
+      end
+      ActiveRecord::Associations::Preloader::Association.send(:include, AssociationPreloader)
+      ActiveRecord::Associations::Association.send(:include, Association)
       require 'active_record/turntable/active_record_ext/fixtures'
+      require 'active_record/turntable/active_record_ext/migration_proxy'
+      require 'active_record/turntable/active_record_ext/activerecord_import_ext'
+      require 'active_record/turntable/active_record_ext/acts_as_archive_extension'
     end
   end
 end

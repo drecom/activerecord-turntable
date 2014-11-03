@@ -1,5 +1,5 @@
 module ActiveRecord
   module Turntable
-    VERSION = "1.1.2"
+    VERSION = "2.0.0.beta7"
   end
 end

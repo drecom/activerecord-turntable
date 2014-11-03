@@ -37,24 +37,24 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         user.save!
       }.to_not raise_error
-      strio.string.should =~ /WHERE `users`\.`id` = #{user.id}[^\s]*$/
+      expect(strio.string).to match(/WHERE `users`\.`id` = #{user.id}[^\s]*$/)
+    end
+
+    it "should be saved to target_shard" do
+      expect(user).to be_saved_to(user.turntable_shard)
     end
 
     it "should change updated_at when updating" do
       user.nickname = "fizzbuzz"
 
-      lambda {
-        user.save!
-      }.should change(user, :updated_at)
+      expect { user.save! }.to change(user, :updated_at)
     end
 
     it "should not changed from normal operation when destroying" do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
-      expect {
-        user.destroy
-      }.to_not raise_error
-      strio.string.should =~ /WHERE `users`\.`id` = #{user.id}[^\s]*$/
+      expect { user.destroy }.to_not raise_error
+      expect(strio.string).to match(/WHERE `users`\.`id` = #{user.id}[^\s]*$/)
     end
   end
 
@@ -74,13 +74,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
     context "on update once" do
       it "callback should be called once" do
-        mock(user).on_update.times(1)
+        expect(user).to receive(:on_update).once
         user.save
       end
     end
     context "on destroy once" do
       it "callback should be called once" do
-        mock(user).on_destroy.times(1)
+        expect(user).to receive(:on_destroy).once
         user.destroy
       end
     end
@@ -95,15 +95,15 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         user_status.save!
       }.to_not raise_error
-      strio.string.should =~ /WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/
+      expect(strio.string).to match(/WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/)
     end
 
     it "should change updated_at when updating" do
       user_status.hp = 20
 
-      lambda {
+      expect {
         user_status.save!
-      }.should change(user_status, :updated_at)
+      }.to change(user_status, :updated_at)
     end
 
     it "should send shard_key condition when destroying" do
@@ -112,11 +112,11 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         user_status.destroy
       }.to_not raise_error
-      strio.string.should =~ /WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/
+      expect(strio.string).to match(/WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/)
     end
 
     it "should warn when creating without shard_key" do
-      pending "doesn't need to implemented soon"
+      skip "doesn't need to implemented soon"
     end
 
     it "should execute one query when reloading" do
@@ -129,7 +129,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       }.to_not raise_error
       puts strio.string
 
-      strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }.should have(1).items
+      expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
   end
 
@@ -141,7 +141,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         card.save!
       }.to_not raise_error
-      strio.string.should =~ /WHERE `cards`\.`id` = #{card.id}[^\s]*$/
+      expect(strio.string).to match(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/)
     end
 
     it "should not send shard_key condition when destroying" do
@@ -150,14 +150,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         card.destroy
       }.to_not raise_error
-      strio.string.should =~ /WHERE `cards`\.`id` = #{card.id}[^\s]*$/
+      expect(strio.string).to match(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/)
     end
   end
 
   context "When call reload" do
     subject { user_status.reload }
-    it { should be_instance_of(UserStatus)}
-    it { should == user_status }
+    it { is_expected.to be_instance_of(UserStatus)}
+    it { is_expected.to eq(user_status) }
   end
 
 end
