@@ -111,14 +111,22 @@ module ActiveRecord::Turntable
       current_shard_entry[object_id] = shard
     end
 
+    # @return connection of current shard
     def connection
       current_shard.connection
     end
 
+    # @return connection_pool of current shard
     def connection_pool
       current_shard.connection_pool
     end
 
+    # Fix connection to given shard in block
+    # @param [ActiveRecord::Base, Symbol, ActiveRecord::Turntable::Shard, Numeric, String] shard which you want to fix
+    # @param shard [ActiveRecord::Base] AR Object
+    # @param shard [Symbol] shard name symbol that defined in turntable.yml
+    # @param shard [ActiveRecord::Turntable::Shard] Shard object
+    # @param shard [String, Numeric] Raw sharding id
     def with_shard(shard)
       shard = cluster.to_shard(shard)
 
@@ -142,6 +150,8 @@ module ActiveRecord::Turntable
       end
     end
 
+    # Send queries to all shards in this cluster
+    # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
     def with_all(continue_on_error = false)
       @cluster.shards.values.map do |shard|
         begin
@@ -157,6 +167,8 @@ module ActiveRecord::Turntable
       end
     end
 
+    # Send queries to master connection and all shards in this cluster
+    # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
     def with_master_and_all(continue_on_error = false)
       ([@cluster.master] + @cluster.shards.values).map do |shard|
         begin

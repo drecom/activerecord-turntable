@@ -20,6 +20,7 @@ module ActiveRecord::Turntable
 
         private
 
+        # @note Override to add sharding condition for singular association
         if ActiveRecord::Turntable.rails41_later?
           def find_target_with_turntable
             current_scope = scope
@@ -50,6 +51,7 @@ module ActiveRecord::Turntable
 
         private
 
+        # @note Override to add sharding condition for collection association
         def find_target_with_turntable
           records =
             if options[:finder_sql]

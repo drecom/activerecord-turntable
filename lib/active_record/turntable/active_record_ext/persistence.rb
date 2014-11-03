@@ -1,6 +1,7 @@
 module ActiveRecord::Turntable::ActiveRecordExt
   module Persistence
     ::ActiveRecord::Persistence.class_eval do
+      # @note Override to add sharding scope on reloading
       def reload(options = nil)
         clear_aggregation_cache
         clear_association_cache
@@ -26,6 +27,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
         self
       end
 
+      # @note Override to add sharding scope on `touch`
       def touch(name = nil)
         raise ActiveRecordError, "can not touch on a new record object" unless persisted?
 
@@ -58,6 +60,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
       private
 
+      # @note Override to add sharding scope on destroying
       def relation_for_destroy
         pk         = self.class.primary_key
         column     = self.class.columns_hash[pk]
@@ -74,6 +77,8 @@ module ActiveRecord::Turntable::ActiveRecordExt
         relation
       end
 
+
+      # @note Override to add sharding scope on updating
       ar_version = ActiveRecord::VERSION::STRING
       if ar_version < "4.1"
         method_name = ar_version =~ /\A4\.0\.[0-5]\z/ ? "update_record" : "_update_record"

@@ -9,6 +9,7 @@ module ActiveRecord::Turntable
         alias_method_chain :records_for, :turntable
       end
 
+      # @note Override to add sharding condition on preload
       def records_for_with_turntable(ids)
         returning_scope = records_for_without_turntable(ids)
         if should_use_shard_key?

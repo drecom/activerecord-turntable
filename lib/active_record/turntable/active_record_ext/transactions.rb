@@ -1,6 +1,7 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module Transactions
+      # @note Override to start transaction on current shard
       def with_transaction_returning_status
         if self.class.turntable_enabled?
           status = nil

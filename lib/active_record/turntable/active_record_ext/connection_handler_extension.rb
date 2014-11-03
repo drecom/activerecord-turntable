@@ -9,6 +9,7 @@ module ActiveRecord::Turntable
 
       private
 
+      # @note Override not to establish_connection destroy existing connection pool proxy object
       def pool_for_with_turntable(owner)
         owner_to_pool.fetch(owner.name) {
           if ancestor_pool = pool_from_any_process_for(owner)
