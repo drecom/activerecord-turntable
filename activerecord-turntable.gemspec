@@ -28,15 +28,18 @@ Gem::Specification.new do |spec|
   spec.add_dependency "bsearch",       "~> 1.5"
   spec.add_dependency "httpclient",    ">= 0"
 
+  # optional dependencies
+  spec.add_development_dependency "activerecord-import"
+  spec.add_development_dependency "barrage"
+  spec.add_development_dependency "mysql2"
+
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rack"
   spec.add_development_dependency "rspec", "~> 3.1.0"
   spec.add_development_dependency "rspec-its"
   spec.add_development_dependency "rspec-collection_matchers"
-  spec.add_development_dependency "mysql2"
   spec.add_development_dependency "fabrication"
   spec.add_development_dependency "faker"
-  spec.add_development_dependency "activerecord-import"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "coveralls"
