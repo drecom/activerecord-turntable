@@ -22,40 +22,44 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
 
   context "When a model has has_one relation" do
     context "When call clever_load!" do
-      before(:each) do
-        @users = User.clever_load!(:user_status)
-      end
+      let(:users) { User.all.clever_load!(:user_status) }
 
-      it "should target loaded" do
-        @users.each do |user|
-          expect(user.association(:user_status).loaded?).to be_truthy
+      context "With their associations" do
+        subject { users.map { |u| u.association(:user_status) } }
+
+        it "should be association target loaded" do
+          is_expected.to all(be_loaded)
         end
       end
 
-      it "should assigned reverse relation" do
-        expect(@users).to all(satisfy { |u|
-          u.user_status.association(:user).loaded?
-        })
+      context "With their targets" do
+        subject { users.map { |u| u.association(:user_status).target } }
+
+        it "should be loaded target object" do
+          is_expected.to all(be_instance_of(UserStatus))
+        end
       end
     end
   end
 
   context "When a model has belongs_to relation" do
     context "When call clever_load!" do
-      before(:each) do
-        @user_statuses = UserStatus.clever_load!(:user)
-      end
+      let(:user_statuses) { UserStatus.all.clever_load!(:user) }
 
-      it "should target loaded" do
-        @user_statuses.each do |user_status|
-          expect(user_status.association(:user).loaded?).to be_truthy
+      context "With their associations" do
+        subject { user_statuses.map { |us| us.association(:user) } }
+
+        it "should target loaded" do
+          is_expected.to all(be_loaded)
         end
       end
 
-      it "should assigned reverse relation" do
-        expect(@user_statuses).to all(satisfy { |us|
-          us.user.association(:user_status).loaded?
-        })
+      context "With their targets" do
+        subject { user_statuses.map { |us| us.association(:user).target } }
+
+        it "should be loaded target object" do
+          is_expected.to all(be_instance_of(User))
+        end
       end
     end
   end

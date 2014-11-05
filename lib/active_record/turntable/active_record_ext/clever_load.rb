@@ -37,7 +37,8 @@ module ActiveRecord::Turntable::ActiveRecordExt
                              }
                            end
           obj.association(association_name).target = matched_object
-          obj.association(association_name).send(:set_inverse_instance, matched_object) if matched_object
+          obj.association(association_name).set_inverse_instance(matched_object) if matched_object
+          obj.association(association_name).loaded!
         end
       end
       records
