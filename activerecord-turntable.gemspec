@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-collection_matchers"
   spec.add_development_dependency "fabrication"
   spec.add_development_dependency "faker"
+  spec.add_development_dependency "webmock"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "coveralls"

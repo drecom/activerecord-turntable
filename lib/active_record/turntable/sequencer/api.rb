@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# APIサーバを利用しての採番
+# Sequencer via HTTP API
 #
 require 'httpclient'
 

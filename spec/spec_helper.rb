@@ -4,6 +4,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'rspec/its'
 require 'rspec/collection_matchers'
+require 'webmock/rspec'
 
 require 'activerecord-turntable'
 
