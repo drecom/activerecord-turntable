@@ -1,5 +1,5 @@
 class EventsUsersHistory < ActiveRecord::Base
-  turntable :user_cluster, :events_user_id
+  turntable :event_cluster, :events_user_id
   sequencer :user_seq
 
   belongs_to :user
