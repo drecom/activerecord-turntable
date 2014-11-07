@@ -94,6 +94,21 @@ namespace :turntable do
           t.datetime   :deleted_at, :default => nil
         end
         ActiveRecord::Base.connection.create_sequence_for :archived_cards_users
+
+        ActiveRecord::Base.connection.create_table :cards_users_histories do |t|
+          t.belongs_to :cards_user,    :null => false
+          t.belongs_to :user,    :null => false
+          t.timestamps
+        end
+        ActiveRecord::Base.connection.create_sequence_for :cards_users_histories
+
+        ActiveRecord::Base.connection.create_table :events_users_histories do |t|
+          t.belongs_to :events_user,    :null => false
+          t.belongs_to :cards_user,    :null => false
+          t.belongs_to :user,    :null => false
+          t.timestamps
+        end
+        ActiveRecord::Base.connection.create_sequence_for :events_users_histories
       end
     end
 
