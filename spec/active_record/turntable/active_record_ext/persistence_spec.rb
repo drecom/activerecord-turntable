@@ -101,7 +101,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         user_status.save!
       }.to_not raise_error
-      expect(strio.string).to match(/WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/)
+      expect(strio.string).to match(/`user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*($|\s)/)
     end
 
     it "should change updated_at when updating" do
@@ -118,7 +118,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect {
         user_status.destroy
       }.to_not raise_error
-      expect(strio.string).to match(/WHERE `user_statuses`\.`id` = #{user_status.id} AND `user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*$/)
+      expect(strio.string).to match(/`user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*($|\s)/)
     end
 
     it "should warn when creating without shard_key" do
@@ -132,6 +132,24 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
       expect { user_status.reload }.to_not raise_error
 
+      expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
+    end
+
+    it "should execute one query when touching" do
+      user; user_status
+      strio = StringIO.new
+      ActiveRecord::Base.logger = Logger.new(strio)
+
+      expect { user_status.touch }.to_not raise_error
+      expect(strio.string.split("\n").select {|stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
+    end
+
+    it "should execute one query when locking" do
+      user; user_status
+      strio = StringIO.new
+      ActiveRecord::Base.logger = Logger.new(strio)
+
+      expect { user_status.lock! }.to_not raise_error
       expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
   end
