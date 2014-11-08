@@ -37,7 +37,7 @@ namespace :turntable do
 
     desc "migrate turntable test tables"
     task :migrate => :load_config do
-      ActiveRecord::Base.establish_connection RAILS_ENV
+      ActiveRecord::Base.establish_connection RAILS_ENV.to_sym
       require 'active_record/turntable'
       ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
       ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
