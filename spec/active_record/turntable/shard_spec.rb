@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::Shard do
 
   context "When initialized" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
     end
 

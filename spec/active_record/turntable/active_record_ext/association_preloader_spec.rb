@@ -35,35 +35,41 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
     end
   end
 
-  context "When a model with has_one relation" do
-    context "When the has_one associated object doesn't exists" do
-      subject { user.user_status }
-      it { expect { subject }.to_not raise_error }
-    end
-  end
-
-  context "With has_many association" do
+  context "When preloads has_many association" do
     before do
       ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
     end
-    let(:cards_user) { CardsUser.where(user: user).first }
 
     context "associated objects has same turntable_key" do
-      subject { cards_user.cards_users_histories }
+      subject { CardsUser.where(user: user).preload(:cards_users_histories).first }
       it { expect { subject }.to_not raise_error }
-      it { is_expected.to include(*cards_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
+
+      it "its association should be loaded" do
+        expect(subject.association(:cards_users_histories)).to be_loaded
+      end
+
+      it "its has_many targets should be assigned all related object" do
+        expect(subject.cards_users_histories).to include(*cards_users_histories.select { |history| history.cards_user_id == subject.id} )
+      end
     end
 
     context "associated objects has different turntable_key" do
       context "when foreign_shard_key option passed" do
-        subject { cards_user.events_users_histories_with_foreign_shard_key }
+        subject { CardsUser.where(user: user).preload(:events_users_histories_with_foreign_shard_key).first }
 
         it { expect { subject }.to_not raise_error }
-        it { is_expected.to include(*events_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
+
+        it "its association should be loaded" do
+          expect(subject.association(:events_users_histories_with_foreign_shard_key)).to be_loaded
+        end
+
+        it "its has_many targets should be assigned all related object" do
+          expect(subject.events_users_histories_with_foreign_shard_key).to include(*events_users_histories.select { |history| history.cards_user_id == subject.id} )
+        end
       end
 
       context "when foreign_shard_key option is not passed" do
-        subject { CardsUser.where(user: user).events_users_histories }
+        subject { CardsUser.where(user: user).preload(:events_users_histories).first }
 
         it { expect { subject }.to raise_error }
       end

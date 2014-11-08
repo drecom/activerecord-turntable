@@ -24,3 +24,12 @@ test:
     user_shard_3:
       <<: *default
       database: turntable_user_shard_3_test
+    user_shard_4:
+      <<: *default
+      database: turntable_user_shard_4_test
+    user_shard_5:
+      <<: *default
+      database: turntable_user_shard_5_test
+    user_shard_6:
+      <<: *default
+      database: turntable_user_shard_6_test

@@ -5,7 +5,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
       ar_version = ActiveRecord::VERSION::STRING
       if ar_version < "4.1"
-        method_name = ar_version < "4.0.6" ? "update_record" : "_update_record"
+        method_name = ar_version =~ /\A4\.0\.[0-5]\z/ ? "update_record" : "_update_record"
 
         class_eval <<-EOD
           def #{method_name}(attribute_names = @attributes.keys) #:nodoc:
@@ -49,7 +49,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
           end
         EOD
       else
-        method_name = ar_version < "4.1.2" ? "update_record" : "_update_record"
+        method_name = ar_version =~ /\A4\.1\.[01]\z/ ? "update_record" : "_update_record"
 
         class_eval <<-EOD
           def _update_record(attribute_names = @attributes.keys) #:nodoc:

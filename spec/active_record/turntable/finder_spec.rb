@@ -7,21 +7,34 @@ describe "ActiveRecord::FinderMethods" do
 
   context "User insert with id" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
-      ActiveRecord::Base.logger = Logger.new(STDOUT)
-      @user = User.new
-      @user.id = 1
-      @user.save
+      user
     end
 
-    it "#find(1) should be == user" do
-      expect(User.find(1)).to eq(@user)
-    end
+    let(:user) {
+      u = User.new
+      u.id = 1
+      u.save
+      u
+    }
 
-    it "#find(2) should raise error" do
-      expect { User.find(2) }.to raise_error
+    describe "User#find" do
+      context "With existing users.id" do
+        subject { User.find(1) }
+
+        it "#find should be returns user" do
+          is_expected.to eq(user)
+        end
+      end
+
+      context "With users.id not existing" do
+        subject { User.find(2) }
+
+        it "#find should raise error" do
+          expect { subject }.to raise_error
+        end
+      end
     end
   end
 end
-

@@ -12,7 +12,7 @@ module ActiveRecord::Turntable
       def records_for_with_turntable(ids)
         returning_scope = records_for_without_turntable(ids)
         if should_use_shard_key?
-          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.map(&foreign_shard_key).uniq)
+          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.map(&foreign_shard_key.to_sym).uniq)
         end
         returning_scope
       end

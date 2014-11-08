@@ -37,7 +37,7 @@ namespace :turntable do
 
     desc "migrate turntable test tables"
     task :migrate => :load_config do
-      ActiveRecord::Base.establish_connection RAILS_ENV
+      ActiveRecord::Base.establish_connection RAILS_ENV.to_sym
       require 'active_record/turntable'
       ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
       ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
@@ -61,6 +61,7 @@ namespace :turntable do
           t.belongs_to :user, :null => false
           t.integer    :hp,   :null => false, :default => 0
           t.integer    :mp,   :null => false, :default => 0
+          t.integer    :lock_version, :null => false, :default => 0
           t.datetime   :deleted_at, :default => nil
           t.timestamps
         end
@@ -94,6 +95,21 @@ namespace :turntable do
           t.datetime   :deleted_at, :default => nil
         end
         ActiveRecord::Base.connection.create_sequence_for :archived_cards_users
+
+        ActiveRecord::Base.connection.create_table :cards_users_histories do |t|
+          t.belongs_to :cards_user,    :null => false
+          t.belongs_to :user,    :null => false
+          t.timestamps
+        end
+        ActiveRecord::Base.connection.create_sequence_for :cards_users_histories
+
+        ActiveRecord::Base.connection.create_table :events_users_histories do |t|
+          t.belongs_to :events_user,    :null => false
+          t.belongs_to :cards_user,    :null => false
+          t.belongs_to :user,    :null => false
+          t.timestamps
+        end
+        ActiveRecord::Base.connection.create_sequence_for :events_users_histories
       end
     end
 

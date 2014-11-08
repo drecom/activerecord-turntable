@@ -7,35 +7,25 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When initialized" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
     end
+
     let(:cluster) { ActiveRecord::Turntable::Cluster.new(User, ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
     subject { ActiveRecord::Turntable::ConnectionProxy.new(cluster) }
-    its(:master_connection) { should == ActiveRecord::Base.connection }
-  end
 
-  context "AR3.1" do
-    it "should proxies columns" do
-      skip "spec not implemented yet"
-    end
-
-    it "should proxies columns_hash" do
-      skip "spec not implemented yet"
-    end
+    its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
   context "User insert with id" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
-      ActiveRecord::Base.logger = Logger.new(STDOUT)
     end
 
     it "should be saved to user_shard_1 with id = 1" do
       user = User.new
       user.id = 1
-      # mock(User.turntable_cluster).select_shard(1) { User.turntable_cluster.shards[:user_shard_1] }
       expect {
         user.save!
       }.not_to raise_error
@@ -44,7 +34,6 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     it "should be saved to user_shard_2 with id = 30000" do
       user = User.new
       user.id = 30000
-      # mock(User.turntable_cluster).select_shard(30000) { User.turntable_cluster.shards[:user_shard_2] }
       expect {
         user.save!
       }.not_to raise_error
@@ -54,12 +43,10 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       user = User.new
       user.id = 30000
       user.nickname = "hogehgoge'00"
-      # mock(User.turntable_cluster).select_shard(30000) { User.turntable_cluster.shards[:user_shard_2] }
       expect {
         user.save!
       }.not_to raise_error
       user.reload
-
     end
 
     it "should should be saved the same string when includes escaped string" do
@@ -74,7 +61,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When have no users" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
     end
 
@@ -89,7 +76,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When have 2 Users in different shards" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -129,7 +116,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling with_all" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -176,7 +163,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -194,7 +181,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with non-existed shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -212,7 +199,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with non shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -230,7 +217,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When calling exists? with non-existed non shard_key" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1
@@ -248,7 +235,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "#table_exists?" do
     before do
-      establish_connection_to("test")
+      establish_connection_to(:test)
       truncate_shard
       @user1 = User.new
       @user1.id = 1

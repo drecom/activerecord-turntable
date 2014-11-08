@@ -198,6 +198,9 @@ module ActiveRecord::Turntable
                                   shards_with_query,
                                   method, query, *args, &block)
       else
+        if raise_on_not_specified_shard_update?
+          raise CannotSpecifyShardError, "[Performance Notice] PLEASE FIX: #{tree.to_sql}"
+        end
         Fader::UpdateShardsMergeResult.new(@proxy,
                                            shards_with_query,
                                            method, query, *args, &block)
@@ -221,6 +224,10 @@ module ActiveRecord::Turntable
 
     def raise_on_not_specified_shard_query?
       ActiveRecord::Base.turntable_config[:raise_on_not_specified_shard_query]
+    end
+
+    def raise_on_not_specified_shard_update?
+      ActiveRecord::Base.turntable_config[:raise_on_not_specified_shard_update]
     end
   end
 end
