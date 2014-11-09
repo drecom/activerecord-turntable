@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.rubyforge_project = "activerecord-turntable"
   spec.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "CHANGELOG.md"
   ]
 
