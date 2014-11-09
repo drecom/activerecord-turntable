@@ -3,7 +3,8 @@ test:
     user_cluster:
       algorithm: range_bsearch
       seq:
-        connection: user_seq_1
+        user_seq:
+          connection: turntable_user_seq_test
       shards:
         - connection: user_shard_1
           less_than: 20000
@@ -14,4 +15,20 @@ test:
         - connection: user_shard_2
           less_than: 80000
         - connection: user_shard_3
+          less_than: 10000000
+    event_cluster:
+      algorithm: range_bsearch
+      seq:
+        user_seq:
+          connection: turntable_user_seq_test
+      shards:
+        - connection: user_shard_4
+          less_than: 20000
+        - connection: user_shard_5
+          less_than: 40000
+        - connection: user_shard_4
+          less_than: 60000
+        - connection: user_shard_5
+          less_than: 80000
+        - connection: user_shard_6
           less_than: 10000000

@@ -1,6 +1,7 @@
 module ActiveRecord::Turntable
   class SeqShard < Shard
     private
+
     def retrieve_connection_pool
       ActiveRecord::Base.turntable_connections[name] ||=
         begin
@@ -11,4 +12,3 @@ module ActiveRecord::Turntable
     end
   end
 end
-

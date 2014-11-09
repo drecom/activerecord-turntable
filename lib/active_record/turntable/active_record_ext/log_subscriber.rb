@@ -1,64 +1,46 @@
+require 'active_record/log_subscriber'
+
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module LogSubscriber
       extend ActiveSupport::Concern
 
       included do
-        if ActiveRecord::VERSION::STRING < '3.1'
-          def sql(event)
-            self.class.runtime += event.duration
-            return unless logger.debug?
+        alias_method_chain :sql, :turntable
+      end
 
-            name = '%s (%.1fms)' % [event.payload[:name], event.duration]
-            shard = '[Shard: %s]' % (event.payload[:turntable_shard_name] ? event.payload[:turntable_shard_name] : nil)
-            sql  = event.payload[:sql].squeeze(' ')
+      protected
 
-            if odd?
-              name = color(name, ActiveRecord::LogSubscriber::CYAN, true)
-              shard = color(shard, ActiveRecord::LogSubscriber::CYAN, true)
-              sql  = color(sql, nil, true)
-            else
-              name = color(name, ActiveRecord::LogSubscriber::MAGENTA, true)
-              shard = color(shard, ActiveRecord::LogSubscriber::MAGENTA, true)
-            end
+      def sql_with_turntable(event)
+        self.class.runtime += event.duration
+        return unless logger.debug?
 
-            debug "  #{name} #{shard} #{sql}"
-          end
+        payload = event.payload
 
-        else
-          def sql(event)
-            self.class.runtime += event.duration
-            return unless logger.debug?
+        return if ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(payload[:name])
 
-            payload = event.payload
+        name  = "#{payload[:name]} (#{event.duration.round(1)}ms)"
+        shard = '[Shard: %s]' % (event.payload[:turntable_shard_name] ? event.payload[:turntable_shard_name] : nil)
+        sql   = payload[:sql].squeeze(' ')
+        binds = nil
 
-            return if 'SCHEMA' == payload[:name]
-
-            name    = '%s (%.1fms)' % [payload[:name], event.duration]
-            shard = '[Shard: %s]' % (event.payload[:turntable_shard_name] ? event.payload[:turntable_shard_name] : nil)
-            sql     = payload[:sql].squeeze(' ')
-            binds   = nil
-
-            unless (payload[:binds] || []).empty?
-              binds = "  " + payload[:binds].map { |col,v|
-                [col.name, v]
-              }.inspect
-            end
-
-            if odd?
-              name = color(name, ActiveRecord::LogSubscriber::CYAN, true)
-              shard = color(shard, ActiveRecord::LogSubscriber::CYAN, true)
-              sql  = color(sql, nil, true)
-            else
-              name = color(name, ActiveRecord::LogSubscriber::MAGENTA, true)
-              shard = color(shard, ActiveRecord::LogSubscriber::MAGENTA, true)
-            end
-
-            debug "  #{name} #{shard} #{sql}#{binds}"
-          end
+        unless (payload[:binds] || []).empty?
+          binds = "  " + payload[:binds].map { |col,v|
+            render_bind(col, v)
+          }.inspect
         end
+
+        if odd?
+          name = color(name, ActiveRecord::LogSubscriber::CYAN, true)
+          shard = color(shard, ActiveRecord::LogSubscriber::CYAN, true)
+          sql  = color(sql, nil, true)
+        else
+          name = color(name, ActiveRecord::LogSubscriber::MAGENTA, true)
+          shard = color(shard, ActiveRecord::LogSubscriber::MAGENTA, true)
+        end
+
+        debug "  #{name} #{shard} #{sql}#{binds}"
       end
     end
   end
 end
-

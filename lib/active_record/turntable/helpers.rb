@@ -1,5 +1,9 @@
 module ActiveRecord::Turntable
   module Helpers
-    autoload :TestHelper, 'active_record/turntable/helpers/test_helper'
+    extend ActiveSupport::Autoload
+
+    eager_autoload do
+      autoload :TestHelper
+    end
   end
 end

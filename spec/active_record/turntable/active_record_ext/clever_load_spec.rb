@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
   end
 
   before(:each) do
-    establish_connection_to("test")
+    establish_connection_to(:test)
     truncate_shard
 
     @user1 = User.new({:nickname => 'user1'})
@@ -18,76 +18,55 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
     @user2.id = 2
     @user2.save
     @user2_status = @user2.create_user_status(:hp => 20, :mp => 10)
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
   end
 
   context "When a model has has_one relation" do
     context "When call clever_load!" do
-      before(:each) do
-        @strio = StringIO.new
-        ActiveRecord::Base.logger = Logger.new(@strio)
-        @users = User.clever_load!(:user_status)
-        puts @strio.string
-      end
-      it "should send merged user_status select query" do
-        @strio.string.should =~ //
-      end
+      let(:users) { User.all.clever_load!(:user_status) }
 
-      it "should target loaded" do
-        if ActiveRecord::VERSION::STRING < "3.1"
-          @users.each do |user|
-            user.loaded_user_status?.should be_true
-          end
-        else
-          @users.each do |user|
-            user.association(:user_status).loaded?.should be_true
-          end
+      context "With their associations" do
+        subject { users.map { |u| u.association(:user_status) } }
+
+        it "should be association target loaded" do
+          is_expected.to all(be_loaded)
         end
       end
 
-      it "should assigned reverse relation" do
-        pending "should be implemented"
+      context "With their targets" do
+        subject { users.map { |u| u.association(:user_status).target } }
+
+        it "should be loaded target object" do
+          is_expected.to all(be_instance_of(UserStatus))
+        end
       end
     end
   end
 
   context "When a model has belongs_to relation" do
     context "When call clever_load!" do
-      before(:each) do
-        @strio = StringIO.new
-        @strio = StringIO.new
-        ActiveRecord::Base.logger = Logger.new(@strio)
-        @user_statuses = UserStatus.clever_load!(:user)
-        puts @strio.string
-      end
+      let(:user_statuses) { UserStatus.all.clever_load!(:user) }
 
-      it "should send merged user_status select query" do
-        @strio.string.should =~ //
-      end
+      context "With their associations" do
+        subject { user_statuses.map { |us| us.association(:user) } }
 
-      it "should target loaded" do
-        if ActiveRecord::VERSION::STRING < "3.1"
-          @user_statuses.each do |user_status|
-            user_status.loaded_user?.should be_true
-          end
-        else
-          @user_statuses.each do |user_status|
-            user_status.association(:user).loaded?.should be_true
-          end
+        it "should target loaded" do
+          is_expected.to all(be_loaded)
         end
       end
 
-      it "should assigned reverse relation" do
-        pending "should be implemented"
+      context "With their targets" do
+        subject { user_statuses.map { |us| us.association(:user).target } }
+
+        it "should be loaded target object" do
+          is_expected.to all(be_instance_of(User))
+        end
       end
     end
   end
 
   context "When a model has has_many relation" do
     it "should send query only 2 times." do
-      pending "not implemented yet"
+      skip "not implemented yet"
     end
   end
-
-
 end

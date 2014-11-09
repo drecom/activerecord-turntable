@@ -1,3 +1,5 @@
+require 'active_support/core_ext/hash/indifferent_access'
+
 module ActiveRecord::Turntable
   class Cluster
 
@@ -16,7 +18,7 @@ module ActiveRecord::Turntable
       @master_shard = MasterShard.new(klass)
 
       # setup sequencer
-      if (seq = (@options[:seq] || @config[:seq]))
+      if (seq = (@options[:seq] || @config[:seq])) && seq[:type] == :mysql
         @seq_shard = SeqShard.new(seq)
       end
 
@@ -53,11 +55,53 @@ module ActiveRecord::Turntable
       @connection_proxy
     end
 
-    def select_shard(key)
+    def shard_for(key)
       @shards[@algorithm.calculate(key)]
     rescue
       raise ActiveRecord::Turntable::CannotSpecifyShardError,
       "[#{klass}] cannot select_shard for key:#{key}"
+    end
+
+    def select_shard(key)
+      ActiveSupport::Deprecation.warn "Cluster#select_shard is deprecated, use shard_for() instead.", caller
+      shard_for(key)
+    end
+
+    def shards_transaction(shards = [], options = {}, in_recursion = false, &block)
+      unless in_recursion
+        shards = Array.wrap(shards).dup
+        if shards.blank?
+          shards = @shards.values.dup
+        end
+      end
+      shard_or_object = shards.shift
+      shard = to_shard(shard_or_object)
+      if shards.present?
+        shard.connection.transaction(options) do
+          shards_transaction(shards, options, true, &block)
+        end
+      else
+        shard.connection.transaction(options) do
+          block.call
+        end
+      end
+    end
+
+    def to_shard(shard_or_object)
+      case shard_or_object
+      when ActiveRecord::Turntable::Shard
+        shard_or_object
+      when ActiveRecord::Base
+        shard_or_object.turntable_shard
+      when Numeric, String
+        shard_for(shard_or_object)
+      when Symbol
+        shards[shard_or_object]
+      else
+        binding.pry
+        raise ActiveRecord::Turntable::TurntableError,
+                "transaction cannot call to object: #{shard_or_object}"
+      end
     end
 
     def weighted_shards(key = nil)

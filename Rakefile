@@ -7,6 +7,9 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
 end
 
+require 'active_record'
+require "active_record/turntable/active_record_ext/database_tasks"
+
 namespace :turntable do
   namespace :db do
     task :rails_env do
@@ -16,32 +19,34 @@ namespace :turntable do
     end
 
     task :load_config => :rails_env do
-      require 'active_record'
-      ActiveRecord::Base.configurations = YAML.load_file(File.join(File.dirname(__FILE__), 'spec/config/database.yml'))
+      yaml_file = File.join(File.dirname(__FILE__), 'spec/config/database.yml')
+      ActiveRecord::Base.configurations = YAML.load ERB.new(IO.read(yaml_file)).result
     end
 
     desc "create turntable test database"
     task :create => :load_config do
-      database_configs = [ActiveRecord::Base.configurations[RAILS_ENV]] + ActiveRecord::Base.configurations[RAILS_ENV]["shards"].values + ActiveRecord::Base.configurations[RAILS_ENV]["seq"].values
-      database_configs.each do |dbconf|
-        command = "mysql "
-        command << "-u #{dbconf["username"]} " if dbconf["username"]
-        command << "-p#{dbconf["password"]} " if dbconf["password"]
-        command << "-h #{dbconf["host"]}" if dbconf["host"]
-        %x{ echo "CREATE DATABASE #{dbconf["database"]}" | #{command} }
-      end
+      ActiveRecord::Tasks::DatabaseTasks.create_current(RAILS_ENV)
+      ActiveRecord::Tasks::DatabaseTasks.create_current_turntable_cluster(RAILS_ENV)
+    end
+
+    desc "drop turntable test database"
+    task :drop => :load_config do
+      ActiveRecord::Tasks::DatabaseTasks.drop_current(RAILS_ENV)
+      ActiveRecord::Tasks::DatabaseTasks.drop_current_turntable_cluster(RAILS_ENV)
     end
 
     desc "migrate turntable test tables"
     task :migrate => :load_config do
-      ActiveRecord::Base.establish_connection RAILS_ENV
+      ActiveRecord::Base.establish_connection RAILS_ENV.to_sym
       require 'active_record/turntable'
       ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
       ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
-      database_configs = [ActiveRecord::Base.configurations[RAILS_ENV]] + ActiveRecord::Base.configurations[RAILS_ENV]["shards"].values + ActiveRecord::Base.configurations[RAILS_ENV]["seq"].values
 
-      database_configs.each do |dbconf|
-        ActiveRecord::Base.establish_connection dbconf
+      configurations = [ActiveRecord::Base.configurations[RAILS_ENV]]
+      configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).map {|v| v[1]}.flatten.uniq
+
+      configurations.each do |configuration|
+        ActiveRecord::Base.establish_connection configuration
 
         ActiveRecord::Base.connection.create_table :users do |t|
           t.string :nickname
@@ -56,6 +61,7 @@ namespace :turntable do
           t.belongs_to :user, :null => false
           t.integer    :hp,   :null => false, :default => 0
           t.integer    :mp,   :null => false, :default => 0
+          t.integer    :lock_version, :null => false, :default => 0
           t.datetime   :deleted_at, :default => nil
           t.timestamps
         end
@@ -89,21 +95,30 @@ namespace :turntable do
           t.datetime   :deleted_at, :default => nil
         end
         ActiveRecord::Base.connection.create_sequence_for :archived_cards_users
+
+        ActiveRecord::Base.connection.create_table :cards_users_histories do |t|
+          t.belongs_to :cards_user,    :null => false
+          t.belongs_to :user,    :null => false
+          t.timestamps
+        end
+        ActiveRecord::Base.connection.create_sequence_for :cards_users_histories
+
+        ActiveRecord::Base.connection.create_table :events_users_histories do |t|
+          t.belongs_to :events_user,    :null => false
+          t.belongs_to :cards_user,    :null => false
+          t.belongs_to :user,    :null => false
+          t.timestamps
+        end
+        ActiveRecord::Base.connection.create_sequence_for :events_users_histories
       end
     end
 
     desc "drop turntable test database"
     task :drop => :load_config do
-      database_configs = [ActiveRecord::Base.configurations[RAILS_ENV]] + ActiveRecord::Base.configurations[RAILS_ENV]["shards"].values + ActiveRecord::Base.configurations[RAILS_ENV]["seq"].values
-      database_configs.each do |dbconf|
-        command = "mysql "
-        command << "-u #{dbconf["username"]} " if dbconf["username"]
-        command << "-p#{dbconf["password"]} " if dbconf["password"]
-        command << "-h #{dbconf["host"]}" if dbconf["host"]
-        %x{ echo "DROP DATABASE #{dbconf["database"]}" | #{command} }
-      end
+      ActiveRecord::Tasks::DatabaseTasks.drop_current_turntable_cluster(RAILS_ENV)
     end
 
+    desc "reset turntable test databases"
     task :reset => ["turntable:db:drop", "turntable:db:create", "turntable:db:migrate"]
   end
 end

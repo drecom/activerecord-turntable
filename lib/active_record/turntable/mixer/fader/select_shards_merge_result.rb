@@ -3,17 +3,28 @@ module ActiveRecord::Turntable
     class Fader
       class SelectShardsMergeResult < Fader
         def execute
-          res = @shards_query_hash.map do |shard, query|
+          results = @shards_query_hash.map do |shard, query|
             args = @args.dup
             args[1] = args[1].dup if args[1].present?
             shard.connection.send(@called_method, query, *args, &@block)
-          end.flatten(1).compact
+          end
+          merge_results(results)
+        end
 
-          case @called_method
-          when "select_value", "select_one"
-            res.first if res
+        private
+
+        def merge_results(results)
+          if results.any? {|r| r.is_a?(ActiveRecord::Result) }
+            first_result = results.find {|r| r.present? }
+            return results.first unless first_result
+
+            ActiveRecord::Result.new(
+              first_result.columns,
+              results.map {|r| r.rows}.flatten(1),
+              first_result.column_types
+            )
           else
-            res
+            results.compact.inject(&:+)
           end
         end
       end
