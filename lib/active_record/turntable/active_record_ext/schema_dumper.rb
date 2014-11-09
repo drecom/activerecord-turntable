@@ -10,6 +10,7 @@ module ActiveRecord::Turntable
 
       private
 
+      # @note Override to dump database sequencer method
       def table_with_turntable(table, stream)
         columns = @connection.columns(table)
         begin

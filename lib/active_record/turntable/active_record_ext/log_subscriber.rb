@@ -11,6 +11,7 @@ module ActiveRecord::Turntable
 
       protected
 
+      # @note Override to add shard name logging
       def sql_with_turntable(event)
         self.class.runtime += event.duration
         return unless logger.debug?
