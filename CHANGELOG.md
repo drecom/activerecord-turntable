@@ -1,4 +1,4 @@
-## activerecord-turntable 2.0.0 (not released yet) ##
+## activerecord-turntable 2.0.0 ##
 
 First release for ActiveRecord 4.x
 
