@@ -1,6 +1,6 @@
 module ActiveRecord::Turntable::ActiveRecordExt
   module LockingOptimistic
-
+    # @note Override to add sharding condition on optimistic locking
     ::ActiveRecord::Locking::Optimistic.class_eval do
 
       ar_version = ActiveRecord::VERSION::STRING

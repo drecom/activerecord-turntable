@@ -16,6 +16,9 @@ module ActiveRecord::Turntable
     end
 
     module ClassMethods
+      # @param [Symbol] cluster_name cluster name for this class
+      # @param [Symbol] shard_key_name shard key attribute name
+      # @param [Hash] options
       def turntable(cluster_name, shard_key_name, options = {})
         class_attribute :turntable_shard_key,
                           :turntable_cluster, :turntable_cluster_name
@@ -34,6 +37,7 @@ module ActiveRecord::Turntable
         turntable_define_cluster_methods(cluster_name)
       end
 
+      #
       def force_transaction_all_shards!(options={}, &block)
         force_connect_all_shards!
         shards = turntable_connections.values
@@ -172,10 +176,12 @@ module ActiveRecord::Turntable
       self.class.shards_transaction(options, &block)
     end
 
+    # @return [ActiveRecord::Turntable::Shard] current shard for self
     def turntable_shard
       turntable_cluster.shard_for(self.send(turntable_shard_key))
     end
 
+    # @see ActiveRecord::Turntable::ConnectionProxy#with_shard
     def with_shard(shard)
       self.class.connection.with_shard(shard) { yield }
     end

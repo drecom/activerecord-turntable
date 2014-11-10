@@ -6,6 +6,7 @@ module ActiveRecord::Turntable
       included do
         protected
 
+        # @note override for logging current shard name
         def log(sql, name = "SQL", binds = [])
           @instrumenter.instrument(
                                    "sql.active_record",

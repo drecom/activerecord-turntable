@@ -15,6 +15,7 @@ module ActiveRecord::Turntable
         end
       end
 
+      # @note Override to add sharding scope on updating
       def _update_record_with_turntable(values, id, id_was, turntable_scope = nil) # :nodoc:
         substitutes, binds = substitute_values values
         condition_scope = @klass.unscoped.where(@klass.arel_table[@klass.primary_key].eq(id_was || id))

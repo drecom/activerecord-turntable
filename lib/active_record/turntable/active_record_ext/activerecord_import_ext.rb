@@ -1,5 +1,6 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
+    # activerecord-import extension
     module ActiverecordImportExt
       extend ActiveSupport::Concern
 
@@ -9,6 +10,7 @@ module ActiveRecord::Turntable
 
       private
 
+      # @note override for sequencer injection
       def values_sql_for_columns_and_attributes_with_turntable(columns, array_of_attributes)
         connection_memo = connection
         array_of_attributes.map do |arr|
