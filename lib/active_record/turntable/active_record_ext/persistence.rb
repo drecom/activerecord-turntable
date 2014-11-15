@@ -56,6 +56,29 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
           finder_scope.where(primary_key => self[primary_key]).update_all(changes) == 1
         end
+
+        # @note Override to add sharding scope on `update_columns`
+        def update_columns(attributes)
+          raise ActiveRecordError, "cannot update on a new record object" unless persisted?
+
+          attributes.each_key do |key|
+            verify_readonly_attribute(key.to_s)
+          end
+
+          update_scope = if turntable_enabled? and self.class.primary_key != self.class.turntable_shard_key.to_s
+                           self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
+                         else
+                           self.class.unscoped
+                         end
+
+          updated_count = update_scope.where(self.class.primary_key => id).update_all(attributes)
+
+          attributes.each do |k, v|
+            raw_write_attribute(k, v)
+          end
+
+          updated_count == 1
+        end
       end
 
       private
