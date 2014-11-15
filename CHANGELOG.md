@@ -1,3 +1,8 @@
+## activerecord-turntable 2.0.1 ##
+
+### Bugfixes
+* support `update_columns`
+
 ## activerecord-turntable 2.0.0 ##
 
 First release for ActiveRecord 4.x
@@ -34,7 +39,7 @@ Supported [barrage](http://github.com/drecom/barrage) gem as sequencer
 
 When using association(or association preloading), Turntable would add shard key condition to relation object if associated models has the same shard key name.
 
-If two related models has different named keys(but same meaning), you can pass option `foreign_shard_key` to association option. 
+If two related models has different named keys(but same meaning), you can pass option `foreign_shard_key` to association option.
 
 Example:
 
@@ -58,7 +63,7 @@ Add follow option to `turntable.yml`:
 To create transaction to all shards on the cluster:
 
 ```ruby
-User.user_cluster_transaction do 
+User.user_cluster_transaction do
   # transaction opened on all shards in 'user_cluster'
 end
 ```
