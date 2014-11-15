@@ -152,6 +152,15 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       expect { user_status.lock! }.to_not raise_error
       expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
+
+    it "should execute one query when update_columns" do
+      user; user_status
+      strio = StringIO.new
+      ActiveRecord::Base.logger = Logger.new(strio)
+
+      expect { user_status.update_columns(hp: 10) }.to_not raise_error
+      expect(strio.string.split("\n").select {|stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
+    end
   end
 
   context "When the model is not sharded" do
