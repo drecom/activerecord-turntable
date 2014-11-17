@@ -1,6 +1,13 @@
+## activerecord-turntable 2.0.2 ##
+
+### Bugfixes
+
+* Fix method definition bug on 2.0.1
+
 ## activerecord-turntable 2.0.1 ##
 
 ### Bugfixes
+
 * support `update_columns`
 
 ## activerecord-turntable 2.0.0 ##
