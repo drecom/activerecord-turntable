@@ -15,6 +15,8 @@ class SQLTree::Token
   const_set('BINARY', Class.new(SQLTree::Token::Keyword))
   const_set('LIMIT', Class.new(SQLTree::Token::Keyword))
   const_set('OFFSET', Class.new(SQLTree::Token::Keyword))
+
+  BINARY_ESCAPE = Class.new(SQLTree::Token).new('x')
 end
 
 class SQLTree::Tokenizer
@@ -24,6 +26,44 @@ class SQLTree::Tokenizer
       string << (current_char == "\\" ? instance_eval("%@\\#{next_char.gsub('@', '\@')}@") : current_char)
     end
     handle_token(SQLTree::Token::String.new(string), &block)
+  end
+
+  # @note Override to handle x'..' binary string
+  def each_token(&block) # :yields: SQLTree::Token
+
+    while next_char
+      case current_char
+      when /^\s?$/;        # whitespace, go to next character
+      when '(';            handle_token(SQLTree::Token::LPAREN, &block)
+      when ')';            handle_token(SQLTree::Token::RPAREN, &block)
+      when '.';            handle_token(SQLTree::Token::DOT, &block)
+      when ',';            handle_token(SQLTree::Token::COMMA, &block)
+      when /\d/;           tokenize_number(&block)
+      when "'";            tokenize_quoted_string(&block)
+      when 'E', 'x', 'X';  tokenize_possible_escaped_string(&block)
+      when /\w/;           tokenize_keyword(&block)
+      when OPERATOR_CHARS; tokenize_operator(&block)
+      when SQLTree.identifier_quote_char; tokenize_quoted_identifier(&block)
+      end
+    end
+
+    # Make sure to yield any tokens that are still stashed on the queue.
+    empty_keyword_queue!(&block)
+  end
+  alias :each :each_token
+
+  def tokenize_possible_escaped_string(&block)
+    if peek_char == "'"
+      token = case current_char
+              when 'E'
+                SQLTree::Token::STRING_ESCAPE
+              when 'x', 'X'
+                SQLTree::Token::BINARY_ESCAPE
+              end
+      handle_token(token, &block)
+    else
+      tokenize_keyword(&block)
+    end
   end
 end
 
@@ -165,6 +205,65 @@ module SQLTree::Node
     class Field < Variable
       def to_sql(options = {})
         @table.nil? ? quote_field_name(@name) : quote_field_name(@table) + '.' + quote_field_name(@name)
+      end
+    end
+
+    class EscapedValue < Value
+      def initialize(value, escape = nil)
+        @value = value
+        @escape = escape
+      end
+
+      def to_sql(options = {})
+        case value
+        when nil;            'NULL'
+        when String;         "#{escape_string}#{quote_str(@value)}"
+        when Numeric;        @value.to_s
+        when Date;           @value.strftime("'%Y-%m-%d'")
+        when DateTime, Time; @value.strftime("'%Y-%m-%d %H:%M:%S'")
+        else raise "Don't know how te represent this value in SQL!"
+        end
+      end
+
+      def escape_string
+        @escape.to_s
+      end
+
+      def self.parse(tokens)
+        escape = tokens.next
+        case tokens.next
+        when SQLTree::Token::String
+          SQLTree::Node::Expression::EscapedValue.new(tokens.current.literal, escape.literal)
+        else
+          raise SQLTree::Parser::UnexpectedToken.new(tokens.current, :literal)
+        end
+      end
+    end
+
+    def self.parse_atomic(tokens)
+      if SQLTree::Token::LPAREN === tokens.peek
+        tokens.consume(SQLTree::Token::LPAREN)
+        expr = self.parse(tokens)
+        tokens.consume(SQLTree::Token::RPAREN)
+        expr
+      elsif tokens.peek.prefix_operator?
+        PrefixOperator.parse(tokens)
+      elsif tokens.peek.variable?
+        if SQLTree::Token::LPAREN === tokens.peek(2)
+          FunctionCall.parse(tokens)
+        elsif SQLTree::Token::DOT === tokens.peek(2)
+          Field.parse(tokens)
+        else
+          Variable.parse(tokens)
+        end
+      elsif SQLTree::Token::STRING_ESCAPE == tokens.peek
+        EscapedValue.parse(tokens)
+      elsif SQLTree::Token::BINARY_ESCAPE == tokens.peek
+        EscapedValue.parse(tokens)
+      elsif SQLTree::Token::INTERVAL === tokens.peek
+        IntervalValue.parse(tokens)
+      else
+        Value.parse(tokens)
       end
     end
   end
