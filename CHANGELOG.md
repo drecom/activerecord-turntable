@@ -1,3 +1,9 @@
+## activerecord-turntable 2.0.3 ##
+
+### Bugfixes
+
+* Fix parse error on sql with binary string literal: ```x'...'```
+
 ## activerecord-turntable 2.0.2 ##
 
 ### Bugfixes
