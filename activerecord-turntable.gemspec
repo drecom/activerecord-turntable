@@ -23,11 +23,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_dependency "activerecord",  ">= 4.0.0"
-  spec.add_dependency "activesupport", ">= 4.0.0"
-  spec.add_dependency "sql_tree",      "= 0.2.0"
-  spec.add_dependency "bsearch",       "~> 1.5"
-  spec.add_dependency "httpclient",    ">= 0"
+  spec.add_runtime_dependency "activerecord",  ">= 4.0.0", "< 5.0"
+  spec.add_runtime_dependency "activesupport", ">= 4.0.0", "< 5.0"
+  spec.add_runtime_dependency "sql_tree",      "= 0.2.0"
+  spec.add_runtime_dependency "bsearch",       "~> 1.5"
+  spec.add_runtime_dependency "httpclient",    ">= 0"
 
   # optional dependencies
   spec.add_development_dependency "activerecord-import"
