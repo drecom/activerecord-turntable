@@ -208,6 +208,10 @@ module SQLTree::Node
       end
     end
 
+    class Value
+      leaf :escape
+    end
+
     class EscapedValue < Value
       def initialize(value, escape = nil)
         @value = value

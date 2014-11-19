@@ -35,6 +35,20 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     Card.create!(:name => 'foobar')
   }
 
+  context "When creating record" do
+    context "with blob column" do
+      let(:blob_value) { "\123\123\123" }
+      let(:user) {
+        u = User.new(:nickname => 'x', :blob => blob_value )
+        u.id = 1
+        u.save
+        u
+      }
+      subject { user }
+      its(:blob) { is_expected.to eq(user.reload.blob) }
+    end
+  end
+
   context "When the model is sharded by surrogate key" do
     it "should not changed from normal operation when updating" do
       user.nickname = "fizzbuzz"
