@@ -1,3 +1,11 @@
+## activerecord-turntable 2.0.4 ##
+
+Add dependency: ruby >= 1.9.3 from this release
+
+### Bugfixes
+
+* Fix incorrect insert sql with binary literal
+
 ## activerecord-turntable 2.0.3 ##
 
 ### Bugfixes
