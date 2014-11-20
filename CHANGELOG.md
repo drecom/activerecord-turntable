@@ -1,3 +1,9 @@
+## activerecord-turntable 2.0.5 ##
+
+### Bugfixes
+
+* Fix not to destroy other database extension's connection proxy object
+
 ## activerecord-turntable 2.0.4 ##
 
 Add dependency: ruby >= 1.9.3 from this release
