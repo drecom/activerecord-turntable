@@ -13,7 +13,7 @@ module ActiveRecord::Turntable::Migration
   module ShardDefinition
     def clusters(*cluster_names)
       config = ActiveRecord::Base.turntable_config
-      (self.target_shards ||= []) <<
+      (self.target_shards ||= []).concat(
         if cluster_names.first == :all
           config['clusters'].map do |name, cluster_conf|
             cluster_conf["shards"].map {|shard| shard["connection"]}
@@ -23,8 +23,9 @@ module ActiveRecord::Turntable::Migration
             config['clusters'][cluster_name]["shards"].map do |shard|
               shard["connection"]
             end
-          end
+          end.flatten
         end
+      )
     end
 
     def shards(*connection_names)
