@@ -1,3 +1,9 @@
+## activerecord-turntable 2.0.6 (unrelelased) ##
+
+### Bugfixes
+
+* Fixes migration dsl:`clusters` is not working (thx macks)
+
 ## activerecord-turntable 2.0.5 ##
 
 ### Bugfixes
