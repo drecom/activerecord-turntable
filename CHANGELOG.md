@@ -1,4 +1,4 @@
-## activerecord-turntable 2.0.6 (unrelelased) ##
+## activerecord-turntable 2.0.6 ##
 
 ### Bugfixes
 
