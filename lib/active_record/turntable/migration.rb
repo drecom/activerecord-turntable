@@ -29,7 +29,7 @@ module ActiveRecord::Turntable::Migration
     end
 
     def shards(*connection_names)
-      (self.target_shards ||= []) << connection_names
+      (self.target_shards ||= []).concat connection_names
     end
   end
 
