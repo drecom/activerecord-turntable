@@ -21,11 +21,16 @@ module ActiveRecord::Turntable::ActiveRecordExt
             finder_scope.find(id)
           end
 
-        @attributes.update(fresh_object.instance_variable_get('@attributes'))
+        if ActiveRecord::Turntable.rails42_later?
+          @attributes = fresh_object.instance_variable_get('@attributes')
+        else
+          @attributes.update(fresh_object.instance_variable_get('@attributes'))
 
-        @column_types           = self.class.column_types
-        @column_types_override  = fresh_object.instance_variable_get('@column_types_override')
-        @attributes_cache       = {}
+          @column_types           = self.class.column_types
+          @column_types_override  = fresh_object.instance_variable_get('@column_types_override')
+          @attributes_cache       = {}
+        end
+        @new_record = false
         self
       end
 
@@ -57,6 +62,8 @@ module ActiveRecord::Turntable::ActiveRecordExt
                          end
 
           finder_scope.where(primary_key => self[primary_key]).update_all(changes) == 1
+        else
+          true
         end
       end
 
