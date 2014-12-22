@@ -98,7 +98,6 @@ module ActiveRecord::Turntable
       when Symbol
         shards[shard_or_object]
       else
-        binding.pry
         raise ActiveRecord::Turntable::TurntableError,
                 "transaction cannot call to object: #{shard_or_object}"
       end
