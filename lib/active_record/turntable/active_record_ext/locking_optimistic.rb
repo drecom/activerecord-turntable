@@ -29,7 +29,11 @@ module ActiveRecord::Turntable::ActiveRecordExt
                 )
               )
               if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-                condition_scope = condition_scope.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+                condition_scope = condition_scope.where(
+                  relation.table[klass.turntable_shard_key].eq(
+                     self.class.quote_value(self.send(turntable_shard_key), column_for_attribute(klass.turntable_shard_key))
+                  )
+                )
               end
               stmt = condition_scope.arel.compile_update(arel_attributes_with_values_for_update(attribute_names))
 
@@ -73,7 +77,11 @@ module ActiveRecord::Turntable::ActiveRecordExt
                 )
               )
               if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-                condition_scope = condition_scope.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+                condition_scope = condition_scope.where(
+                  relation.table[klass.turntable_shard_key].eq(
+                     self.class.quote_value(self.send(turntable_shard_key), column_for_attribute(klass.turntable_shard_key))
+                  )
+                )
               end
               stmt = condition_scope.arel.compile_update(
                        arel_attributes_with_values_for_update(attribute_names),
