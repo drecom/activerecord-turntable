@@ -101,14 +101,17 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
         relation = self.class.unscoped.where(
           self.class.arel_table[pk].eq(substitute))
-        if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-          relation = relation.where(klass.turntable_shard_key => self.send(turntable_shard_key))
-        end
-
         relation.bind_values = [[column, id]]
+
+        if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+          shard_key_column = klass.columns_hash[klass.turntable_shard_key]
+          shard_key_substitute = klass.connection.substitute_at(shard_key_column)
+
+          relation = relation.where(self.class.arel_table[klass.turntable_shard_key].eq(shard_key_substitute))
+          relation.bind_values << [shard_key_column, self[klass.turntable_shard_key]]
+        end
         relation
       end
-
 
       # @note Override to add sharding scope on updating
       ar_version = ActiveRecord::VERSION::STRING
