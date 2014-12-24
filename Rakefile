@@ -85,6 +85,7 @@ namespace :turntable do
         ActiveRecord::Base.connection.create_table :cards_users do |t|
           t.belongs_to :card,    :null => false
           t.belongs_to :user,    :null => false
+          t.integer    :num,     :default => 1, :null => false
           t.timestamps
         end
         ActiveRecord::Base.connection.create_sequence_for :cards_users

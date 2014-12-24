@@ -34,7 +34,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   let(:card){
     Card.create!(:name => 'foobar')
   }
-
+  let(:cards_user){
+    user.cards_users.create(card: card)
+  }
   context "When creating record" do
     context "with blob column" do
       let(:blob_value) { "\123\123\123" }
@@ -108,31 +110,31 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
   context "When the model is sharded by other key" do
     it "should send shard_key condition when updating" do
-      user_status.hp = 20
+      cards_user.num = 10
 
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
-        user_status.save!
+        cards_user.save!
       }.to_not raise_error
-      expect(strio.string).to match(/`user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*($|\s)/)
+      expect(strio.string).to match(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/)
     end
 
     it "should change updated_at when updating" do
-      user_status.hp = 20
+      cards_user.num = 2
 
       expect {
-        user_status.save!
-      }.to change(user_status, :updated_at)
+        cards_user.save!
+      }.to change(cards_user, :updated_at)
     end
 
     it "should send shard_key condition when destroying" do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
-        user_status.destroy
+        cards_user.destroy
       }.to_not raise_error
-      expect(strio.string).to match(/`user_statuses`\.`user_id` = #{user_status.user_id}[^\s]*($|\s)/)
+      expect(strio.string).to match(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/)
     end
 
     it "should warn when creating without shard_key" do
@@ -140,39 +142,39 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     end
 
     it "should execute one query when reloading" do
-      user; user_status
+      user; cards_user
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { user_status.reload }.to_not raise_error
+      expect { cards_user.reload }.to_not raise_error
 
       expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
     it "should execute one query when touching" do
-      user; user_status
+      user; cards_user
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { user_status.touch }.to_not raise_error
+      expect { cards_user.touch }.to_not raise_error
       expect(strio.string.split("\n").select {|stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
     it "should execute one query when locking" do
-      user; user_status
+      user; cards_user
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { user_status.lock! }.to_not raise_error
+      expect { cards_user.lock! }.to_not raise_error
       expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
     it "should execute one query when update_columns" do
-      user; user_status
+      user; cards_user
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { user_status.update_columns(hp: 10) }.to_not raise_error
+      expect { cards_user.update_columns(num: 10) }.to_not raise_error
       expect(strio.string.split("\n").select {|stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
     end
   end
@@ -199,9 +201,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   end
 
   context "When call reload" do
-    subject { user_status.reload }
-    it { is_expected.to be_instance_of(UserStatus)}
-    it { is_expected.to eq(user_status) }
+    subject { cards_user.reload }
+    it { is_expected.to be_instance_of(CardsUser) }
+    it { is_expected.to eq(cards_user) }
   end
 
 end
