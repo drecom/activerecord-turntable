@@ -1,3 +1,4 @@
+require 'active_support/lazy_load_hooks'
 require 'active_support/core_ext/hash/indifferent_access'
 
 module ActiveRecord::Turntable
@@ -19,6 +20,7 @@ module ActiveRecord::Turntable
 
     def load!(config_file, env)
       @config = YAML.load(ERB.new(IO.read(config_file)).result).with_indifferent_access[env]
+      ActiveSupport.run_load_hooks(:turntable_config_loaded, ActiveRecord::Base)
     end
   end
 end

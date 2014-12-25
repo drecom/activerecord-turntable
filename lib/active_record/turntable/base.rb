@@ -1,3 +1,5 @@
+require 'active_support/lazy_load_hooks'
+
 module ActiveRecord::Turntable
   module Base
     extend ActiveSupport::Concern
@@ -12,6 +14,10 @@ module ActiveRecord::Turntable
       self.turntable_sequencer_enabled = false
       class << self
         delegate :shards_transaction, :with_all, :to => :connection
+      end
+
+      ActiveSupport.on_load(:turntable_config_loaded) do
+        self.initialize_clusters!
       end
     end
 
@@ -43,6 +49,9 @@ module ActiveRecord::Turntable
         pp = PoolProxy.new(cp)
         ch.class_to_pool.clear if defined?(ch.class_to_pool)
         ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
+      end
+
+      def initialize_clusters!
       end
 
       def spec_for(config)
