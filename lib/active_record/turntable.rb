@@ -20,6 +20,7 @@ module ActiveRecord::Turntable
     autoload :Algorithm
     autoload :Base
     autoload :Cluster
+    autoload :ClusterHelperMethods
     autoload :Config
     autoload :ConnectionProxy
     autoload :MasterShard
@@ -35,6 +36,7 @@ module ActiveRecord::Turntable
 
   included do
     include ActiveRecordExt
+    include ClusterHelperMethods
     include Base
   end
 
