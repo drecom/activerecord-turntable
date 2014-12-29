@@ -12,6 +12,13 @@ module ActiveRecord::Turntable
       end
     end
 
+    # initialize
+    initializer "turntable.initialize_clusters" do
+      ActiveSupport.on_load(:active_record) do
+        ActiveRecord::Turntable::Config.load!
+      end
+    end
+
     # QueryCache Middleware for turntable shards
     initializer "turntable.insert_query_cache_middleware" do |app|
       app.middleware.insert_after ActiveRecord::QueryCache, ActiveRecord::Turntable::Rack::QueryCache

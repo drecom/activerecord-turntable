@@ -1,3 +1,5 @@
+require 'active_support/lazy_load_hooks'
+
 module ActiveRecord::Turntable
   module Base
     extend ActiveSupport::Concern
@@ -7,12 +9,17 @@ module ActiveRecord::Turntable
                         :turntable_enabled, :turntable_sequencer_enabled
 
       self.turntable_connections = {}
-      self.turntable_clusters = Hash.new {|h,k| h[k]={}}
+      self.turntable_clusters = {}.with_indifferent_access
       self.turntable_enabled = false
       self.turntable_sequencer_enabled = false
       class << self
         delegate :shards_transaction, :with_all, :to => :connection
       end
+
+      ActiveSupport.on_load(:turntable_config_loaded) do
+        self.initialize_clusters!
+      end
+      include ClusterHelperMethods
     end
 
     module ClassMethods
@@ -26,53 +33,27 @@ module ActiveRecord::Turntable
         self.turntable_enabled = true
         self.turntable_cluster_name = cluster_name
         self.turntable_shard_key = shard_key_name
-        self.turntable_cluster = Cluster.new(
-                                   self,
-                                   turntable_config[:clusters][cluster_name],
-                                   options
-                                 )
-        self.turntable_clusters[cluster_name][self] = turntable_cluster
-
+        self.turntable_cluster =
+          self.turntable_clusters[cluster_name] ||= Cluster.new(
+                                                      turntable_config[:clusters][cluster_name],
+                                                      options
+                                                    )
         turntable_replace_connection_pool
-        turntable_define_cluster_methods(cluster_name)
       end
 
-      #
-      def force_transaction_all_shards!(options={}, &block)
-        force_connect_all_shards!
-        shards = turntable_connections.values
-        shards += [ActiveRecord::Base.connection_pool]
-        recursive_transaction(shards, options, &block)
-      end
-
-      def recursive_transaction(pools, options, &block)
-        pool = pools.shift
-        if pools.present?
-          pool.connection.transaction(options) do
-            recursive_transaction(pools, options, &block)
-          end
-        else
-          pool.connection.transaction(options, &block)
-        end
-      end
-
-      def force_connect_all_shards!
-        conf = configurations[Rails.env]
-        shards = {}
-        shards = shards.merge(conf["shards"]) if conf["shards"]
-        shards = shards.merge(conf["seq"]) if conf["seq"]
-        shards.each do |name, config|
-          turntable_connections[name] ||=
-            ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec_for(config))
-        end
-      end
 
       def turntable_replace_connection_pool
         ch = connection_handler
-        cp = turntable_cluster.connection_proxy
+        cp = ConnectionProxy.new(self, turntable_cluster)
         pp = PoolProxy.new(cp)
         ch.class_to_pool.clear if defined?(ch.class_to_pool)
         ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
+      end
+
+      def initialize_clusters!
+        turntable_config[:clusters].each do |name, spec|
+          self.turntable_clusters[name] ||= Cluster.new(spec, {})
+        end
       end
 
       def spec_for(config)
@@ -114,16 +95,6 @@ module ActiveRecord::Turntable
         turntable_cluster.select_shard(current_sequence) if sequencer_enabled?
       end
 
-      def weighted_random_shard_with(*klasses, &block)
-        shards_weight = self.turntable_cluster.weighted_shards
-        sum = shards_weight.values.inject(&:+)
-        idx = rand(sum)
-        shard, weight = shards_weight.find {|k,v|
-          (idx -= v) < 0
-        }
-        self.connection.with_recursive_shards(shard.name, *klasses, &block)
-      end
-
       def with_shard(any_shard)
         shard = case any_shard
                 when Numeric
@@ -134,41 +105,6 @@ module ActiveRecord::Turntable
                   shard_or_key
                 end
         connection.with_shard(shard) { yield }
-      end
-
-      private
-
-      def turntable_define_cluster_methods(cluster_name)
-        turntable_define_cluster_class_methods(cluster_name)
-      end
-
-      def turntable_define_cluster_class_methods(cluster_name)
-        (class << ActiveRecord::Base; self; end).class_eval <<-EOD
-          unless respond_to?(:#{cluster_name}_transaction)
-            def #{cluster_name}_transaction(shards = [], options = {})
-              cluster = turntable_clusters[#{cluster_name.inspect}].values.first
-              cluster.shards_transaction(shards, options) { yield }
-            end
-          end
-
-          unless respond_to?(:all_cluster_transaction)
-            def all_cluster_transaction(options = {})
-              clusters = turntable_clusters.values.map { |v| v.values.first }
-              recursive_cluster_transaction(clusters) { yield }
-            end
-
-            def recursive_cluster_transaction(clusters, options = {}, &block)
-              current_cluster = clusters.shift
-              current_cluster.shards_transaction do
-                if clusters.present?
-                  recursive_cluster_transaction(clusters, options, &block)
-                else
-                  yield
-                end
-              end
-            end
-          end
-        EOD
       end
     end
 

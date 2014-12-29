@@ -10,14 +10,13 @@ describe ActiveRecord::Turntable::Cluster do
     truncate_shard
   end
   let(:cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:user_cluster] }
-  let(:cluster) { ActiveRecord::Turntable::Cluster.new(User, cluster_config) }
+  let(:cluster) { ActiveRecord::Turntable::Cluster.new(cluster_config) }
   let(:in_range_shard_key_value) { cluster_config[:shards].last[:less_than] - 1 }
   let(:out_of_range_shard_key_value) { cluster_config[:shards].last[:less_than] }
 
   context "When initialized" do
     subject { cluster }
 
-    its(:klass) { should == User }
     its(:shards) { should have(3).items }
   end
 

@@ -126,12 +126,12 @@ module ActiveRecord::Turntable
     def build_select_fader(tree, method, query, *args, &block)
       shard_keys = if !tree.where and tree.from.size == 1 and SQLTree::Node::SubQuery === tree.from.first.table_reference.table
                      find_shard_keys(tree.from.first.table_reference.table.where,
-                                     @proxy.cluster.klass.table_name,
-                                     @proxy.cluster.klass.turntable_shard_key.to_s)
+                                     @proxy.klass.table_name,
+                                     @proxy.klass.turntable_shard_key.to_s)
                    else
                      find_shard_keys(tree.where,
-                                     @proxy.cluster.klass.table_name,
-                                     @proxy.cluster.klass.turntable_shard_key.to_s)
+                                     @proxy.klass.table_name,
+                                     @proxy.klass.turntable_shard_key.to_s)
                    end
 
       if shard_keys.size == 1 # shard
@@ -186,7 +186,7 @@ module ActiveRecord::Turntable
     end
 
     def build_update_fader(tree, method, query, *args, &block)
-      shard_keys = find_shard_keys(tree.where, @proxy.cluster.klass.table_name, @proxy.cluster.klass.turntable_shard_key.to_s)
+      shard_keys = find_shard_keys(tree.where, @proxy.klass.table_name, @proxy.klass.turntable_shard_key.to_s)
       shards_with_query = if shard_keys.present?
                             build_shards_with_same_query(shard_keys.map {|k| @proxy.cluster.shard_for(k) }, query)
                           else
@@ -208,7 +208,7 @@ module ActiveRecord::Turntable
     end
 
     def build_insert_fader(tree, method, query, *args, &block)
-      values_hash = divide_insert_values(tree, @proxy.cluster.klass.turntable_shard_key)
+      values_hash = divide_insert_values(tree, @proxy.klass.turntable_shard_key)
       shards_with_query = {}
       values_hash.each do |k,vs|
         tree.values = [[SQLTree::Node::Expression::Variable.new("\\0")]]

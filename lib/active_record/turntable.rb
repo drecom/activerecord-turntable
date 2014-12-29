@@ -20,6 +20,7 @@ module ActiveRecord::Turntable
     autoload :Algorithm
     autoload :Base
     autoload :Cluster
+    autoload :ClusterHelperMethods
     autoload :Config
     autoload :ConnectionProxy
     autoload :MasterShard

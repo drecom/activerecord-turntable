@@ -6,12 +6,14 @@ module ActiveRecord::Turntable
     # for expiring query cache
     CLEAR_CACHE_METHODS = [:update, :insert, :delete, :exec_insert, :exec_update, :exec_delete, :insert_many]
 
+    attr_reader :klass
     attr_writer :spec
 
-    def initialize(cluster, options = {})
-      @cluster      =  cluster
-      @model_class  =  cluster.klass
-      @default_current_shard =  (cluster.master || cluster.shards.first[1])
+    def initialize(klass, cluster, options = {})
+      @klass   = klass
+      @cluster = cluster
+      @master_shard = MasterShard.new(klass)
+      @default_current_shard = @master_shard
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
     end
 
@@ -36,7 +38,7 @@ module ActiveRecord::Turntable
     end
 
     def enable_query_cache!
-      @model_class.turntable_connections.each do |k,v|
+      klass.turntable_connections.each do |k,v|
         v.connection.enable_query_cache!
       end
     end
@@ -46,7 +48,7 @@ module ActiveRecord::Turntable
     end
 
     def clear_query_cache
-      @model_class.turntable_connections.each do |k,v|
+      klass.turntable_connections.each do |k,v|
         v.connection.clear_query_cache
       end
     end
@@ -91,7 +93,7 @@ module ActiveRecord::Turntable
     end
 
     def master
-      @cluster.master
+      @master_shard
     end
 
     def master_connection
@@ -99,7 +101,7 @@ module ActiveRecord::Turntable
     end
 
     def seq
-      @cluster.seq
+      @cluster.seq || master
     end
 
     def current_shard
@@ -107,7 +109,7 @@ module ActiveRecord::Turntable
     end
 
     def current_shard=(shard)
-      logger.debug { "Changing #{@model_class}'s shard to #{shard.name}"}
+      logger.debug { "Changing #{klass}'s shard to #{shard.name}"}
       current_shard_entry[object_id] = shard
     end
 
@@ -170,7 +172,7 @@ module ActiveRecord::Turntable
     # Send queries to master connection and all shards in this cluster
     # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
     def with_master_and_all(continue_on_error = false)
-      ([@cluster.master] + @cluster.shards.values).map do |shard|
+      ([master] + @cluster.shards.values).map do |shard|
         begin
           with_shard(shard) {
             yield
@@ -185,7 +187,7 @@ module ActiveRecord::Turntable
     end
 
     def with_master(&block)
-      with_shard(@cluster.master) do
+      with_shard(master) do
         yield
       end
     end
