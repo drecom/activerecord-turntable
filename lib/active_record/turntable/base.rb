@@ -9,7 +9,7 @@ module ActiveRecord::Turntable
                         :turntable_enabled, :turntable_sequencer_enabled
 
       self.turntable_connections = {}
-      self.turntable_clusters = Hash.new {|h,k| h[k]={}}
+      self.turntable_clusters = {}.with_indifferent_access
       self.turntable_enabled = false
       self.turntable_sequencer_enabled = false
       class << self
@@ -19,6 +19,7 @@ module ActiveRecord::Turntable
       ActiveSupport.on_load(:turntable_config_loaded) do
         self.initialize_clusters!
       end
+      include ClusterHelperMethods
     end
 
     module ClassMethods
@@ -32,26 +33,27 @@ module ActiveRecord::Turntable
         self.turntable_enabled = true
         self.turntable_cluster_name = cluster_name
         self.turntable_shard_key = shard_key_name
-        self.turntable_cluster = Cluster.new(
-                                   self,
-                                   turntable_config[:clusters][cluster_name],
-                                   options
-                                 )
-        self.turntable_clusters[cluster_name][self] = turntable_cluster
-
+        self.turntable_cluster =
+          self.turntable_clusters[cluster_name] ||= Cluster.new(
+                                                      turntable_config[:clusters][cluster_name],
+                                                      options
+                                                    )
         turntable_replace_connection_pool
       end
 
 
       def turntable_replace_connection_pool
         ch = connection_handler
-        cp = turntable_cluster.connection_proxy
+        cp = ConnectionProxy.new(self, turntable_cluster)
         pp = PoolProxy.new(cp)
         ch.class_to_pool.clear if defined?(ch.class_to_pool)
         ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
       end
 
       def initialize_clusters!
+        turntable_config[:clusters].each do |name, spec|
+          self.turntable_clusters[name] ||= Cluster.new(spec, {})
+        end
       end
 
       def spec_for(config)

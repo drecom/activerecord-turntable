@@ -36,7 +36,6 @@ module ActiveRecord::Turntable
 
   included do
     include ActiveRecordExt
-    include ClusterHelperMethods
     include Base
   end
 

@@ -11,8 +11,8 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
     end
 
-    let(:cluster) { ActiveRecord::Turntable::Cluster.new(User, ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
-    subject { ActiveRecord::Turntable::ConnectionProxy.new(cluster) }
+    let(:cluster) { ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
+    subject { ActiveRecord::Turntable::ConnectionProxy.new(User, cluster) }
 
     its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end

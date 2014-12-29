@@ -2,6 +2,14 @@ module ActiveRecord::Turntable
   module ClusterHelperMethods
     extend ActiveSupport::Concern
 
+    included do
+      ActiveSupport.on_load(:turntable_config_loaded) do
+        turntable_clusters.each do |name, cluster|
+          turntable_define_cluster_methods(name)
+        end
+      end
+    end
+
     module ClassMethods
       def force_transaction_all_shards!(options={}, &block)
         force_connect_all_shards!
@@ -33,7 +41,7 @@ module ActiveRecord::Turntable
       end
 
       def weighted_random_shard_with(*klasses, &block)
-        shards_weight = self.turntable_cluster.weighted_shards
+        shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence)
         sum = shards_weight.values.inject(&:+)
         idx = rand(sum)
         shard, weight = shards_weight.find {|k,v|
@@ -42,8 +50,8 @@ module ActiveRecord::Turntable
         self.connection.with_recursive_shards(shard.name, *klasses, &block)
       end
 
-            def all_cluster_transaction(options = {})
-        clusters = turntable_clusters.values.map { |v| v.values.first }
+      def all_cluster_transaction(options = {})
+        clusters = turntable_clusters.values
         recursive_cluster_transaction(clusters) { yield }
       end
 
@@ -66,7 +74,7 @@ module ActiveRecord::Turntable
         (class << ActiveRecord::Base; self; end).class_eval <<-EOD
           unless respond_to?(:#{cluster_name}_transaction)
             def #{cluster_name}_transaction(shards = [], options = {})
-              cluster = turntable_clusters[#{cluster_name.inspect}].values.first
+              cluster = turntable_clusters[#{cluster_name.inspect}]
               cluster.shards_transaction(shards, options) { yield }
             end
           end
