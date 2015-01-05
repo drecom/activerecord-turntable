@@ -1,3 +1,9 @@
+## activerecord-turntable 2.1.0 (unreleased) ##
+
+### Bugfixes
+
+* Fix cluster helper methods(i.e xxxx_cluster_transaction helper) on lazy load environments(development, test)
+
 ## activerecord-turntable 2.0.6 ##
 
 ### Bugfixes
