@@ -92,29 +92,47 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
       private
 
+      ar_version = ActiveRecord::VERSION::STRING
+
       # @note Override to add sharding scope on destroying
-      def relation_for_destroy
-        pk         = self.class.primary_key
-        column     = self.class.columns_hash[pk]
-        substitute = self.class.connection.substitute_at(column, 0)
-        klass      = self.class
+      if ActiveRecord::Turntable.rails42_later?
+        def relation_for_destroy
+          pk         = self.class.primary_key
+          column     = self.class.columns_hash[pk]
+          substitute = self.class.connection.substitute_at(column, 0)
+          klass      = self.class
 
-        relation = self.class.unscoped.where(
-          self.class.arel_table[pk].eq(substitute))
-        relation.bind_values = [[column, id]]
+          relation = self.class.unscoped.where(
+                       self.class.arel_table[pk].eq(substitute))
+          relation.bind_values = [[column, id]]
 
-        if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-          shard_key_column = klass.columns_hash[klass.turntable_shard_key]
-          shard_key_substitute = klass.connection.substitute_at(shard_key_column)
+          if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+            shard_key_column = klass.columns_hash[klass.turntable_shard_key]
+            shard_key_substitute = klass.connection.substitute_at(shard_key_column)
 
-          relation = relation.where(self.class.arel_table[klass.turntable_shard_key].eq(shard_key_substitute))
-          relation.bind_values << [shard_key_column, self[klass.turntable_shard_key]]
+            relation = relation.where(self.class.arel_table[klass.turntable_shard_key].eq(shard_key_substitute))
+            relation.bind_values << [shard_key_column, self[klass.turntable_shard_key]]
+          end
+          relation
         end
-        relation
+      else
+        def relation_for_destroy
+          pk         = self.class.primary_key
+          column     = self.class.columns_hash[pk]
+          substitute = self.class.connection.substitute_at(column, 0)
+          klass      = self.class
+
+          relation = self.class.unscoped.where(
+                       self.class.arel_table[pk].eq(substitute))
+          if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+            relation = relation.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+          end
+          relation.bind_values = [[column, id]]
+          relation
+        end
       end
 
       # @note Override to add sharding scope on updating
-      ar_version = ActiveRecord::VERSION::STRING
       if ar_version < "4.1"
         method_name = ar_version =~ /\A4\.0\.[0-5]\z/ ? "update_record" : "_update_record"
         class_eval <<-EOD

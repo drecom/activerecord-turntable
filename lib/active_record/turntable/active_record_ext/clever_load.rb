@@ -12,7 +12,8 @@ module ActiveRecord::Turntable::ActiveRecordExt
       # load records
       records = self.to_a
       klass = records.first.class
-      reflection = klass.reflections[association_name.to_s]
+      association_key = ActiveRecord::Turntable.rails42_later? ? association_name.to_s : association_name
+      reflection = klass.reflections[association_key]
 
       if reflection
         foreign_class = reflection.klass
