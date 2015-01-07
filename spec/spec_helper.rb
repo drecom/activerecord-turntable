@@ -6,7 +6,10 @@ require 'rspec/its'
 require 'rspec/collection_matchers'
 require 'webmock/rspec'
 require 'pry'
-require 'pry-byebug'
+begin
+  require 'pry-byebug'
+rescue LoadError
+end
 
 require 'activerecord-turntable'
 
