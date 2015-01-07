@@ -43,6 +43,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "faker"
   spec.add_development_dependency "webmock"
   spec.add_development_dependency "pry"
+  if RUBY_VERSION > "2.0"
+    spec.add_development_dependency "pry-byebug"
+  end
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "coveralls"
 

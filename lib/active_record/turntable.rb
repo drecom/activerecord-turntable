@@ -65,5 +65,9 @@ module ActiveRecord::Turntable
     rails4? && ActiveRecord::VERSION::MINOR >= 1
   end
 
+  def self.rails42_later?
+    rails4? && ActiveRecord::VERSION::MINOR >= 2
+  end
+
   require "active_record/turntable/railtie" if defined?(Rails)
 end

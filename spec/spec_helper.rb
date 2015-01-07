@@ -5,6 +5,11 @@ require 'bundler/setup'
 require 'rspec/its'
 require 'rspec/collection_matchers'
 require 'webmock/rspec'
+require 'pry'
+begin
+  require 'pry-byebug'
+rescue LoadError
+end
 
 require 'activerecord-turntable'
 

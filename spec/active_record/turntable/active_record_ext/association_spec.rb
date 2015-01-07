@@ -49,14 +49,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
     let(:cards_user) { CardsUser.where(user: user).first }
 
     context "associated objects has same turntable_key" do
-      subject { cards_user.cards_users_histories }
+      subject { cards_user.cards_users_histories.to_a }
       it { expect { subject }.to_not raise_error }
       it { is_expected.to include(*cards_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
     end
 
     context "associated objects has different turntable_key" do
       context "when foreign_shard_key option passed" do
-        subject { cards_user.events_users_histories_with_foreign_shard_key }
+        subject { cards_user.events_users_histories_with_foreign_shard_key.to_a }
 
         it { expect { subject }.to_not raise_error }
         it { is_expected.to include(*events_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
