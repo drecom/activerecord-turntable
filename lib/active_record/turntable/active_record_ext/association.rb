@@ -38,7 +38,7 @@ module ActiveRecord::Turntable
                 scope.eager_loading? ||
                 klass.current_scope ||
                 klass.default_scopes.any? ||
-                should_use_shard_key?
+                should_use_shard_key? # OPTIMIZE: Use bind values if cachable scope
 
               return turntable_scope(scope).limit(1).to_a
             end
@@ -86,7 +86,7 @@ module ActiveRecord::Turntable
                 scope.eager_loading? ||
                 klass.current_scope ||
                 klass.default_scopes.any? ||
-                should_use_shard_key?
+                should_use_shard_key? # OPTIMIZE: Use bind values if cachable scope
 
               return turntable_scope(scope).to_a
             end
