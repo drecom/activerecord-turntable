@@ -11,6 +11,15 @@ module ActiveRecord::Turntable
         ActiveRecord::Associations::Builder::Association.valid_options += [:foreign_shard_key]
       end
 
+      private
+
+      def turntable_scope(scope, bind = nil)
+        if should_use_shard_key?
+          scope = scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
+        end
+        scope
+      end
+
       module SingularAssociationExt
         extend ActiveSupport::Concern
 
@@ -22,22 +31,14 @@ module ActiveRecord::Turntable
           end
         end
 
-        private
-
-        def turntable_scope(scope)
-          if should_use_shard_key?
-            scope = scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
-          end
-          scope
-        end
-
         # @note Override to add sharding condition for singular association
         if ActiveRecord::Turntable.rails42_later?
           def get_records_with_turntable
             if reflection.scope_chain.any?(&:any?) ||
                 scope.eager_loading? ||
                 klass.current_scope ||
-                klass.default_scopes.any?
+                klass.default_scopes.any? ||
+                should_use_shard_key?
 
               return turntable_scope(scope).limit(1).to_a
             end
@@ -84,9 +85,10 @@ module ActiveRecord::Turntable
             if reflection.scope_chain.any?(&:any?) ||
                 scope.eager_loading? ||
                 klass.current_scope ||
-                klass.default_scopes.any?
+                klass.default_scopes.any? ||
+                should_use_shard_key?
 
-              return scope.to_a
+              return turntable_scope(scope).to_a
             end
 
             conn = klass.connection
