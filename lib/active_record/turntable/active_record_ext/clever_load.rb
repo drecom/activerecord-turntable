@@ -12,7 +12,7 @@ module ActiveRecord::Turntable::ActiveRecordExt
       # load records
       records = self.to_a
       klass = records.first.class
-      reflection = klass.reflections[association_name]
+      reflection = klass.reflections[association_name.to_s]
 
       if reflection
         foreign_class = reflection.klass
