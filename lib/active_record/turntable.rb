@@ -8,6 +8,7 @@ require 'active_record'
 require 'active_record/fixtures'
 require 'active_support/concern'
 require 'active_record/turntable/error'
+require 'active_record/turntable/util'
 require 'logger'
 require 'singleton'
 
@@ -55,18 +56,6 @@ module ActiveRecord::Turntable
     def turntable_config
       ActiveRecord::Turntable::Config.instance
     end
-  end
-
-  def self.rails4?
-    ActiveRecord::VERSION::MAJOR == 4
-  end
-
-  def self.rails41_later?
-    rails4? && ActiveRecord::VERSION::MINOR >= 1
-  end
-
-  def self.rails42_later?
-    rails4? && ActiveRecord::VERSION::MINOR >= 2
   end
 
   require "active_record/turntable/railtie" if defined?(Rails)

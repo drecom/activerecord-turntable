@@ -16,7 +16,7 @@ module ActiveRecord::Turntable
       end
 
       # @note Override to add sharding scope on updating
-      if ActiveRecord::Turntable.rails42_later?
+      if Util.rails42_later?
         def _update_record_with_turntable(values, id, id_was, turntable_scope = nil) # :nodoc:
           substitutes, binds = substitute_values values
 

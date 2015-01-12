@@ -61,6 +61,8 @@ module ActiveRecord
   end
 
   module TestFixtures
+    extend ActiveRecord::Turntable::Util
+
     def setup_fixtures(config = ActiveRecord::Base)
       return unless !ActiveRecord::Base.configurations.blank?
 
@@ -120,9 +122,9 @@ module ActiveRecord
     private
 
     def turntable_load_fixtures(config)
-      if ActiveRecord::Turntable.rails41_later?
+      if rails41_later?
         load_fixtures(config)
-      elsif ActiveRecord::Turntable.rails4?
+      elsif rails4?
         load_fixtures
       else
         raise NotImplementedError
@@ -130,9 +132,9 @@ module ActiveRecord
     end
 
     def turntable_instantiate_fixtures(config)
-      if ActiveRecord::Turntable.rails41_later?
+      if rails41_later?
         instantiate_fixtures(config)
-      elsif ActiveRecord::Turntable.rails4?
+      elsif rails4?
         instantiate_fixtures
       else
         raise NotImplementedError
