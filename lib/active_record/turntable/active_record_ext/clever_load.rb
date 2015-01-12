@@ -13,7 +13,7 @@ module ActiveRecord::Turntable
         # load records
         records = self.to_a
         klass = records.first.class
-        association_key = Util.rails42_later? ? association_name.to_s : association_name
+        association_key = Util.ar42_or_later? ? association_name.to_s : association_name
         reflection = klass.reflections[association_key]
 
         if reflection

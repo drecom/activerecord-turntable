@@ -22,7 +22,7 @@ module ActiveRecord::Turntable
               finder_scope.find(id)
             end
 
-          if Util.rails42_later?
+          if Util.ar42_or_later?
             @attributes = fresh_object.instance_variable_get('@attributes')
           else
             @attributes.update(fresh_object.instance_variable_get('@attributes'))
@@ -93,10 +93,8 @@ module ActiveRecord::Turntable
 
         private
 
-        ar_version = ActiveRecord::VERSION::STRING
-
         # @note Override to add sharding scope on destroying
-        if Util.rails42_later?
+        if Util.ar42_or_later?
           def relation_for_destroy
             pk         = self.class.primary_key
             column     = self.class.columns_hash[pk]
@@ -134,8 +132,8 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding scope on updating
-        if ar_version < "4.1"
-          method_name = ar_version =~ /\A4\.0\.[0-5]\z/ ? "update_record" : "_update_record"
+        if Util.earlier_than_ar41?
+          method_name = Util.ar_version_earlier_than?("4.0.6") ? "update_record" : "_update_record"
           class_eval <<-EOD
             def #{method_name}(attribute_names = @attributes.keys)
               attributes_with_values = arel_attributes_with_values_for_update(attribute_names)
@@ -163,7 +161,7 @@ module ActiveRecord::Turntable
             end
           EOD
         else
-          method_name = ar_version =~ /\A4\.1\.[01]\z/ ? "update_record" : "_update_record"
+          method_name = Util.ar_version_earlier_than?("4.1.2") ? "update_record" : "_update_record"
           class_eval <<-EOD
             def #{method_name}(attribute_names = @attributes.keys)
               klass = self.class

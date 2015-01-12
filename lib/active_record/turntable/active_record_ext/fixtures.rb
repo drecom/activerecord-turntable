@@ -122,24 +122,19 @@ module ActiveRecord
     private
 
     def turntable_load_fixtures(config)
-      if rails41_later?
+      if ar41_or_later?
         load_fixtures(config)
-      elsif rails4?
-        load_fixtures
       else
-        raise NotImplementedError
+        load_fixtures
       end
     end
 
     def turntable_instantiate_fixtures(config)
-      if rails41_later?
+      if ar41_or_later?
         instantiate_fixtures(config)
-      elsif rails4?
-        instantiate_fixtures
       else
-        raise NotImplementedError
+        instantiate_fixtures
       end
     end
-
   end
 end

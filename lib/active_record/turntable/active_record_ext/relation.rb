@@ -4,9 +4,8 @@ module ActiveRecord::Turntable
       extend ActiveSupport::Concern
 
       included do
-        version = ActiveRecord::VERSION::STRING
-        if version >= '4.1'
-          if version < '4.1.2'
+        if Util.ar41_or_later?
+          if Util.ar_version_earlier_than?('4.1.2')
             alias_method :_update_record_without_turntable, :update_record
             alias_method :update_record, :_update_record_with_turntable
           else
@@ -16,7 +15,7 @@ module ActiveRecord::Turntable
       end
 
       # @note Override to add sharding scope on updating
-      if Util.rails42_later?
+      if Util.ar42_or_later?
         def _update_record_with_turntable(values, id, id_was, turntable_scope = nil) # :nodoc:
           substitutes, binds = substitute_values values
 

@@ -24,7 +24,7 @@ module ActiveRecord::Turntable
         extend ActiveSupport::Concern
 
         included do
-          if Util.rails42_later?
+          if Util.ar42_or_later?
             alias_method_chain :get_records, :turntable
           else
             alias_method_chain :find_target, :turntable
@@ -32,7 +32,7 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding condition for singular association
-        if Util.rails42_later?
+        if Util.ar42_or_later?
           def get_records_with_turntable
             if reflection.scope_chain.any?(&:any?) ||
                 scope.eager_loading? ||
@@ -54,7 +54,7 @@ module ActiveRecord::Turntable
             binds = ActiveRecord::Associations::AssociationScope.get_bind_values(owner, reflection.chain)
             sc.execute binds, klass, klass.connection
           end
-        elsif Util.rails41_later?
+        elsif Util.ar41_or_later?
           def find_target_with_turntable
             if record = turntable_scope(scope).take
               set_inverse_instance record
@@ -71,7 +71,7 @@ module ActiveRecord::Turntable
         extend ActiveSupport::Concern
 
         included do
-          if Util.rails42_later?
+          if Util.ar42_or_later?
             alias_method_chain :get_records, :turntable
           else
             alias_method_chain :find_target, :turntable
@@ -80,7 +80,7 @@ module ActiveRecord::Turntable
 
         private
 
-        if Util.rails42_later?
+        if Util.ar42_or_later?
           def get_records_with_turntable
             if reflection.scope_chain.any?(&:any?) ||
                 scope.eager_loading? ||
