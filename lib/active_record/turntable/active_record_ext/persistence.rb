@@ -162,8 +162,9 @@ module ActiveRecord::Turntable
           EOD
         else
           method_name = Util.ar_version_earlier_than?("4.1.2") ? "update_record" : "_update_record"
+          attributes_method_name = Util.ar42_or_later? ? "self.attribute_names" : "@attributes.keys"
           class_eval <<-EOD
-            def #{method_name}(attribute_names = @attributes.keys)
+            def #{method_name}(attribute_names = #{attributes_method_name})
               klass = self.class
               attributes_values = arel_attributes_with_values_for_update(attribute_names)
               if attributes_values.empty?
