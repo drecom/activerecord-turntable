@@ -12,6 +12,15 @@ require 'active_record/turntable/util'
 require 'logger'
 require 'singleton'
 
+# for 4.0.x series
+module ActiveRecord
+  unless respond_to?(:gem_version)
+    class << self
+      alias_method :gem_version, :version
+    end
+  end
+end
+
 module ActiveRecord::Turntable
   extend ActiveSupport::Concern
   extend ActiveSupport::Autoload
