@@ -26,6 +26,10 @@ module ActiveRecord::Turntable
       ar_version_equals_or_later?("4.2")
     end
 
+    def earlier_than_ar42?
+      ar_version_earlier_than?("4.2")
+    end
+
     def ar_version
       ActiveRecord::gem_version
     end

@@ -53,7 +53,7 @@ module ActiveRecord::Turntable
               end
             end
           EOD
-        elsif Util.ar42_or_later?
+        elsif Util.earlier_than_ar42?
           method_name = Util.ar_version_earlier_than?("4.1.2") ? "update_record" : "_update_record"
 
           class_eval <<-EOD
