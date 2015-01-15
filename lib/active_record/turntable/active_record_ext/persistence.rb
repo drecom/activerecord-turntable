@@ -36,41 +36,76 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding scope on `touch`
-        def touch(name = nil)
-          raise ActiveRecordError, "can not touch on a new record object" unless persisted?
+        if Util.ar42_or_later?
+          def touch(*names)
+            raise ActiveRecordError, "cannot touch on a new record object" unless persisted?
 
-          attributes = timestamp_attributes_for_update_in_model
-          attributes << name if name
+            attributes = timestamp_attributes_for_update_in_model
+            attributes.concat(names)
 
-          unless attributes.empty?
-            current_time = current_time_from_proper_timezone
-            changes = {}
+            unless attributes.empty?
+              current_time = current_time_from_proper_timezone
+              changes = {}
 
-            attributes.each do |column|
-              column = column.to_s
-              changes[column] = write_attribute(column, current_time)
+              attributes.each do |column|
+                column = column.to_s
+                changes[column] = write_attribute(column, current_time)
+              end
+
+              changes[self.class.locking_column] = increment_lock if locking_enabled?
+
+              clear_attribute_changes(changes.keys)
+              primary_key = self.class.primary_key
+
+              finder_scope = if turntable_enabled? and primary_key != self.class.turntable_shard_key.to_s
+                               self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
+                             else
+                               self.class.unscoped
+                             end
+
+              finder_scope.where(primary_key => self[primary_key]).update_all(changes) == 1
+            else
+              true
             end
+          end
+        else
+          def touch(name = nil)
+            raise ActiveRecordError, "can not touch on a new record object" unless persisted?
 
-            changes[self.class.locking_column] = increment_lock if locking_enabled?
+            attributes = timestamp_attributes_for_update_in_model
+            attributes << name if name
 
-            @changed_attributes.except!(*changes.keys)
-            primary_key = self.class.primary_key
+            unless attributes.empty?
+              current_time = current_time_from_proper_timezone
+              changes = {}
 
-            finder_scope = if turntable_enabled? and primary_key != self.class.turntable_shard_key.to_s
-                             self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
-                           else
-                             self.class.unscoped
-                           end
+              attributes.each do |column|
+                column = column.to_s
+                changes[column] = write_attribute(column, current_time)
+              end
 
-            finder_scope.where(primary_key => self[primary_key]).update_all(changes) == 1
-          else
-            true
+              changes[self.class.locking_column] = increment_lock if locking_enabled?
+
+              @changed_attributes.except!(*changes.keys)
+              primary_key = self.class.primary_key
+
+              finder_scope = if turntable_enabled? and primary_key != self.class.turntable_shard_key.to_s
+                               self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
+                             else
+                               self.class.unscoped
+                             end
+
+              finder_scope.where(primary_key => self[primary_key]).update_all(changes) == 1
+            else
+              true
+            end
           end
         end
 
         # @note Override to add sharding scope on `update_columns`
         def update_columns(attributes)
-          raise ActiveRecordError, "cannot update on a new record object" unless persisted?
+          raise ActiveRecordError, "cannot update a new record" if new_record?
+          raise ActiveRecordError, "cannot update a destroyed record" if destroyed?
 
           attributes.each_key do |key|
             verify_readonly_attribute(key.to_s)
