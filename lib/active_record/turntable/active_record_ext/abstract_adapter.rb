@@ -17,7 +17,7 @@ module ActiveRecord::Turntable
                                    :turntable_shard_name => turntable_shard_name) { yield }
         rescue Exception => e
           message = "#{e.class.name}: #{e.message}: #{sql} : #{turntable_shard_name}"
-          @logger.debug message if @logger
+          @logger.error message if @logger
           exception = translate_exception(e, message)
           exception.set_backtrace e.backtrace
           raise exception
