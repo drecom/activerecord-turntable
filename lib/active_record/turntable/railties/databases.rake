@@ -37,8 +37,8 @@ db_namespace = namespace :db do
     ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
       puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
       ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-      db_namespace['_dump'].invoke
     end
+    db_namespace['_dump'].invoke
   end
 
   desc 'Rolls the turntable cluster schema back to the previous version (specify steps w/ STEP=n).'
