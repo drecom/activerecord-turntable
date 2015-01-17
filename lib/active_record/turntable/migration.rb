@@ -8,6 +8,7 @@ module ActiveRecord::Turntable::Migration
     alias_method_chain :exec_migration, :turntable
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
     ::ActiveRecord::Migration::CommandRecorder.send(:include, CommandRecorder)
+    ::ActiveRecord::Migrator.send(:include, Migrator)
   end
 
   module ShardDefinition
@@ -93,4 +94,58 @@ module ActiveRecord::Turntable::Migration
     end
   end
 
+  module Migrator
+    extend ActiveSupport::Concern
+
+    included do
+      klass = self
+      (class << klass; self; end).instance_eval {
+        [:up, :down, :run, :open].each do |method_name|
+          original_method_alias = "_original_#{method_name}"
+          unless klass.respond_to?(original_method_alias)
+            alias_method original_method_alias, method_name
+          end
+          alias_method_chain method_name, :turntable
+        end
+      }
+    end
+
+    module ClassMethods
+      def up_with_turntable(migrations_paths, target_version = nil)
+        up_without_turntable(migrations_paths, target_version)
+
+        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+          _original_up(migrations_paths, target_version)
+        end
+      end
+
+      def down_with_turntable(migrations_paths, target_version = nil, &block)
+        down_without_turntable(migrations_paths, target_version, &block)
+
+        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+          _original_down(migrations_paths, target_version, &block)
+        end
+      end
+
+      def run_with_turntable(*args)
+        run_without_turntable(*args)
+
+        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+          _original_run(*args)
+        end
+      end
+
+      def open_with_turntable(migrations_paths)
+        open_without_turntable(migrations_paths)
+
+        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+          _original_open(*args)
+        end
+      end
+    end
+  end
 end

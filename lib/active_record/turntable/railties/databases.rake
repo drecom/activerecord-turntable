@@ -31,40 +31,6 @@ db_namespace = namespace :db do
       end
     end
 
-    desc "Migrate turntable databases (options: VERSION=x, VERBOSE=false, SCOPE=blog)."
-    task :migrate do
-      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-
-      ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-        puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-        ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-      end
-      db_namespace['_dump'].invoke
-    end
-
-    desc 'Rolls the turntable cluster schema back to the previous version (specify steps w/ STEP=n).'
-    task :rollback do
-      step = ENV['STEP'] ? ENV['STEP'].to_i : 1
-
-      ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-        puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-        ActiveRecord::Migrator.rollback(ActiveRecord::Migrator.migrations_paths, step)
-      end
-      db_namespace['_dump'].invoke
-    end
-
-    # desc 'Pushes the turntable cluster schema to the next version (specify steps w/ STEP=n).'
-    task :forward do
-      step = ENV['STEP'] ? ENV['STEP'].to_i : 1
-
-      ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-        puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-        ActiveRecord::Migrator.forward(ActiveRecord::Migrator.migrations_paths, step)
-      end
-      db_namespace['_dump'].invoke
-    end
-
-
     namespace :schema do
       # TODO: implement schema:cache:xxxx
       task :dump do
