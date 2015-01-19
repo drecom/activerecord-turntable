@@ -136,9 +136,7 @@ end
   create:all
   create
   drop:all
-  drop migrate
-  rollback
-  forward
+  drop
   schema:dump
   schema:load
   structure:dump
