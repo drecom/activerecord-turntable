@@ -5,6 +5,7 @@ Support activerecord 4.2.0
 ### Bugfixes
 
 * Fix cluster helper methods(i.e xxxx_cluster_transaction helper) on lazy load environments(development, test)
+* Move migration tasks as Migrator extension to fix rake actions(added by other gems) ordering problem
 
 ## activerecord-turntable 2.0.6 ##
 
