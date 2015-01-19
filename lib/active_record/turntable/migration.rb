@@ -100,7 +100,7 @@ module ActiveRecord::Turntable::Migration
     included do
       klass = self
       (class << klass; self; end).instance_eval {
-        [:up, :down, :run, :open].each do |method_name|
+        [:up, :down, :run].each do |method_name|
           original_method_alias = "_original_#{method_name}"
           unless klass.respond_to?(original_method_alias)
             alias_method original_method_alias, method_name
@@ -135,15 +135,6 @@ module ActiveRecord::Turntable::Migration
         ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
           puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
           _original_run(*args)
-        end
-      end
-
-      def open_with_turntable(migrations_paths)
-        open_without_turntable(migrations_paths)
-
-        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_open(*args)
         end
       end
     end
