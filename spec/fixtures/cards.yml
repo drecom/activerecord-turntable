@@ -1,0 +1,11 @@
+card_1:
+  id: 1
+  name: card_1
+  hp: 10
+  mp: 10
+
+card_2:
+  id: 2
+  name: card_2
+  hp: 20
+  mp: 20
