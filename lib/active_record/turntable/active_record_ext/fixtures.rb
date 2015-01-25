@@ -2,11 +2,18 @@
 # force TestFixtures to begin transaction with all shards.
 #
 require 'active_record/fixtures'
+
 module ActiveRecord
   class FixtureSet
+    extend ActiveRecord::Turntable::Util
+
     def self.create_fixtures(fixtures_directory, fixture_set_names, class_names = {}, config = ActiveRecord::Base)
       fixture_set_names = Array(fixture_set_names).map(&:to_s)
-      class_names = ClassCache.new class_names, config
+      class_names = if ar41_or_later?
+                      ClassCache.new class_names, config
+                    else
+                      class_names = class_names.stringify_keys
+                    end
 
       # FIXME: Apparently JK uses this.
       connection = block_given? ? yield : ActiveRecord::Base.connection
@@ -20,8 +27,12 @@ module ActiveRecord
           fixtures_map = {}
 
           fixture_sets = files_to_read.map do |fs_name|
-            klass = class_names[fs_name]
-            conn = klass ? klass.connection : connection
+            klass = if ar41_or_later?
+                      class_names[fs_name]
+                    else
+                      class_names[fs_name] || default_fixture_model_name(fs_name)
+                    end
+            conn = klass.is_a?(String) ? connection : klass.connection
             fixtures_map[fs_name] = new( # ActiveRecord::FixtureSet.new
               conn,
               fs_name,
@@ -29,9 +40,13 @@ module ActiveRecord
               ::File.join(fixtures_directory, fs_name))
           end
 
-          update_all_loaded_fixtures fixtures_map
+          if ar42_or_later?
+            update_all_loaded_fixtures fixtures_map
+          else
+            all_loaded_fixtures.update(fixtures_map)
+          end
 
-          ActiveRecord::Turntable::Base.force_transaction_all_shards!(:requires_new => true) do
+          ActiveRecord::Base.force_transaction_all_shards!(:requires_new => true) do
             fixture_sets.each do |fs|
               conn = fs.model_class.respond_to?(:connection) ? fs.model_class.connection : connection
               table_rows = fs.table_rows
@@ -63,7 +78,7 @@ module ActiveRecord
   end
 
   module TestFixtures
-    extend ActiveRecord::Turntable::Util
+    include ActiveRecord::Turntable::Util
 
     def setup_fixtures(config = ActiveRecord::Base)
       return unless !ActiveRecord::Base.configurations.blank?
