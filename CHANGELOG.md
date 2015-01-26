@@ -1,3 +1,10 @@
+## activerecord-turntable 2.1.1 ##
+
+### Bugfixes
+
+* Fix `ActiveRecord::Fixtures` doesn't working
+* Fix `ActiveRecord::Base.clear_active_connections!` to release connections established by turntable at development env
+
 ## activerecord-turntable 2.1.0 ##
 
 Support activerecord 4.2.0
