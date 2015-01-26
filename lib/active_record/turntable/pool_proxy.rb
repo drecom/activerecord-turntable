@@ -38,6 +38,16 @@ module ActiveRecord::Turntable
       end
     end
 
+    %w(active_connection?).each do |name|
+      define_method(name.to_sym) do |*args|
+        @proxy.master.connection_pool.send(name.to_sym) ||
+        @proxy.seq.connection_pool.try(name.to_sym) if @proxy.respond_to?(:seq) ||
+        @proxy.shards.values.any? do |pool|
+          pool.connection_pool.send(name.to_sym)
+        end
+      end
+    end
+
     %w(disconnect! release_connection clear_all_connections! clear_active_connections! clear_reloadable_connections! clear_stale_cached_connections! verify_active_connections!).each do |name|
       define_method(name.to_sym) do
         @proxy.master.connection_pool.send(name.to_sym)
