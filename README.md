@@ -22,7 +22,7 @@ Currently supports mysql only.
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-turntable', '~> 2.0.0'
+gem 'activerecord-turntable', '~> 2.1.1'
 ```
 
 Run a bundle install:
