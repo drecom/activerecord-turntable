@@ -1,48 +1,46 @@
 module ActiveRecord::Turntable
   class Shard
+    module Connections; end
+
     DEFAULT_CONFIG = {
       "connection" => (defined?(Rails) ? Rails.env : "development")
     }.with_indifferent_access
 
+    attr_reader :name
+
     def initialize(shard_spec)
       @config = DEFAULT_CONFIG.merge(shard_spec)
       @name = @config["connection"]
+      ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
     def connection_pool
-      @connection_pool ||= retrieve_connection_pool
+      connection_klass.connection_pool
     end
 
     def connection
-      connection = connection_pool.connection
-      connection.turntable_shard_name = name
-      connection
-    end
-
-    def name
-      @name
+      connection_pool.connection.tap do |conn|
+        conn.turntable_shard_name ||= name
+      end
     end
 
     private
 
-    def retrieve_connection_pool
-      ActiveRecord::Base.turntable_connections[name] ||=
-        begin
-          config = ActiveRecord::Base.configurations[Rails.env]["shards"][name]
-          raise ArgumentError, "Unknown database config: #{name}, have #{ActiveRecord::Base.configurations.inspect}" unless config
-          ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec_for(config))
-        end
+    def connection_klass
+      @connection_klass ||= create_connection_class
     end
 
-    def spec_for(config)
-      begin
-        require "active_record/connection_adapters/#{config['adapter']}_adapter"
-      rescue LoadError => e
-        raise "Please install the #{config['adapter']} adapter: `gem install activerecord-#{config['adapter']}-adapter` (#{e})"
+    def create_connection_class
+      if Connections.const_defined?(name.classify)
+        klass = Connections.const_get(name.classify)
+      else
+        klass = Class.new(ActiveRecord::Base)
+        Connections.const_set(name.classify, klass)
+        klass.abstract_class = true
       end
-      adapter_method = "#{config['adapter']}_connection"
-
-      ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
+      klass.remove_connection
+      klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
+      klass
     end
   end
 end
