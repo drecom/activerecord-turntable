@@ -296,7 +296,7 @@ Next, add sequencer definition to the model:
 ```ruby
   class User < ActiveRecord::Base
     turntable :id
-    sequencer :users_seq # <-- this line enables sequencer module
+    sequencer :user_seq # <-- this line enables sequencer module
     has_one :status
   end
 ```
