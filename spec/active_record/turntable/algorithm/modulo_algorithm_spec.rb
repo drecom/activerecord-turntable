@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::Algorithm::ModuloAlgorithm do
 
   context "When initialized" do
     before do
-      @alg = ActiveRecord::Turntable::Algorithm::ModuloAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
+      @alg = ActiveRecord::Turntable::Algorithm::ModuloAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:mod_cluster])
     end
 
     context "#calculate with 1" do
