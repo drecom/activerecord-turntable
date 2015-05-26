@@ -48,7 +48,7 @@ module ActiveRecord::Turntable
                            method, query, *args, &block)
       end
     rescue Exception => err
-      logger.warn { "[ActiveRecord::Turntable] Error on Building Fader: #{binded_query}, on_method: #{method_name}" }
+      logger.warn { "[ActiveRecord::Turntable] Error on Building Fader: #{binded_query}, on_method: #{method_name}, err: #{err}" }
       raise err
     end
 
