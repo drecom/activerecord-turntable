@@ -2,6 +2,13 @@ module ActiveRecord::Turntable
   class SeqShard < Shard
     private
 
+    def create_connection_class
+      klass = get_or_set_connection_class
+      klass.remove_connection
+      klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:seq][name].with_indifferent_access
+      klass
+    end
+ 
     def retrieve_connection_pool
       ActiveRecord::Base.turntable_connections[name] ||=
         begin
