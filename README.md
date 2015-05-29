@@ -178,13 +178,13 @@ Add turntable [shard_key_name] to the model class:
 ```ruby
 class User < ActiveRecord::Base
   turntable :user_cluster, :id
-  sequencer
+  sequencer :user_seq
   has_one :status
 end
 
 class Status < ActiveRecord::Base
   turntable :user_cluster, :user_id
-  sequencer
+  sequencer :user_seq
   belongs_to :user
 end
 ```
