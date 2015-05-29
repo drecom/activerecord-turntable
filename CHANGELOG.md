@@ -1,3 +1,21 @@
+## activerecord-turntable 2.2.0 ##
+
+### Features
+
+* Add `modulo` algorithm (thx tatsuma)
+
+### Improvements
+
+* Add err detail to Building Fader exception log (thx tatsuma)
+
+### Bugfixes
+
+* Fix building cluster with mysql sequencer (fixes #25) (thx tatsuma)
+
+### Documentation
+
+* Fix seqeucner example (thx akicho8, tatsuma)
+
 ## activerecord-turntable 2.1.1 ##
 
 ### Bugfixes
