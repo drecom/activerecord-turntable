@@ -1,3 +1,9 @@
+## activerecord-turntable 2.2.1 ##
+
+### Bugfix
+
+* Fixes #30 undefined local variable with `db:structure:(dump|load)`
+
 ## activerecord-turntable 2.2.0 ##
 
 ### Features
