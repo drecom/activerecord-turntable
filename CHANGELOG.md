@@ -1,3 +1,9 @@
+## activerecord-turntable 2.2.2 ##
+
+### Bugfix
+
+* Fix imcomplete bugfix for #30
+
 ## activerecord-turntable 2.2.1 ##
 
 ### Bugfix
