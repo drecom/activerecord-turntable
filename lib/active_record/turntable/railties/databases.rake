@@ -78,7 +78,7 @@ db_namespace = namespace :db do
       task :dump do
         current_config = ActiveRecord::Tasks::DatabaseTasks.current_config
         shard_configs = current_config["shards"]
-        shard_configs.merge!(config["seq"]) if config["seq"]
+        shard_configs.merge!(config["seq"]) if current_config["seq"]
         if shard_configs
           shard_configs.each do |name, config|
             next unless config["database"]
@@ -101,7 +101,7 @@ db_namespace = namespace :db do
       task :load do
         current_config = ActiveRecord::Tasks::DatabaseTasks.current_config
         shard_configs = current_config["shards"]
-        shard_configs.merge!(config["seq"]) if config["seq"]
+        shard_configs.merge!(config["seq"]) if current_config["seq"]
         if shard_configs
           shard_configs.each do |name, config|
             next unless config["database"]
