@@ -9,14 +9,22 @@ module SQLTree
 end
 
 class SQLTree::Token
-  KEYWORDS << 'BINARY'
-  KEYWORDS << 'LIMIT'
-  KEYWORDS << 'OFFSET'
-  const_set('BINARY', Class.new(SQLTree::Token::Keyword))
-  const_set('LIMIT', Class.new(SQLTree::Token::Keyword))
-  const_set('OFFSET', Class.new(SQLTree::Token::Keyword))
+  extended_keywords = ['BINARY', 'LIMIT', 'OFFSET', 'INDEX', 'KEY', 'USE', 'FORCE', 'IGNORE']
+  KEYWORDS += extended_keywords
+
+  extended_keywords.each do |kwd|
+    const_set(kwd, Class.new(SQLTree::Token::Keyword))
+  end
 
   BINARY_ESCAPE = Class.new(SQLTree::Token).new('x')
+
+  def possible_index_hint?
+    [SQLTree::Token::USE, SQLTree::Token::FORCE, SQLTree::Token::IGNORE].include?(self.class)
+  end
+
+  def index_keyword?
+    [SQLTree::Token::INDEX, SQLTree::Token::KEY].include?(self.class)
+  end
 end
 
 class SQLTree::Tokenizer
@@ -141,9 +149,16 @@ module SQLTree::Node
   end
 
   class TableReference < Base
+    leaf :index_hint
+
+    def initialize(table, table_alias = nil, index_hint = nil)
+      @table, @table_alias, @index_hint = table, table_alias, index_hint
+    end
+
     def to_sql(options={})
       sql = (SQLTree::Node::SubQuery === table) ? table.to_sql : quote_field_name(table)
       sql << " AS " << quote_field_name(table_alias) if table_alias
+      sql << " " << index_hint.to_sql if index_hint
       return sql
     end
 
@@ -151,9 +166,13 @@ module SQLTree::Node
       if SQLTree::Token::Identifier === tokens.peek
         tokens.next
         table_reference = self.new(tokens.current.literal)
-        if SQLTree::Token::AS === tokens.peek || SQLTree::Token::Identifier === tokens.peek
+        if tokens.peek && !tokens.peek.possible_index_hint? &&
+            (SQLTree::Token::AS === tokens.peek || SQLTree::Token::Identifier === tokens.peek)
           tokens.consume(SQLTree::Token::AS) if SQLTree::Token::AS === tokens.peek
           table_reference.table_alias = tokens.next.literal
+        end
+        if tokens.peek && tokens.peek.possible_index_hint? && tokens.peek(2).index_keyword?
+          table_reference.index_hint = SQLTree::Node::IndexHint.parse(tokens)
         end
         return table_reference
       elsif SQLTree::Token::SELECT === tokens.peek(2)
@@ -163,6 +182,35 @@ module SQLTree::Node
           table_reference.table_alias = tokens.next.literal
         end
         table_reference
+      else
+        raise SQLTree::Parser::UnexpectedToken.new(tokens.current)
+      end
+    end
+  end
+
+  class IndexHint < Base
+    leaf :hint_method
+    leaf :hint_key
+    leaf :index_list
+
+    def initialize(hint_method, hint_key, index_list)
+      @hint_method, @hint_key, @index_list = hint_method, hint_key, index_list
+    end
+
+    def to_sql(options={})
+      sql = "#{hint_method} #{hint_key} "
+      sql << "(#{index_list.map {|idx| idx.to_sql }.join(' ')})"
+      sql
+    end
+
+    def self.parse(tokens)
+      hint_method = tokens.next.literal
+      if tokens.peek.index_keyword?
+        hint_key = tokens.next.literal
+        tokens.consume(SQLTree::Token::LPAREN)
+        index_list = parse_list(tokens, SQLTree::Node::Expression::Field)
+        tokens.consume(SQLTree::Token::RPAREN)
+        self.new(hint_method, hint_key, index_list)
       else
         raise SQLTree::Parser::UnexpectedToken.new(tokens.current)
       end
