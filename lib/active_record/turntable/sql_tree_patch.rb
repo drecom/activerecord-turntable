@@ -10,7 +10,7 @@ end
 
 class SQLTree::Token
   extended_keywords = ['BINARY', 'LIMIT', 'OFFSET', 'INDEX', 'KEY', 'USE', 'FORCE', 'IGNORE']
-  KEYWORDS += extended_keywords
+  KEYWORDS.concat(extended_keywords)
 
   extended_keywords.each do |kwd|
     const_set(kwd, Class.new(SQLTree::Token::Keyword))
