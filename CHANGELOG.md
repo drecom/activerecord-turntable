@@ -1,3 +1,9 @@
+## activerecord-turntable 2.3.0 ##
+
+### Features
+
+* Support index hint
+
 ## activerecord-turntable 2.2.2 ##
 
 ### Bugfix
