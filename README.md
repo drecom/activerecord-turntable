@@ -47,7 +47,7 @@ Shard is a database which is horizontal partitioned.
 
 ### Cluster
 
-Cluster of shards. i.e) set of userdb1, userdb2, userdb3
+Cluster of shards. i.e) set of userdb1, userdb2, userdb3.
 Shards in the same cluster should have the same schema structure.
 
 ### Master
