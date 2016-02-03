@@ -90,14 +90,14 @@ Edit turntable.yml and database.yml. See below example config.
     development:
       clusters:
         user_cluster: # <-- cluster name
-          algorithm: range_bsearch # <-- `range` or `range_bsearch`
+          algorithm: range_bsearch # <-- `range`, `range_bsearch` or `modulo`
           seq:
             user_seq: # <-- sequencer name
               seq_type: mysql # <-- sequencer type
               connection: user_seq_1 # <-- sequencer database connection setting
           shards:
             - connection: user_shard_1 # <-- shard name
-              less_than: 100           # <-- shard range(like mysql partitioning)
+              less_than: 100           # <-- shard range(like mysql partitioning) If you are using a modulo algorithm, it doesn't need it.
             - connection: user_shard_2
               less_than: 200
             - connection: user_shard_3
@@ -178,13 +178,13 @@ Add turntable [shard_key_name] to the model class:
 ```ruby
 class User < ActiveRecord::Base
   turntable :user_cluster, :id
-  sequencer
+  sequencer :user_seq
   has_one :status
 end
 
 class Status < ActiveRecord::Base
   turntable :user_cluster, :user_id
-  sequencer
+  sequencer :user_seq
   belongs_to :user
 end
 ```

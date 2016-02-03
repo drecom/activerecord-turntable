@@ -1,3 +1,39 @@
+## activerecord-turntable 2.3.0 ##
+
+### Features
+
+* Support index hint
+
+## activerecord-turntable 2.2.2 ##
+
+### Bugfix
+
+* Fix imcomplete bugfix for #30
+
+## activerecord-turntable 2.2.1 ##
+
+### Bugfix
+
+* Fixes #30 undefined local variable with `db:structure:(dump|load)`
+
+## activerecord-turntable 2.2.0 ##
+
+### Features
+
+* Add `modulo` algorithm (thx tatsuma)
+
+### Improvements
+
+* Add err detail to Building Fader exception log (thx tatsuma)
+
+### Bugfixes
+
+* Fix building cluster with mysql sequencer (fixes #25) (thx tatsuma)
+
+### Documentation
+
+* Fix seqeucner example (thx akicho8, tatsuma)
+
 ## activerecord-turntable 2.1.1 ##
 
 ### Bugfixes

@@ -82,4 +82,19 @@ describe ActiveRecord::Turntable::Algorithm do
       end
     end
   end
+
+  describe ActiveRecord::Turntable::Algorithm::ModuloAlgorithm do
+    let(:algorithm) { ActiveRecord::Turntable::Algorithm::ModuloAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:mod_cluster]) }
+    context "#calculate" do
+      it "called with 1 return user_shard_2" do
+        expect(algorithm.calculate(1)).to eq("user_shard_2")
+      end
+      it "called with 3 return user_shard_2" do
+        expect(algorithm.calculate(3)).to eq("user_shard_2")
+      end
+      it "called with 5 return user_shard_1" do
+        expect(algorithm.calculate(5)).to eq("user_shard_1")
+      end
+    end
+  end
 end
