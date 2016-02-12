@@ -68,6 +68,10 @@ module ActiveRecord::Turntable
       end
     end
 
+    def respond_to_missing?(method, include_private = false)
+      connection.send(:respond_to?, method, include_private)
+    end
+
     def to_sql(arel, binds = [])
       master.connection.to_sql(arel, binds)
     end
