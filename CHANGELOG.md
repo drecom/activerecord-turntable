@@ -1,3 +1,9 @@
+## activerecord-turntable 2.3.1 ##
+
+### Improvement
+
+* ConnectionProxy uses a method_missing, so it should adapt respond_to? (thx, misoobu)
+
 ## activerecord-turntable 2.3.0 ##
 
 ### Features
