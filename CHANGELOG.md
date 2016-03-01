@@ -1,3 +1,9 @@
+## activerecord-turntable 2.3.2 ##
+
+### Improvement
+
+* ActiveRecord::Import follow ActiveRecord 5 (thx mitaku)
+
 ## activerecord-turntable 2.3.1 ##
 
 ### Improvement
