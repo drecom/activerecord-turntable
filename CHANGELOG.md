@@ -1,3 +1,9 @@
+## activerecord-turntable 2.3.3 ##
+
+### Bugfix
+
+* Fallback `sequence_name` to parent modules, because ar-import expects original `sequence_name` result(= nil)
+
 ## activerecord-turntable 2.3.2 ##
 
 ### Improvement
