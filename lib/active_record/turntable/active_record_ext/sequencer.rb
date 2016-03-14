@@ -9,7 +9,11 @@ module ActiveRecord::Turntable::ActiveRecordExt
 
     module DatabaseStatements
       def default_sequence_name(table_name, pk = nil)
-        ActiveRecord::Turntable::Sequencer.sequence_name(table_name, pk)
+        if ActiveRecord::Turntable::Sequencer.has_sequencer?(table_name)
+          ActiveRecord::Turntable::Sequencer.sequence_name(table_name, pk)
+        else
+          super
+        end
       end
     end
 
