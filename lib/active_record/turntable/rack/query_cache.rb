@@ -1,5 +1,5 @@
-require 'rack/body_proxy'
-require 'active_record/query_cache'
+require "rack/body_proxy"
+require "active_record/query_cache"
 
 module ActiveRecord
   module Turntable
@@ -26,14 +26,14 @@ module ActiveRecord
 
         private
 
-        def restore_query_cache_settings(connection_id, enabled)
-          klasses = ActiveRecord::Base.turntable_connections.values
-          klasses.each do |k|
-            ActiveRecord::Base.connection_id = connection_id
-            k.connection.clear_query_cache
-            k.connection.disable_query_cache! unless enabled
+          def restore_query_cache_settings(connection_id, enabled)
+            klasses = ActiveRecord::Base.turntable_connections.values
+            klasses.each do |k|
+              ActiveRecord::Base.connection_id = connection_id
+              k.connection.clear_query_cache
+              k.connection.disable_query_cache! unless enabled
+            end
           end
-        end
       end
     end
   end

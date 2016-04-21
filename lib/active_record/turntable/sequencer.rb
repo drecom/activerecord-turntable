@@ -14,9 +14,9 @@ module ActiveRecord::Turntable
     end
 
     @@sequence_types = {
-      :api => Api,
-      :mysql => Mysql,
-      :barrage => Barrage
+      api: Api,
+      mysql: Mysql,
+      barrage: Barrage,
     }
 
     @@sequences = {}
@@ -39,7 +39,7 @@ module ActiveRecord::Turntable
     end
 
     def self.table_name(seq_name)
-      seq_name.split('_').first
+      seq_name.split("_").first
     end
 
     def next_sequence_value
@@ -52,13 +52,13 @@ module ActiveRecord::Turntable
 
     private
 
-    def self.current_cluster_config_for(klass_or_name)
-      cluster_name = if klass_or_name.is_a?(Symbol)
-                       klass_or_name
-                     else
-                       klass_or_name.turntable_cluster_name.to_s
-                     end
-      ActiveRecord::Base.turntable_config["clusters"][cluster_name]
-    end
+      def self.current_cluster_config_for(klass_or_name)
+        cluster_name = if klass_or_name.is_a?(Symbol)
+                         klass_or_name
+                       else
+                         klass_or_name.turntable_cluster_name.to_s
+                       end
+        ActiveRecord::Base.turntable_config["clusters"][cluster_name]
+      end
   end
 end

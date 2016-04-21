@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Sequencer do
   before(:all) do

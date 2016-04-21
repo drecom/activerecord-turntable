@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   before(:all) do
@@ -11,7 +11,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   end
 
   let!(:user) do
-    user = User.new({:nickname => 'user1'})
+    user = User.new({ nickname: "user1" })
     user.id = 1
     user.save
     user
@@ -49,7 +49,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       end
 
       it "its has_many targets should be assigned all related object" do
-        expect(subject.cards_users_histories).to include(*cards_users_histories.select { |history| history.cards_user_id == subject.id} )
+        expect(subject.cards_users_histories).to include(*cards_users_histories.select { |history| history.cards_user_id == subject.id })
       end
     end
 
@@ -64,7 +64,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
         end
 
         it "its has_many targets should be assigned all related object" do
-          expect(subject.events_users_histories_with_foreign_shard_key).to include(*events_users_histories.select { |history| history.cards_user_id == subject.id} )
+          expect(subject.events_users_histories_with_foreign_shard_key).to include(*events_users_histories.select { |history| history.cards_user_id == subject.id })
         end
       end
 

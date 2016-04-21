@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "ActiveRecord::FinderMethods" do
   before(:all) do

@@ -5,8 +5,8 @@ module ActiveRecord::Turntable
       def with_transaction_returning_status
         if self.class.turntable_enabled?
           status = nil
-          if self.new_record? and self.turntable_shard_key.to_s == self.class.primary_key and
-              self.id.nil? and self.class.connection.prefetch_primary_key?(self.class.table_name)
+          if self.new_record? && self.turntable_shard_key.to_s == self.class.primary_key &&
+             self.id.nil? && self.class.connection.prefetch_primary_key?(self.class.table_name)
             self.id = self.class.connection.next_sequence_value(self.class.sequence_name)
           end
           self.class.connection.shards_transaction([self.turntable_shard]) do

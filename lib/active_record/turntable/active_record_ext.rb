@@ -32,10 +32,10 @@ module ActiveRecord::Turntable
       end
       ActiveRecord::Associations::Preloader::Association.send(:include, AssociationPreloader)
       ActiveRecord::Associations::Association.send(:include, Association)
-      require 'active_record/turntable/active_record_ext/fixtures'
-      require 'active_record/turntable/active_record_ext/migration_proxy'
-      require 'active_record/turntable/active_record_ext/activerecord_import_ext'
-      require 'active_record/turntable/active_record_ext/acts_as_archive_extension'
+      require "active_record/turntable/active_record_ext/fixtures"
+      require "active_record/turntable/active_record_ext/migration_proxy"
+      require "active_record/turntable/active_record_ext/activerecord_import_ext"
+      require "active_record/turntable/active_record_ext/acts_as_archive_extension"
     end
   end
 end

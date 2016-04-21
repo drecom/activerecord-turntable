@@ -1,4 +1,4 @@
-require 'active_record/associations/preloader/association'
+require "active_record/associations/preloader/association"
 
 module ActiveRecord::Turntable
   module ActiveRecordExt
@@ -20,19 +20,19 @@ module ActiveRecord::Turntable
 
       private
 
-      def foreign_shard_key
-        options[:foreign_shard_key] || model.turntable_shard_key
-      end
+        def foreign_shard_key
+          options[:foreign_shard_key] || model.turntable_shard_key
+        end
 
-      def should_use_shard_key?
-        sharded_by_same_key? || !!options[:foreign_shard_key]
-      end
+        def should_use_shard_key?
+          sharded_by_same_key? || !!options[:foreign_shard_key]
+        end
 
-      def sharded_by_same_key?
-        model.turntable_enabled? &&
-          klass.turntable_enabled? &&
-          model.turntable_shard_key == klass.turntable_shard_key
-      end
+        def sharded_by_same_key?
+          model.turntable_enabled? &&
+            klass.turntable_enabled? &&
+            model.turntable_shard_key == klass.turntable_shard_key
+        end
     end
   end
 end

@@ -9,7 +9,7 @@ module ActiveRecord::Turntable
           clear_aggregation_cache
           clear_association_cache
 
-          finder_scope = if turntable_enabled? and self.class.primary_key != self.class.turntable_shard_key.to_s
+          finder_scope = if turntable_enabled? && self.class.primary_key != self.class.turntable_shard_key.to_s
                            self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
                          else
                            self.class.unscoped
@@ -23,12 +23,12 @@ module ActiveRecord::Turntable
             end
 
           if Util.ar42_or_later?
-            @attributes = fresh_object.instance_variable_get('@attributes')
+            @attributes = fresh_object.instance_variable_get("@attributes")
           else
-            @attributes.update(fresh_object.instance_variable_get('@attributes'))
+            @attributes.update(fresh_object.instance_variable_get("@attributes"))
 
             @column_types           = self.class.column_types
-            @column_types_override  = fresh_object.instance_variable_get('@column_types_override')
+            @column_types_override  = fresh_object.instance_variable_get("@column_types_override")
             @attributes_cache       = {}
           end
           @new_record = false
@@ -57,7 +57,7 @@ module ActiveRecord::Turntable
               clear_attribute_changes(changes.keys)
               primary_key = self.class.primary_key
 
-              finder_scope = if turntable_enabled? and primary_key != self.class.turntable_shard_key.to_s
+              finder_scope = if turntable_enabled? && primary_key != self.class.turntable_shard_key.to_s
                                self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
                              else
                                self.class.unscoped
@@ -89,7 +89,7 @@ module ActiveRecord::Turntable
               @changed_attributes.except!(*changes.keys)
               primary_key = self.class.primary_key
 
-              finder_scope = if turntable_enabled? and primary_key != self.class.turntable_shard_key.to_s
+              finder_scope = if turntable_enabled? && primary_key != self.class.turntable_shard_key.to_s
                                self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
                              else
                                self.class.unscoped
@@ -111,7 +111,7 @@ module ActiveRecord::Turntable
             verify_readonly_attribute(key.to_s)
           end
 
-          update_scope = if turntable_enabled? and self.class.primary_key != self.class.turntable_shard_key.to_s
+          update_scope = if turntable_enabled? && self.class.primary_key != self.class.turntable_shard_key.to_s
                            self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
                          else
                            self.class.unscoped
@@ -137,10 +137,10 @@ module ActiveRecord::Turntable
             klass      = self.class
 
             relation = self.class.unscoped.where(
-                                                 self.class.arel_table[pk].eq(substitute))
+              self.class.arel_table[pk].eq(substitute))
             relation.bind_values = [[column, id]]
 
-            if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+            if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
               shard_key_column = klass.columns_hash[klass.turntable_shard_key]
               shard_key_substitute = klass.connection.substitute_at(shard_key_column)
 
@@ -157,8 +157,8 @@ module ActiveRecord::Turntable
             klass      = self.class
 
             relation = self.class.unscoped.where(
-                                                 self.class.arel_table[pk].eq(substitute))
-            if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+              self.class.arel_table[pk].eq(substitute))
+            if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
               relation = relation.where(klass.turntable_shard_key => self.send(turntable_shard_key))
             end
             relation.bind_values = [[column, id]]

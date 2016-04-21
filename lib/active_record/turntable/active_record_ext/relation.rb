@@ -5,7 +5,7 @@ module ActiveRecord::Turntable
 
       included do
         if Util.ar41_or_later?
-          if Util.ar_version_earlier_than?('4.1.2')
+          if Util.ar_version_earlier_than?("4.1.2")
             alias_method :_update_record_without_turntable, :update_record
             alias_method :update_record, :_update_record_with_turntable
           else
@@ -29,14 +29,14 @@ module ActiveRecord::Turntable
           relation = relation.merge(turntable_scope) if turntable_scope
 
           bvs = binds + relation.bind_values
-          um = relation
-            .arel
-            .compile_update(substitutes, @klass.primary_key)
+          um = relation.
+               arel.
+               compile_update(substitutes, @klass.primary_key)
 
           @klass.connection.update(
             um,
-            'SQL',
-            bvs,
+            "SQL",
+            bvs
           )
         end
       else
@@ -48,7 +48,7 @@ module ActiveRecord::Turntable
 
           @klass.connection.update(
             um,
-            'SQL',
+            "SQL",
             binds)
         end
       end

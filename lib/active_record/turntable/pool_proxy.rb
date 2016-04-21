@@ -14,9 +14,7 @@ module ActiveRecord::Turntable
       @proxy = proxy
     end
 
-    def proxy
-      @proxy
-    end
+    attr_reader :proxy
     alias_method :connection, :proxy
 
     def with_connection
@@ -24,7 +22,7 @@ module ActiveRecord::Turntable
     end
 
     delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
-               :spec, :connections, :size, :reaper, :table_exists?, to: :proxy
+             :spec, :connections, :size, :reaper, :table_exists?, to: :proxy
 
     %w(columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
@@ -39,12 +37,12 @@ module ActiveRecord::Turntable
     end
 
     %w(active_connection?).each do |name|
-      define_method(name.to_sym) do |*args|
+      define_method(name.to_sym) do |*_args|
         @proxy.master.connection_pool.send(name.to_sym) ||
-        @proxy.seq.connection_pool.try(name.to_sym) if @proxy.respond_to?(:seq) ||
-        @proxy.shards.values.any? do |pool|
-          pool.connection_pool.send(name.to_sym)
-        end
+          @proxy.seq.connection_pool.try(name.to_sym) if @proxy.respond_to?(:seq) ||
+                                                         @proxy.shards.values.any? do |pool|
+                                                           pool.connection_pool.send(name.to_sym)
+                                                         end
       end
     end
 

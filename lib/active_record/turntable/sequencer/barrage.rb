@@ -4,7 +4,7 @@ module ActiveRecord::Turntable
       @@unique_barrage_instance = {}
 
       def initialize(klass, options = {})
-        require 'barrage'
+        require "barrage"
         @klass = klass
         @options = options["options"]
         @barrage = get_barrage_instance
@@ -20,9 +20,9 @@ module ActiveRecord::Turntable
 
       private
 
-      def get_barrage_instance
-        @@unique_barrage_instance[@options] ||= ::Barrage.new(@options)
-      end
+        def get_barrage_instance
+          @@unique_barrage_instance[@options] ||= ::Barrage.new(@options)
+        end
     end
   end
 end

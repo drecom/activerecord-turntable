@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'logger'
+require "spec_helper"
+require "logger"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   before(:all) do
@@ -19,20 +19,20 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   end
 
   let(:user) {
-    u = User.new({:nickname => 'foobar'})
+    u = User.new({ nickname: "foobar" })
     u.id = 1
     u.updated_at = Time.current - 1.day
     u.save
     u
   }
   let(:user_status){
-    stat = user.create_user_status(:hp => 10, :mp => 10)
+    stat = user.create_user_status(hp: 10, mp: 10)
     stat.updated_at = Time.current - 1.day
     stat.save
     stat
   }
   let(:card){
-    Card.create!(:name => 'foobar')
+    Card.create!(name: "foobar")
   }
   let(:cards_user){
     user.cards_users.create(card: card)
@@ -41,7 +41,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     context "with blob column" do
       let(:blob_value) { "\123\123\123" }
       let(:user) {
-        u = User.new(:nickname => 'x', :blob => blob_value )
+        u = User.new(nickname: "x", blob: blob_value)
         u.id = 1
         u.save
         u
@@ -148,7 +148,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
       expect { cards_user.reload }.to_not raise_error
 
-      expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
+      expect(strio.string.split("\n").select { |stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
     it "should execute one query when touching" do
@@ -157,7 +157,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
 
       expect { cards_user.touch }.to_not raise_error
-      expect(strio.string.split("\n").select {|stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
+      expect(strio.string.split("\n").select { |stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
     it "should execute one query when locking" do
@@ -166,7 +166,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
 
       expect { cards_user.lock! }.to_not raise_error
-      expect(strio.string.split("\n").select {|stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
+      expect(strio.string.split("\n").select { |stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
     it "should execute one query when update_columns" do
@@ -175,7 +175,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
 
       expect { cards_user.update_columns(num: 10) }.to_not raise_error
-      expect(strio.string.split("\n").select {|stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
+      expect(strio.string.split("\n").select { |stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
     end
   end
 
@@ -205,5 +205,4 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     it { is_expected.to be_instance_of(CardsUser) }
     it { is_expected.to eq(cards_user) }
   end
-
 end

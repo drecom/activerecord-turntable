@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   before(:all) do
@@ -11,7 +11,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   end
 
   let!(:user) do
-    user = User.new({:nickname => 'user1'})
+    user = User.new({ nickname: "user1" })
     user.id = 1
     user.save
     user

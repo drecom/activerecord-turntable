@@ -4,14 +4,14 @@ module ActiveRecord::Turntable
 
     included do
       ActiveSupport.on_load(:turntable_config_loaded) do
-        turntable_clusters.each do |name, cluster|
+        turntable_clusters.each do |name, _cluster|
           turntable_define_cluster_methods(name)
         end
       end
     end
 
     module ClassMethods
-      def force_transaction_all_shards!(options={}, &block)
+      def force_transaction_all_shards!(options = {}, &block)
         force_connect_all_shards!
         shards = turntable_connections.values
         shards += [ActiveRecord::Base.connection_pool]
@@ -44,7 +44,7 @@ module ActiveRecord::Turntable
         shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence)
         sum = shards_weight.values.inject(&:+)
         idx = rand(sum)
-        shard, weight = shards_weight.find {|k,v|
+        shard, weight = shards_weight.find {|_k, v|
           (idx -= v) < 0
         }
         self.connection.with_recursive_shards(shard.name, *klasses, &block)

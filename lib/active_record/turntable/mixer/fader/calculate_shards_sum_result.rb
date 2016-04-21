@@ -13,13 +13,13 @@ module ActiveRecord::Turntable
 
         private
 
-        def merge_results(results)
-          ActiveRecord::Result.new(
-            results.first.columns,
-            results[0].rows.zip(*results[1..-1].map{|r| r.rows}).map {|r| [r.map {|v| v.first}.inject(&:+)]},
-            results.first.column_types
-          )
-        end
+          def merge_results(results)
+            ActiveRecord::Result.new(
+              results.first.columns,
+              results[0].rows.zip(*results[1..-1].map(&:rows)).map { |r| [r.map(&:first).inject(&:+)] },
+              results.first.column_types
+            )
+          end
       end
     end
   end

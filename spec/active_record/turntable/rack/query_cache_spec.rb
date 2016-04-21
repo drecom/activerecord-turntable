@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Rack::QueryCache do
   before(:all) do
@@ -10,7 +10,7 @@ describe ActiveRecord::Turntable::Rack::QueryCache do
     truncate_shard
   end
 
-  let(:mw) { ActiveRecord::Turntable::Rack::QueryCache.new lambda {|env| [200, {}]} }
+  let(:mw) { ActiveRecord::Turntable::Rack::QueryCache.new lambda { |_env| [200, {}] } }
   subject { mw.call({}) }
 
   it "should returns 200 response" do

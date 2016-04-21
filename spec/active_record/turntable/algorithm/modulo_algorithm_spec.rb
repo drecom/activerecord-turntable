@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm::ModuloAlgorithm do
   before(:all) do
@@ -27,9 +27,8 @@ describe ActiveRecord::Turntable::Algorithm::ModuloAlgorithm do
 
     context "#calculate with a value that is not a number" do
       it "raises ActiveRecord::Turntable::CannotSpecifyShardError" do
-        expect { @alg.calculate('a') }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError)
+        expect { @alg.calculate("a") }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError)
       end
     end
   end
-
 end

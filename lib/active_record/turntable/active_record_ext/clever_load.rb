@@ -5,7 +5,7 @@ module ActiveRecord::Turntable
 
       included do
         class << ActiveRecord::Base
-          delegate :clever_load!, :to => :all
+          delegate :clever_load!, to: :all
         end
       end
 

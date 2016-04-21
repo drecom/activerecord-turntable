@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'active_record/turntable/sql_tree_patch'
+require "spec_helper"
+require "active_record/turntable/sql_tree_patch"
 
 describe SQLTree do
   before(:all) do

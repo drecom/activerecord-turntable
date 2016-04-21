@@ -1,4 +1,4 @@
-require 'active_record'
+require "active_record"
 
 module TurntableHelper
   def reload_turntable!(config_file_name = nil)
@@ -9,8 +9,8 @@ module TurntableHelper
 
   def establish_connection_to(env = :test)
     silence_warnings {
-      Object.const_set('RAILS_ENV', env.to_s)
-      Object.const_set('Rails', Object.new)
+      Object.const_set("RAILS_ENV", env.to_s)
+      Object.const_set("Rails", Object.new)
       allow(Rails).to receive(:env) { ActiveSupport::StringInquirer.new(RAILS_ENV) }
       ActiveRecord::Base.logger = Logger.new("/dev/null")
     }

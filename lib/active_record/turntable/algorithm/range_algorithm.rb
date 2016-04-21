@@ -13,7 +13,7 @@ module ActiveRecord::Turntable::Algorithm
     end
 
     def calculate_idx(key)
-      @config["shards"].find_index {|h| h["less_than"] > key }
+      @config["shards"].find_index { |h| h["less_than"] > key }
     end
 
     # { connection_name => weight, ... }
@@ -21,9 +21,9 @@ module ActiveRecord::Turntable::Algorithm
       idx = calculate_idx(sequence_value)
       last_connection = calculate(sequence_value)
       shards = @config["shards"][0..idx]
-      weighted_hash = Hash.new {|h,k| h[k]=0}
+      weighted_hash = Hash.new { |h, k| h[k] = 0 }
       prev_max = 0
-      shards.each_with_index do |h,idx|
+      shards.each_with_index do |h, idx|
         weighted_hash[h["connection"]] += if idx < shards.size - 1
                                             h["less_than"] - prev_max - 1
                                           else
@@ -31,7 +31,7 @@ module ActiveRecord::Turntable::Algorithm
                                           end
         prev_max = h["less_than"] - 1
       end
-      return weighted_hash
+      weighted_hash
     end
   end
 end

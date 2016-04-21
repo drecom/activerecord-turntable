@@ -1,7 +1,7 @@
 #
 # force TestFixtures to begin transaction with all shards.
 #
-require 'active_record/fixtures'
+require "active_record/fixtures"
 
 module ActiveRecord
   class FixtureSet
@@ -46,13 +46,13 @@ module ActiveRecord
             all_loaded_fixtures.update(fixtures_map)
           end
 
-          ActiveRecord::Base.force_transaction_all_shards!(:requires_new => true) do
+          ActiveRecord::Base.force_transaction_all_shards!(requires_new: true) do
             fixture_sets.each do |fs|
               conn = fs.model_class.respond_to?(:connection) ? fs.model_class.connection : connection
               table_rows = fs.table_rows
 
               table_rows.each_key do |table|
-                conn.delete "DELETE FROM #{conn.quote_table_name(table)}", 'Fixture Delete'
+                conn.delete "DELETE FROM #{conn.quote_table_name(table)}", "Fixture Delete"
               end
 
               table_rows.each do |fixture_set_name, rows|
@@ -81,10 +81,10 @@ module ActiveRecord
     include ActiveRecord::Turntable::Util
 
     def setup_fixtures(config = ActiveRecord::Base)
-      return unless !ActiveRecord::Base.configurations.blank?
+      return if ActiveRecord::Base.configurations.blank?
 
       if pre_loaded_fixtures && !use_transactional_fixtures
-        raise RuntimeError, 'pre_loaded_fixtures requires use_transactional_fixtures'
+        raise "pre_loaded_fixtures requires use_transactional_fixtures"
       end
 
       @fixture_cache = {}
@@ -122,20 +122,20 @@ module ActiveRecord
 
     private
 
-    def turntable_load_fixtures(config)
-      if ar41_or_later?
-        load_fixtures(config)
-      else
-        load_fixtures
+      def turntable_load_fixtures(config)
+        if ar41_or_later?
+          load_fixtures(config)
+        else
+          load_fixtures
+        end
       end
-    end
 
-    def turntable_instantiate_fixtures(config)
-      if ar41_or_later?
-        instantiate_fixtures(config)
-      else
-        instantiate_fixtures
+      def turntable_instantiate_fixtures(config)
+        if ar41_or_later?
+          instantiate_fixtures(config)
+        else
+          instantiate_fixtures
+        end
       end
-    end
   end
 end

@@ -1,5 +1,5 @@
-require 'active_support/lazy_load_hooks'
-require 'active_support/core_ext/hash/indifferent_access'
+require "active_support/lazy_load_hooks"
+require "active_support/core_ext/hash/indifferent_access"
 
 module ActiveRecord::Turntable
   class Config
@@ -14,7 +14,7 @@ module ActiveRecord::Turntable
       @config[key]
     end
 
-    def self.load!(config_file = ActiveRecord::Base.turntable_config_file, env = (defined?(Rails) ? Rails.env : 'development'))
+    def self.load!(config_file = ActiveRecord::Base.turntable_config_file, env = (defined?(Rails) ? Rails.env : "development"))
       instance.load!(config_file, env)
     end
 

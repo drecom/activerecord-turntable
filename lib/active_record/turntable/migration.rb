@@ -16,12 +16,12 @@ module ActiveRecord::Turntable::Migration
       config = ActiveRecord::Base.turntable_config
       (self.target_shards ||= []).concat(
         if cluster_names.first == :all
-          config['clusters'].map do |name, cluster_conf|
-            cluster_conf["shards"].map {|shard| shard["connection"]}
+          config["clusters"].map do |_name, cluster_conf|
+            cluster_conf["shards"].map { |shard| shard["connection"] }
           end
         else
           cluster_names.map do |cluster_name|
-            config['clusters'][cluster_name]["shards"].map do |shard|
+            config["clusters"][cluster_name]["shards"].map do |shard|
               shard["connection"]
             end
           end.flatten
@@ -47,19 +47,19 @@ module ActiveRecord::Turntable::Migration
   end
 
   module SchemaStatementsExt
-    def create_sequence_for(table_name, options = { })
-      options = options.merge(:id => false)
+    def create_sequence_for(table_name, options = {})
+      options = options.merge(id: false)
 
       # TODO: pkname should be pulled from table definitions
       pkname = "id"
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
       create_table(sequence_table_name, options) do |t|
-        t.integer :id, :limit => 8
+        t.integer :id, limit: 8
       end
       execute "INSERT INTO #{quote_table_name(sequence_table_name)} (`id`) VALUES (0)"
     end
 
-    def drop_sequence_for(table_name, options = { })
+    def drop_sequence_for(table_name, options = {})
       # TODO: pkname should be pulled from table definitions
       pkname = "id"
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
@@ -85,13 +85,13 @@ module ActiveRecord::Turntable::Migration
 
     private
 
-    def invert_create_sequence_for(args)
-      [:drop_sequence_for, args]
-    end
+      def invert_create_sequence_for(args)
+        [:drop_sequence_for, args]
+      end
 
-    def invert_rename_sequence_for(args)
-      [:rename_sequence_for, args.reverse]
-    end
+      def invert_rename_sequence_for(args)
+        [:rename_sequence_for, args.reverse]
+      end
   end
 
   module Migrator

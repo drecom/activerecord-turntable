@@ -31,7 +31,7 @@ module ActiveRecord::Turntable
     end
 
     def ar_version
-      ActiveRecord::gem_version
+      ActiveRecord.gem_version
     end
   end
 end

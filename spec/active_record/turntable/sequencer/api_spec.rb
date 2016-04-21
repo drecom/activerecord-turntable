@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Api do
   before(:all) do
@@ -18,7 +18,7 @@ describe ActiveRecord::Turntable::Sequencer::Api do
 
   describe "#next_sequence_value" do
     before do
-      stub_request(:get, next_sequence_uri).to_return(:body => api_response.to_s)
+      stub_request(:get, next_sequence_uri).to_return(body: api_response.to_s)
     end
 
     subject { sequencer.next_sequence_value(sequence_name) }
@@ -28,7 +28,7 @@ describe ActiveRecord::Turntable::Sequencer::Api do
 
   describe "#current_sequence_value" do
     before do
-      stub_request(:get, current_sequence_uri).to_return(:body => api_response.to_s)
+      stub_request(:get, current_sequence_uri).to_return(body: api_response.to_s)
     end
 
     subject { sequencer.current_sequence_value(sequence_name) }

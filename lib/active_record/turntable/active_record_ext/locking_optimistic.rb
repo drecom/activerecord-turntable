@@ -3,7 +3,6 @@ module ActiveRecord::Turntable
     module LockingOptimistic
       # @note Override to add sharding condition on optimistic locking
       ::ActiveRecord::Locking::Optimistic.class_eval do
-
         ar_version = ActiveRecord::VERSION::STRING
         if Util.earlier_than_ar41?
           method_name = Util.ar_version_earlier_than?("4.0.6") ? "update_record" : "_update_record"
