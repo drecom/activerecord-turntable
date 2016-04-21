@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = '>= 1.9.3'
+  spec.required_ruby_version = ">= 2.2"
 
   spec.add_runtime_dependency "activerecord",  ">= 4.0.0", "< 5.0"
   spec.add_runtime_dependency "activesupport", ">= 4.0.0", "< 5.0"
@@ -43,9 +43,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "faker"
   spec.add_development_dependency "webmock"
   spec.add_development_dependency "pry"
-  if RUBY_VERSION > "2.0"
-    spec.add_development_dependency "pry-byebug"
-  end
+  spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "coveralls"
 
