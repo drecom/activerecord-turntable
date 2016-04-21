@@ -46,6 +46,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "coveralls"
+  spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "onkcop"
+  spec.add_development_dependency "guard-rubocop"
 
   if RUBY_PLATFORM =~ /darwin/
     spec.add_development_dependency "growl"
