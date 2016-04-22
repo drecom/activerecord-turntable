@@ -20,18 +20,18 @@ module ActiveRecord::Turntable
 
     included do
       include Transactions
-      ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, Sequencer)
-      ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, AbstractAdapter)
-      ActiveRecord::LogSubscriber.send(:include, LogSubscriber)
-      ActiveRecord::Persistence.send(:include, Persistence)
-      ActiveRecord::Locking::Optimistic.send(:include, LockingOptimistic)
-      ActiveRecord::Relation.send(:include, CleverLoad, Relation)
-      ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
+      ActiveRecord::ConnectionAdapters::AbstractAdapter.include(Sequencer)
+      ActiveRecord::ConnectionAdapters::AbstractAdapter.include(AbstractAdapter)
+      ActiveRecord::LogSubscriber.include(LogSubscriber)
+      ActiveRecord::Persistence.include(Persistence)
+      ActiveRecord::Locking::Optimistic.include(LockingOptimistic)
+      ActiveRecord::Relation.include(CleverLoad, Relation)
+      ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
       ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
         include ConnectionHandlerExtension
       end
       ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
-      ActiveRecord::Associations::Association.send(:include, Association)
+      ActiveRecord::Associations::Association.include(Association)
       require "active_record/turntable/active_record_ext/fixtures"
       require "active_record/turntable/active_record_ext/migration_proxy"
       require "active_record/turntable/active_record_ext/activerecord_import_ext"

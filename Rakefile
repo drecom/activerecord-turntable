@@ -39,8 +39,8 @@ namespace :turntable do
     task :migrate => :load_config do
       ActiveRecord::Base.establish_connection RAILS_ENV.to_sym
       require "active_record/turntable"
-      ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
-      ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
+      ActiveRecord::Base.include(ActiveRecord::Turntable)
+      ActiveRecord::ConnectionAdapters::SchemaStatements.include(ActiveRecord::Turntable::Migration::SchemaStatementsExt)
 
       configurations = [ActiveRecord::Base.configurations[RAILS_ENV]]
       configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).map { |v| v[1] }.flatten.uniq

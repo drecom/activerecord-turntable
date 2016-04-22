@@ -6,9 +6,9 @@ module ActiveRecord::Turntable::Migration
     class_attribute :target_shards, :current_shard
     alias_method_chain :announce, :turntable
     alias_method_chain :exec_migration, :turntable
-    ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
-    ::ActiveRecord::Migration::CommandRecorder.send(:include, CommandRecorder)
-    ::ActiveRecord::Migrator.send(:include, Migrator)
+    ::ActiveRecord::ConnectionAdapters::AbstractAdapter.include(SchemaStatementsExt)
+    ::ActiveRecord::Migration::CommandRecorder.include(CommandRecorder)
+    ::ActiveRecord::Migrator.include(Migrator)
   end
 
   module ShardDefinition

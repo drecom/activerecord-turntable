@@ -6,8 +6,8 @@ module ActiveRecord::Turntable
       extend ActiveSupport::Concern
 
       included do
-        ActiveRecord::Associations::SingularAssociation.send(:include, SingularAssociationExt)
-        ActiveRecord::Associations::CollectionAssociation.send(:include, CollectionAssociationExt)
+        ActiveRecord::Associations::SingularAssociation.include(SingularAssociationExt)
+        ActiveRecord::Associations::CollectionAssociation.include(CollectionAssociationExt)
         ActiveRecord::Associations::Builder::Association.valid_options += [:foreign_shard_key]
       end
 

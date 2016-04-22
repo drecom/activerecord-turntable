@@ -8,7 +8,7 @@ module ActiveRecord::Turntable
     # rails loading hook
     ActiveSupport.on_load(:before_initialize) do
       ActiveSupport.on_load(:active_record) do
-        ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
+        ActiveRecord::Base.include(ActiveRecord::Turntable)
       end
     end
 

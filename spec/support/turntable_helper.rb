@@ -2,7 +2,7 @@ require "active_record"
 
 module TurntableHelper
   def reload_turntable!(config_file_name = nil)
-    ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
+    ActiveRecord::Base.include(ActiveRecord::Turntable)
     ActiveRecord::Base.turntable_config_file = config_file_name
     ActiveRecord::Turntable::Config.load!(ActiveRecord::Base.turntable_config_file, :test)
   end
