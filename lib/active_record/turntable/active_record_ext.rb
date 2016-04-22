@@ -28,9 +28,7 @@ module ActiveRecord::Turntable
       ActiveRecord::Relation.include(CleverLoad)
       ActiveRecord::Relation.prepend(Relation)
       ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
-      ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
-        include ConnectionHandlerExtension
-      end
+      ActiveRecord::ConnectionAdapters::ConnectionHandler.prepend(ConnectionHandlerExtension)
       ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
       ActiveRecord::Associations::Association.include(Association)
       require "active_record/turntable/active_record_ext/fixtures"

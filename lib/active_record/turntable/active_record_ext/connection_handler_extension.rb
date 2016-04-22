@@ -1,11 +1,6 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module ConnectionHandlerExtension
-      extend ActiveSupport::Concern
-
-      included do
-        alias_method_chain :pool_for, :turntable
-      end
 
       private
 
