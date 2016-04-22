@@ -3,12 +3,11 @@ module ActiveRecord::Turntable::Migration
 
   included do
     extend ShardDefinition
+    prepend OverrideMethods
     class_attribute :target_shards, :current_shard
-    alias_method_chain :announce, :turntable
-    alias_method_chain :exec_migration, :turntable
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.include(SchemaStatementsExt)
     ::ActiveRecord::Migration::CommandRecorder.include(CommandRecorder)
-    ::ActiveRecord::Migrator.include(Migrator)
+    ::ActiveRecord::Migrator.prepend(Migrator)
   end
 
   module ShardDefinition
@@ -34,16 +33,18 @@ module ActiveRecord::Turntable::Migration
     end
   end
 
-  def target_shard?(shard_name)
-    target_shards.blank? or target_shards.include?(shard_name)
-  end
+  module OverrideMethods
+    def announce(message)
+      super("#{message} - Shard: #{current_shard}")
+    end
 
-  def announce_with_turntable(message)
-    announce_without_turntable("#{message} - Shard: #{current_shard}")
-  end
+    def exec_migration(*args)
+      super(*args) if target_shard?(current_shard)
+    end
 
-  def exec_migration_with_turntable(*args)
-    exec_migration_without_turntable(*args) if target_shard?(current_shard)
+    def target_shard?(shard_name)
+      target_shards.blank? or target_shards.include?(shard_name)
+    end
   end
 
   module SchemaStatementsExt
@@ -97,44 +98,37 @@ module ActiveRecord::Turntable::Migration
   module Migrator
     extend ActiveSupport::Concern
 
-    included do
-      klass = self
-      (class << klass; self; end).instance_eval {
-        [:up, :down, :run].each do |method_name|
-          original_method_alias = "_original_#{method_name}"
-          unless klass.respond_to?(original_method_alias)
-            alias_method original_method_alias, method_name
-          end
-          alias_method_chain method_name, :turntable
-        end
-      }
+    def self.prepended(base)
+      class << base
+        prepend ClassMethods
+      end
     end
 
     module ClassMethods
-      def up_with_turntable(migrations_paths, target_version = nil)
-        up_without_turntable(migrations_paths, target_version)
+      def up(migrations_paths, target_version = nil)
+        super
 
         ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
           puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_up(migrations_paths, target_version)
+          super(migrations_paths, target_version)
         end
       end
 
-      def down_with_turntable(migrations_paths, target_version = nil, &block)
-        down_without_turntable(migrations_paths, target_version, &block)
+      def down(migrations_paths, target_version = nil, &block)
+        super
 
         ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
           puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_down(migrations_paths, target_version, &block)
+          super(migrations_paths, target_version, &block)
         end
       end
 
-      def run_with_turntable(*args)
-        run_without_turntable(*args)
+      def run(*args)
+        super
 
         ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
           puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_run(*args)
+          super(*args)
         end
       end
     end
