@@ -25,7 +25,8 @@ module ActiveRecord::Turntable
       ActiveRecord::LogSubscriber.include(LogSubscriber)
       ActiveRecord::Persistence.include(Persistence)
       ActiveRecord::Locking::Optimistic.include(LockingOptimistic)
-      ActiveRecord::Relation.include(CleverLoad, Relation)
+      ActiveRecord::Relation.include(CleverLoad)
+      ActiveRecord::Relation.prepend(Relation)
       ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
       ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
         include ConnectionHandlerExtension
