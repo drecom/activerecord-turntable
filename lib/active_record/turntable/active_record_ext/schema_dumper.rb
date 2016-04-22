@@ -2,44 +2,37 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module SchemaDumper
-      extend ActiveSupport::Concern
-
-      included do
-        alias_method_chain :table, :turntable
-      end
 
       private
 
         # @note Override to dump database sequencer method
-        def table_with_turntable(table, stream)
+        def table(table, stream)
           columns = @connection.columns(table)
           begin
             tbl = StringIO.new
 
             # first dump primary key column
-            if @connection.respond_to?(:pk_and_sequence_for)
-              pk, = @connection.pk_and_sequence_for(table)
-            elsif @connection.respond_to?(:primary_key)
-              pk = @connection.primary_key(table)
-            end
+            pk = @connection.primary_key(table)
 
-            if table =~ /\A(.*)_id_seq\z/
-              tbl.print "  create_sequence_for #{remove_prefix_and_suffix($1).inspect}"
-            else
-              tbl.print "  create_table #{remove_prefix_and_suffix(table).inspect}"
-            end
+            tbl.print = if table =~ /\A(.*)_id_seq\z/
+                          "  create_sequence_for #{remove_prefix_and_suffix($1).inspect}"
+                        else
+                          "  create_table #{remove_prefix_and_suffix(table).inspect}"
+                        end
             pkcol = columns.detect { |c| c.name == pk }
             if pkcol
-              if pk != "id"
-                tbl.print %(, primary_key: "#{pk}")
-              elsif pkcol.sql_type == "uuid"
+              if pk != 'id'
+                tbl.print %Q(, primary_key: "#{pk}")
+              elsif pkcol.sql_type == 'bigint'
+                tbl.print ", id: :bigserial"
+              elsif pkcol.sql_type == 'uuid'
                 tbl.print ", id: :uuid"
-                tbl.print %(, default: "#{pkcol.default_function}") if pkcol.default_function
+                tbl.print %Q(, default: #{pkcol.default_function.inspect})
               end
             else
               tbl.print ", id: false"
             end
-            tbl.print ", force: true"
+            tbl.print ", force: :cascade"
             tbl.puts " do |t|"
 
             # then dump all non-primary key columns

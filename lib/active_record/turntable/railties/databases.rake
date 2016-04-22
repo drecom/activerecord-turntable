@@ -1,5 +1,5 @@
 require "active_record/turntable"
-ActiveRecord::SchemaDumper.include(ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper)
+ActiveRecord::SchemaDumper.prepend(ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper)
 
 turntable_namespace = nil
 
