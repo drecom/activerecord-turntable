@@ -6,7 +6,7 @@ module ActiveRecord::Turntable::Algorithm
     end
 
     def calculate(key)
-      @config["shards"][key % @config["shards"].size]["connection"]
+      @config[:shards][key % @config[:shards].size][:connection]
     rescue
       raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key}"
     end

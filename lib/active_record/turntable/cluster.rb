@@ -15,18 +15,18 @@ module ActiveRecord::Turntable
       # setup sequencer
       seq = (@options[:seq] || @config[:seq])
       if seq
-        if seq.values.size > 0 && seq.values.first["seq_type"] == "mysql"
+        if seq.values.size > 0 && seq.values.first[:seq_type] == "mysql"
           @seq_shard = SeqShard.new(seq.values.first)
         end
       end
 
       # setup shards
       @config[:shards].each do |spec|
-        @shards[spec["connection"]] ||= Shard.new(spec)
+        @shards[spec[:connection]] ||= Shard.new(spec)
       end
 
       # setup algorithm
-      alg_name = "ActiveRecord::Turntable::Algorithm::#{@config["algorithm"].camelize}Algorithm"
+      alg_name = "ActiveRecord::Turntable::Algorithm::#{@config[:algorithm].camelize}Algorithm"
       @algorithm = alg_name.constantize.new(@config)
     end
 

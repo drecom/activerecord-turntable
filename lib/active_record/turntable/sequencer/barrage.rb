@@ -7,20 +7,19 @@ module ActiveRecord::Turntable
         require "barrage"
         @klass = klass
         @options = options["options"]
-        @barrage = get_barrage_instance
       end
 
       def next_sequence_value(sequence_name)
-        @barrage.next
+        barrage.next
       end
 
       def current_sequence_value(sequence_name)
-        @barrage.current
+        barrage.current
       end
 
       private
 
-        def get_barrage_instance
+        def barrage
           @@unique_barrage_instance[@options] ||= ::Barrage.new(@options)
         end
     end

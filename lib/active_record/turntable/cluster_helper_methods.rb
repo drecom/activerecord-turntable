@@ -31,9 +31,9 @@ module ActiveRecord::Turntable
 
       def force_connect_all_shards!
         conf = configurations[Rails.env]
-        shards = {}
-        shards = shards.merge(conf["shards"]) if conf["shards"]
-        shards = shards.merge(conf["seq"]) if conf["seq"]
+        shards = HashWithIndifferentAccess.new
+        shards = shards.merge(conf[:shards]) if conf[:shards]
+        shards = shards.merge(conf[:seq]) if conf[:seq]
         shards.each do |name, config|
           turntable_connections[name] ||=
             ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec_for(config))

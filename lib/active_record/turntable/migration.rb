@@ -16,13 +16,13 @@ module ActiveRecord::Turntable::Migration
       config = ActiveRecord::Base.turntable_config
       (self.target_shards ||= []).concat(
         if cluster_names.first == :all
-          config["clusters"].map do |_name, cluster_conf|
-            cluster_conf["shards"].map { |shard| shard["connection"] }
+          config[:clusters].map do |_name, cluster_conf|
+            cluster_conf[:shards].map { |shard| shard[:connection] }
           end
         else
           cluster_names.map do |cluster_name|
-            config["clusters"][cluster_name]["shards"].map do |shard|
-              shard["connection"]
+            config[:clusters][cluster_name][:shards].map do |shard|
+              shard[:connection]
             end
           end.flatten
         end

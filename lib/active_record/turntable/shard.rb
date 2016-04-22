@@ -10,7 +10,7 @@ module ActiveRecord::Turntable
 
     def initialize(shard_spec)
       @config = DEFAULT_CONFIG.merge(shard_spec)
-      @name = @config["connection"]
+      @name = @config[:connection]
       ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
