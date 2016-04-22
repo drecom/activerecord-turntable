@@ -3,6 +3,8 @@ require "active_record/associations/preloader/association"
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module AssociationPreloader
+      include ShardingCondition
+
       # @note Override to add sharding condition on preload
       def records_for(ids)
         returning_scope = super
@@ -11,22 +13,6 @@ module ActiveRecord::Turntable
         end
         returning_scope
       end
-
-      private
-
-        def foreign_shard_key
-          options[:foreign_shard_key] || model.turntable_shard_key
-        end
-
-        def should_use_shard_key?
-          sharded_by_same_key? || !!options[:foreign_shard_key]
-        end
-
-        def sharded_by_same_key?
-          model.turntable_enabled? &&
-            klass.turntable_enabled? &&
-            model.turntable_shard_key == klass.turntable_shard_key
-        end
     end
   end
 end
