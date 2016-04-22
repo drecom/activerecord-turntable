@@ -24,46 +24,30 @@ module ActiveRecord::Turntable
           extend ActiveSupport::Concern
 
           included do
-            if Util.ar42_or_later?
-              alias_method_chain :get_records, :turntable
-            else
-              alias_method_chain :find_target, :turntable
-            end
+            alias_method_chain :get_records, :turntable
           end
 
           # @note Override to add sharding condition for singular association
-          if Util.ar42_or_later?
-            def get_records_with_turntable
-              if reflection.scope_chain.any?(&:any?) ||
-                 scope.eager_loading? ||
-                 klass.current_scope ||
-                 klass.default_scopes.any? ||
-                 should_use_shard_key? # OPTIMIZE: Use bind values if cachable scope
+          def get_records_with_turntable
+            if reflection.scope_chain.any?(&:any?) ||
+                scope.eager_loading? ||
+                klass.current_scope ||
+                klass.default_scopes.any? ||
+                should_use_shard_key? # OPTIMIZE: Use bind values if cachable scope
 
-                return turntable_scope(scope).limit(1).to_a
-              end
+              return turntable_scope(scope).limit(1).to_a
+            end
 
-              conn = klass.connection
-              sc = reflection.association_scope_cache(conn, owner) do
-                ActiveRecord::StatementCache.create(conn) { |params|
-                  as = ActiveRecord::Associations::AssociationScope.create { params.bind }
-                  target_scope.merge(as.scope(self, conn)).limit(1)
-                }
-              end
+            conn = klass.connection
+            sc = reflection.association_scope_cache(conn, owner) do
+              ActiveRecord::StatementCache.create(conn) { |params|
+                as = ActiveRecord::Associations::AssociationScope.create { params.bind }
+                target_scope.merge(as.scope(self, conn)).limit(1)
+              }
+            end
 
-              binds = ActiveRecord::Associations::AssociationScope.get_bind_values(owner, reflection.chain)
-              sc.execute binds, klass, klass.connection
-            end
-          elsif Util.ar41_or_later?
-            def find_target_with_turntable
-              if record = turntable_scope(scope).take
-                set_inverse_instance record
-              end
-            end
-          else
-            def find_target_with_turntable
-              turntable_scope(scope).take.tap { |record| set_inverse_instance(record) }
-            end
+            binds = ActiveRecord::Associations::AssociationScope.get_bind_values(owner, reflection.chain)
+            sc.execute binds, klass, klass.connection
           end
         end
 
@@ -71,57 +55,35 @@ module ActiveRecord::Turntable
           extend ActiveSupport::Concern
 
           included do
-            if Util.ar42_or_later?
-              alias_method_chain :get_records, :turntable
-            else
-              alias_method_chain :find_target, :turntable
-            end
+            alias_method_chain :get_records, :turntable
           end
 
           private
 
-            if Util.ar42_or_later?
-              def get_records_with_turntable
-                if reflection.scope_chain.any?(&:any?) ||
-                   scope.eager_loading? ||
-                   klass.current_scope ||
-                   klass.default_scopes.any? ||
-                   should_use_shard_key? # OPTIMIZE: Use bind values if cachable scope
+          def get_records_with_turntable
+            if reflection.scope_chain.any?(&:any?) ||
+                scope.eager_loading? ||
+                klass.current_scope ||
+                klass.default_scopes.any? ||
+                should_use_shard_key? # OPTIMIZE: Use bind values if cachable scope
 
-                  return turntable_scope(scope).to_a
-                end
-
-                conn = klass.connection
-                sc = reflection.association_scope_cache(conn, owner) do
-                  ActiveRecord::StatementCache.create(conn) { |params|
-                    as = ActiveRecord::Associations::AssociationScope.create { params.bind }
-                    target_scope.merge as.scope(self, conn)
-                  }
-                end
-
-                binds = ActiveRecord::Associations::AssociationScope.get_bind_values(owner, reflection.chain)
-                sc.execute binds, klass, klass.connection
-              end
-            else
-              # @note Override to add sharding condition for collection association
-              def find_target_with_turntable
-                records =
-                  if options[:finder_sql]
-                    reflection.klass.find_by_sql(custom_finder_sql)
-                  else
-                    current_scope = scope
-                    if should_use_shard_key?
-                      current_scope = current_scope.where(klass.turntable_shard_key => owner.send(foreign_shard_key))
-                    end
-                    current_scope.to_a
-                  end
-                records.each { |record| set_inverse_instance(record) }
-                records
-              end
+              return turntable_scope(scope).to_a
             end
+
+            conn = klass.connection
+            sc = reflection.association_scope_cache(conn, owner) do
+              ActiveRecord::StatementCache.create(conn) { |params|
+                as = ActiveRecord::Associations::AssociationScope.create { params.bind }
+                target_scope.merge as.scope(self, conn)
+              }
+            end
+
+            binds = ActiveRecord::Associations::AssociationScope.get_bind_values(owner, reflection.chain)
+            sc.execute binds, klass, klass.connection
+          end
         end
 
-      private
+        private
 
         def foreign_shard_key
           options[:foreign_shard_key] || owner.turntable_shard_key

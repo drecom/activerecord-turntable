@@ -14,11 +14,7 @@ module ActiveRecord::Turntable
             begin
               status = yield
             rescue ActiveRecord::Rollback
-              if Util.ar42_or_later?
-                clear_transaction_record_state
-              else
-                @_start_transaction_state[:level] = (@_start_transaction_state[:level] || 0) - 1
-              end
+              clear_transaction_record_state
               status = nil
             end
 
