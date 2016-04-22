@@ -3,16 +3,11 @@ require "active_record/log_subscriber"
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module LogSubscriber
-      extend ActiveSupport::Concern
-
-      included do
-        alias_method_chain :sql, :turntable
-      end
 
       protected
 
         # @note Override to add shard name logging
-        def sql_with_turntable(event)
+        def sql(event)
           self.class.runtime += event.duration
           return unless logger.debug?
 

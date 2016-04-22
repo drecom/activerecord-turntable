@@ -22,7 +22,7 @@ module ActiveRecord::Turntable
       include Transactions
       ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(Sequencer)
       ActiveRecord::ConnectionAdapters::AbstractAdapter.include(AbstractAdapter)
-      ActiveRecord::LogSubscriber.include(LogSubscriber)
+      ActiveRecord::LogSubscriber.prepend(LogSubscriber)
       ActiveRecord::Persistence.include(Persistence)
       ActiveRecord::Locking::Optimistic.include(LockingOptimistic)
       ActiveRecord::Relation.include(CleverLoad)
