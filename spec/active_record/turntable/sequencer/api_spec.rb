@@ -10,7 +10,7 @@ describe ActiveRecord::Turntable::Sequencer::Api do
   let(:klass) { Class.new }
   let(:api_host) { "example.example" }
   let(:api_port) { 80 }
-  let(:options) { { "api_host" => api_host, "api_port" => api_port } }
+  let(:options) { { api_host: api_host, api_port: api_port }.with_indifferent_access }
   let(:api_response) { 1024 }
 
   let(:next_sequence_uri) { "http://#{api_host}/sequences/#{sequence_name}/new" }

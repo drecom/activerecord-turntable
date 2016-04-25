@@ -13,8 +13,8 @@ module ActiveRecord::Turntable
       def initialize(klass, options = {})
         @klass = klass
         @options = options
-        @host = @options["api_host"]
-        @port = @options["api_port"]
+        @host = @options[:api_host]
+        @port = @options[:api_port]
         @client = HTTPClient.new
       end
 

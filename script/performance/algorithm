@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
 require "rspec"
-require File.join(File.dirname(__FILE__), "../../../spec/spec_helper")
+require File.join(File.dirname(__FILE__), "../../spec/spec_helper")
 require "benchmark"
 
 def setup_algorithm(n, alg = "Range")
   config = {
     "shards" => n.times.map do |i|
-      { "connection" => "connection_#{i}", "less_than" => (i + 1) * 100 }
+      { connection: "connection_#{i}", less_than: (i + 1) * 100 }
     end,
-  }
+  }.with_indifferent_access
   "ActiveRecord::Turntable::Algorithm::#{alg}Algorithm".constantize.new(config)
 end
 
