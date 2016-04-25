@@ -51,7 +51,7 @@ module ActiveRecord::Turntable
 
       def initialize_clusters!
         turntable_config[:clusters].each do |name, spec|
-          self.turntable_clusters[name] ||= Cluster.new(spec, {})
+          self.turntable_clusters[name] ||= Cluster.new(spec)
         end
       end
 
