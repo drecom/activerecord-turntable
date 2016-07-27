@@ -61,13 +61,25 @@ describe ActiveRecord::Turntable::Mixer do
 
     context "For Select SQL" do
       context "When call find_shard_keys with eql shardkey condition" do
-        subject {
-          tree = SQLTree["SELECT * FROM `users` WHERE `users`.`id` = 1"]
-          @mixer.find_shard_keys(tree.where, "users", "id")
-        }
+        context "with single equal expression" do
+          subject {
+            tree = SQLTree["SELECT * FROM `users` WHERE `users`.`id` = 1"]
+            @mixer.find_shard_keys(tree.where, "users", "id")
+          }
 
-        it { is_expected.to be_instance_of Array }
-        it { is_expected.to eq([1]) }
+          it { is_expected.to be_instance_of Array }
+          it { is_expected.to eq([1]) }
+        end
+
+        context "with duplicated equal expressions" do
+          subject {
+            tree = SQLTree["SELECT * FROM `users` WHERE `users`.`id` = 1 AND `users`.`id` = 1"]
+            @mixer.find_shard_keys(tree.where, "users", "id")
+          }
+
+          it { is_expected.to be_instance_of Array }
+          it { is_expected.to eq([1]) }
+        end
       end
 
       context "When call find_shard_keys with shardkey collection condition" do
