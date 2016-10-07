@@ -22,6 +22,13 @@ module ActiveRecord::Turntable
       include ClusterHelperMethods
     end
 
+    module ConnectionExtension
+      def connection_specification_name
+        return super unless turntable_enabled?
+        "turntable_pool_proxy::#{name}"
+      end
+    end
+
     module ClassMethods
       # @param [Symbol] cluster_name cluster name for this class
       # @param [Symbol] shard_key_name shard key attribute name
@@ -37,7 +44,8 @@ module ActiveRecord::Turntable
           self.turntable_clusters[cluster_name] ||= Cluster.new(
             turntable_config[:clusters][cluster_name],
             options
-          )
+        )
+        prepend ConnectionExtension
         turntable_replace_connection_pool
       end
 
@@ -45,8 +53,8 @@ module ActiveRecord::Turntable
         ch = connection_handler
         cp = ConnectionProxy.new(self, turntable_cluster)
         pp = PoolProxy.new(cp)
-        ch.class_to_pool.clear if defined?(ch.class_to_pool)
-        ch.send(:class_to_pool)[name] = ch.send(:owner_to_pool)[name] = pp
+
+        ch.send(:owner_to_pool)[connection_specification_name] = pp
       end
 
       def initialize_clusters!
