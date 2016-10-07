@@ -1,161 +1,57 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module LockingOptimistic
-      # @note Override to add sharding condition on optimistic locking
-      ::ActiveRecord::Locking::Optimistic.class_eval do
+      ::ActiveRecord::Locking::Optimistic.class_eval <<-EOD
+        private
+        # @note Override to add sharding condition on optimistic locking
+        def _update_record(attribute_names = self.attribute_names) #:nodoc:
+          return super unless locking_enabled?
+          return 0 if attribute_names.empty?
 
-        ar_version = ActiveRecord::VERSION::STRING
-        if Util.earlier_than_ar41?
-          method_name = Util.ar_version_earlier_than?("4.0.6") ? "update_record" : "_update_record"
+          klass = self.class
+          lock_col = self.class.locking_column
+          previous_lock_value = send(lock_col).to_i
+          increment_lock
 
-          class_eval <<-EOD
-            def #{method_name}(attribute_names = @attributes.keys) #:nodoc:
-              return super unless locking_enabled?
-              return 0 if attribute_names.empty?
+          attribute_names += [lock_col]
+          attribute_names.uniq!
 
-              klass = self.class
-              lock_col = self.class.locking_column
-              previous_lock_value = send(lock_col).to_i
-              increment_lock
+          begin
+            relation = self.class.unscoped
 
-              attribute_names += [lock_col]
-              attribute_names.uniq!
-
-              begin
-                relation = self.class.unscoped
-
-                condition_scope = relation.where(
-                  relation.table[self.class.primary_key].eq(id).and(
-                    relation.table[lock_col].eq(self.class.quote_value(previous_lock_value, column_for_attribute(lock_col)))
-                  )
+            condition_scope = relation.where(
+              relation.table[self.class.primary_key].eq(id).and(
+                relation.table[lock_col].eq(self.class.quote_value(previous_lock_value, column_for_attribute(lock_col)))
+              )
+            )
+            if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
+              condition_scope = condition_scope.where(
+                relation.table[klass.turntable_shard_key].eq(
+                  self.class.quote_value(self.send(turntable_shard_key), column_for_attribute(klass.turntable_shard_key))
                 )
-                if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-                  condition_scope = condition_scope.where(
-                    relation.table[klass.turntable_shard_key].eq(
-                       self.class.quote_value(self.send(turntable_shard_key), column_for_attribute(klass.turntable_shard_key))
-                    )
-                  )
-                end
-                stmt = condition_scope.arel.compile_update(arel_attributes_with_values_for_update(attribute_names))
-
-                affected_rows = self.class.connection.update stmt
-
-                unless affected_rows == 1
-                  raise ActiveRecord::StaleObjectError.new(self, "update")
-                end
-
-                affected_rows
-
-              # If something went wrong, revert the version.
-              rescue Exception
-                send(lock_col + '=', previous_lock_value)
-                raise
-              end
+              )
             end
-          EOD
-        elsif Util.earlier_than_ar42?
-          method_name = Util.ar_version_earlier_than?("4.1.2") ? "update_record" : "_update_record"
 
-          class_eval <<-EOD
-            def _update_record(attribute_names = @attributes.keys) #:nodoc:
-              return super unless locking_enabled?
-              return 0 if attribute_names.empty?
+            stmt = condition_scope.arel.compile_update(
+              arel_attributes_with_values_for_update(attribute_names),
+              self.class.primary_key
+            )
 
-              klass = self.class
-              lock_col = self.class.locking_column
-              previous_lock_value = send(lock_col).to_i
-              increment_lock
+            affected_rows = self.class.connection.update stmt
 
-              attribute_names += [lock_col]
-              attribute_names.uniq!
-
-              begin
-                relation = self.class.unscoped
-
-                condition_scope = relation.where(
-                  relation.table[self.class.primary_key].eq(id).and(
-                    relation.table[lock_col].eq(self.class.quote_value(previous_lock_value, column_for_attribute(lock_col)))
-                  )
-                )
-                if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-                  condition_scope = condition_scope.where(
-                    relation.table[klass.turntable_shard_key].eq(
-                       self.class.quote_value(self.send(turntable_shard_key), column_for_attribute(klass.turntable_shard_key))
-                    )
-                  )
-                end
-                stmt = condition_scope.arel.compile_update(
-                         arel_attributes_with_values_for_update(attribute_names),
-                         self.class.primary_key
-                       )
-
-                affected_rows = self.class.connection.update stmt
-
-                unless affected_rows == 1
-                  raise ActiveRecord::StaleObjectError.new(self, "update")
-                end
-
-                affected_rows
-
-              # If something went wrong, revert the version.
-              rescue Exception
-                send(lock_col + '=', previous_lock_value)
-                raise
-              end
+            unless affected_rows == 1
+              raise ActiveRecord::StaleObjectError.new(self, "update")
             end
-          EOD
-        else
-          class_eval <<-EOD
-            def _update_record(attribute_names = self.attribute_names) #:nodoc:
-              return super unless locking_enabled?
-              return 0 if attribute_names.empty?
 
-              klass = self.class
-              lock_col = self.class.locking_column
-              previous_lock_value = send(lock_col).to_i
-              increment_lock
+            affected_rows
 
-              attribute_names += [lock_col]
-              attribute_names.uniq!
-
-              begin
-                relation = self.class.unscoped
-
-                condition_scope = relation.where(
-                  relation.table[self.class.primary_key].eq(id).and(
-                    relation.table[lock_col].eq(self.class.quote_value(previous_lock_value, column_for_attribute(lock_col)))
-                  )
-                )
-                if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-                  condition_scope = condition_scope.where(
-                    relation.table[klass.turntable_shard_key].eq(
-                       self.class.quote_value(self.send(turntable_shard_key), column_for_attribute(klass.turntable_shard_key))
-                    )
-                  )
-                end
-
-                stmt = condition_scope.arel.compile_update(
-                  arel_attributes_with_values_for_update(attribute_names),
-                  self.class.primary_key
-                )
-
-                affected_rows = self.class.connection.update stmt
-
-                unless affected_rows == 1
-                  raise ActiveRecord::StaleObjectError.new(self, "update")
-                end
-
-                affected_rows
-
-              # If something went wrong, revert the version.
-              rescue Exception
-                send(lock_col + '=', previous_lock_value)
-                raise
-              end
-            end
-          EOD
+            # If something went wrong, revert the version.
+          rescue Exception
+            send(lock_col + '=', previous_lock_value)
+            raise
+          end
         end
-      end
+      EOD
     end
   end
 end

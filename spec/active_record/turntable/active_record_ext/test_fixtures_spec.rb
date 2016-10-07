@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
-require 'active_record'
-require 'active_record/turntable/active_record_ext/fixtures'
+require "active_record"
+require "active_record/turntable/active_record_ext/fixtures"
 
 describe ActiveRecord::TestFixtures do
   before(:all) do

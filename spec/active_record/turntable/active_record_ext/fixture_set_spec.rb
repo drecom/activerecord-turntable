@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
-require 'active_record'
-require 'active_record/turntable/active_record_ext/fixtures'
+require "active_record"
+require "active_record/turntable/active_record_ext/fixtures"
 
 describe ActiveRecord::FixtureSet do
   before(:all) do
@@ -21,7 +21,7 @@ describe ActiveRecord::FixtureSet do
     subject { ActiveRecord::FixtureSet.create_fixtures(fixtures_root, "cards") }
     it { is_expected.to be_instance_of(Array) }
     it "creates card records" do
-      expect {subject}.to change {Card.count}.from(0).to(cards.size)
+      expect { subject }.to change { Card.count }.from(0).to(cards.size)
     end
   end
 end

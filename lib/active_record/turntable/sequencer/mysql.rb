@@ -17,7 +17,7 @@ module ActiveRecord::Turntable
         res = conn.execute("SELECT LAST_INSERT_ID()")
         new_id = res.first.first.to_i
         raise SequenceNotFoundError if new_id.zero?
-        return new_id
+        new_id
       end
 
       def current_sequence_value(sequence_name)
@@ -25,7 +25,7 @@ module ActiveRecord::Turntable
         conn.execute "UPDATE #{@klass.connection.quote_table_name(sequence_name)} SET id=LAST_INSERT_ID(id)"
         res = conn.execute("SELECT LAST_INSERT_ID()")
         current_id = res.first.first.to_i
-        return current_id
+        current_id
       end
     end
   end

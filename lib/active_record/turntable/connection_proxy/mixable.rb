@@ -10,7 +10,7 @@ module ActiveRecord::Turntable
       def mixable?(method, *args)
         (method.to_s =~ METHODS_REGEXP &&
          args.first !~ EXCLUDE_QUERY_REGEXP) ||
-          (method.to_s == 'execute' && args.first =~ QUERY_REGEXP)
+          (method.to_s == "execute" && args.first =~ QUERY_REGEXP)
       end
     end
   end

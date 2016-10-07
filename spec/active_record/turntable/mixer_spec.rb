@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Mixer do
   before(:all) do
@@ -85,7 +85,7 @@ describe ActiveRecord::Turntable::Mixer do
         }
 
         it { is_expected.to be_instance_of Array }
-        it { is_expected.to eq([1,2,3,4,5]) }
+        it { is_expected.to eq([1, 2, 3, 4, 5]) }
       end
 
       context "When call find_shard_keys with not determine shardkey condition" do
@@ -108,7 +108,5 @@ describe ActiveRecord::Turntable::Mixer do
         it { is_expected.to eq([]) }
       end
     end
-
   end
-
 end

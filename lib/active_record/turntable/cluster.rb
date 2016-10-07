@@ -1,8 +1,7 @@
-require 'active_support/core_ext/hash/indifferent_access'
+require "active_support/core_ext/hash/indifferent_access"
 
 module ActiveRecord::Turntable
   class Cluster
-
     DEFAULT_CONFIG = {
       "shards" => [],
       "algorithm" => "range",
@@ -15,19 +14,19 @@ module ActiveRecord::Turntable
 
       # setup sequencer
       seq = (@options[:seq] || @config[:seq])
-      if seq 
-        if seq.values.size > 0 && seq.values.first["seq_type"] == "mysql"
+      if seq
+        if seq.values.size > 0 && seq.values.first[:seq_type] == "mysql"
           @seq_shard = SeqShard.new(seq.values.first)
         end
       end
 
       # setup shards
       @config[:shards].each do |spec|
-        @shards[spec["connection"]] ||= Shard.new(spec)
+        @shards[spec[:connection]] ||= Shard.new(spec)
       end
 
       # setup algorithm
-      alg_name = "ActiveRecord::Turntable::Algorithm::#{@config["algorithm"].camelize}Algorithm"
+      alg_name = "ActiveRecord::Turntable::Algorithm::#{@config[:algorithm].camelize}Algorithm"
       @algorithm = alg_name.constantize.new(@config)
     end
 
@@ -35,15 +34,13 @@ module ActiveRecord::Turntable
       @seq_shard
     end
 
-    def shards
-      @shards
-    end
+    attr_reader :shards
 
     def shard_for(key)
       @shards[@algorithm.calculate(key)]
     rescue
       raise ActiveRecord::Turntable::CannotSpecifyShardError,
-        "cannot select_shard for key:#{key}"
+            "cannot select_shard for key:#{key}"
     end
 
     def select_shard(key)
@@ -65,7 +62,7 @@ module ActiveRecord::Turntable
         end
       else
         shard.connection.transaction(options) do
-          block.call
+          yield
         end
       end
     end
@@ -82,12 +79,12 @@ module ActiveRecord::Turntable
         shards[shard_or_object]
       else
         raise ActiveRecord::Turntable::TurntableError,
-                "transaction cannot call to object: #{shard_or_object}"
+              "transaction cannot call to object: #{shard_or_object}"
       end
     end
 
     def weighted_shards(key = nil)
-      Hash[@algorithm.calculate_used_shards_with_weight(key).map do |k,v|
+      Hash[@algorithm.calculate_used_shards_with_weight(key).map do |k, v|
         [@shards[k], v]
       end]
     end

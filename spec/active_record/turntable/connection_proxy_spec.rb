@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::ConnectionProxy do
   before(:all) do
@@ -91,7 +91,6 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       expect {
         @user1.save!
       }.not_to raise_error
-
     end
 
     it "should be saved to user_shard_2 with id = 30000" do
@@ -102,7 +101,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     it "User.where('id IN (1, 30000)') returns 2 record" do
-      expect(User.where(:id => [1, 30000]).all.size).to eq(2)
+      expect(User.where(id: [1, 30000]).all.size).to eq(2)
     end
 
     it "count should be 2" do
@@ -120,11 +119,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
       @user1 = User.new
       @user1.id = 1
-      @user1.nickname = 'user1'
+      @user1.nickname = "user1"
       @user1.save!
       @user2 = User.new
       @user2.id = 30000
-      @user2.nickname = 'user2'
+      @user2.nickname = "user2"
       @user2.save!
     end
 
@@ -167,11 +166,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
       @user1 = User.new
       @user1.id = 1
-      @user1.nickname = 'user1'
+      @user1.nickname = "user1"
       @user1.save!
       @user2 = User.new
       @user2.id = 30000
-      @user2.nickname = 'user2'
+      @user2.nickname = "user2"
       @user2.save!
     end
 
@@ -185,11 +184,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
       @user1 = User.new
       @user1.id = 1
-      @user1.nickname = 'user1'
+      @user1.nickname = "user1"
       @user1.save!
       @user2 = User.new
       @user2.id = 30000
-      @user2.nickname = 'user2'
+      @user2.nickname = "user2"
       @user2.save!
     end
 
@@ -203,15 +202,15 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
       @user1 = User.new
       @user1.id = 1
-      @user1.nickname = 'user1'
+      @user1.nickname = "user1"
       @user1.save!
       @user2 = User.new
       @user2.id = 30000
-      @user2.nickname = 'user2'
+      @user2.nickname = "user2"
       @user2.save!
     end
 
-    subject { User.exists?(nickname: 'user2') }
+    subject { User.exists?(nickname: "user2") }
     it { is_expected.to be_truthy }
   end
 
@@ -221,15 +220,15 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
       @user1 = User.new
       @user1.id = 1
-      @user1.nickname = 'user1'
+      @user1.nickname = "user1"
       @user1.save!
       @user2 = User.new
       @user2.id = 30000
-      @user2.nickname = 'user2'
+      @user2.nickname = "user2"
       @user2.save!
     end
 
-    subject { User.exists?(nickname: 'user999') }
+    subject { User.exists?(nickname: "user999") }
     it { is_expected.to be_falsey }
   end
 
@@ -239,11 +238,11 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
       @user1 = User.new
       @user1.id = 1
-      @user1.nickname = 'user1'
+      @user1.nickname = "user1"
       @user1.save!
       @user2 = User.new
       @user2.id = 30000
-      @user2.nickname = 'user2'
+      @user2.nickname = "user2"
       @user2.save!
     end
 

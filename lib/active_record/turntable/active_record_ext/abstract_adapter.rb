@@ -9,12 +9,12 @@ module ActiveRecord::Turntable
         # @note override for logging current shard name
         def log(sql, name = "SQL", binds = [])
           @instrumenter.instrument(
-                                   "sql.active_record",
-                                   :sql           => sql,
-                                   :name          => name,
-                                   :connection_id => object_id,
-                                   :binds         => binds,
-                                   :turntable_shard_name => turntable_shard_name) { yield }
+            "sql.active_record",
+            sql: sql,
+            name: name,
+            connection_id: object_id,
+            binds: binds,
+            turntable_shard_name: turntable_shard_name) { yield }
         rescue Exception => e
           message = "#{e.class.name}: #{e.message}: #{sql} : #{turntable_shard_name}"
           @logger.error message if @logger

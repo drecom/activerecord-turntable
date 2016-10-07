@@ -20,22 +20,21 @@ module ActiveRecord::Turntable
 
     included do
       include Transactions
-      ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, Sequencer)
-      ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, AbstractAdapter)
-      ActiveRecord::LogSubscriber.send(:include, LogSubscriber)
-      ActiveRecord::Persistence.send(:include, Persistence)
-      ActiveRecord::Locking::Optimistic.send(:include, LockingOptimistic)
-      ActiveRecord::Relation.send(:include, CleverLoad, Relation)
-      ActiveRecord::Migration.send(:include, ActiveRecord::Turntable::Migration)
-      ActiveRecord::ConnectionAdapters::ConnectionHandler.instance_exec do
-        include ConnectionHandlerExtension
-      end
-      ActiveRecord::Associations::Preloader::Association.send(:include, AssociationPreloader)
-      ActiveRecord::Associations::Association.send(:include, Association)
-      require 'active_record/turntable/active_record_ext/fixtures'
-      require 'active_record/turntable/active_record_ext/migration_proxy'
-      require 'active_record/turntable/active_record_ext/activerecord_import_ext'
-      require 'active_record/turntable/active_record_ext/acts_as_archive_extension'
+      ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(Sequencer)
+      ActiveRecord::ConnectionAdapters::AbstractAdapter.include(AbstractAdapter)
+      ActiveRecord::LogSubscriber.prepend(LogSubscriber)
+      ActiveRecord::Persistence.include(Persistence)
+      ActiveRecord::Locking::Optimistic.include(LockingOptimistic)
+      ActiveRecord::Relation.include(CleverLoad)
+      ActiveRecord::Relation.prepend(Relation)
+      ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
+      ActiveRecord::ConnectionAdapters::ConnectionHandler.prepend(ConnectionHandlerExtension)
+      ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
+      ActiveRecord::Associations::Association.include(Association)
+      require "active_record/turntable/active_record_ext/fixtures"
+      require "active_record/turntable/active_record_ext/migration_proxy"
+      require "active_record/turntable/active_record_ext/activerecord_import_ext"
+      require "active_record/turntable/active_record_ext/acts_as_archive_extension"
     end
   end
 end

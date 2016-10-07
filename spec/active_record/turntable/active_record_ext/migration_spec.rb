@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Migration do
   before(:all) do
@@ -16,11 +16,11 @@ describe ActiveRecord::Turntable::Migration do
     context "With clusters definitions" do
       let(:migration_class) {
         klass = Class.new(ActiveRecord::Migration) {
-        clusters :user_cluster
+          clusters :user_cluster
         }
       }
-      let(:cluster_config) { ActiveRecord::Base.turntable_config["clusters"]["user_cluster"] }
-      let(:user_cluster_shards) { cluster_config["shards"].map { |s| s["connection"] } }
+      let(:cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:user_cluster] }
+      let(:user_cluster_shards) { cluster_config[:shards].map { |s| s[:connection] } }
 
       it { is_expected.to eq(user_cluster_shards) }
     end

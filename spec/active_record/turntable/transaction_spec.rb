@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "transaction" do
   before(:all) do
@@ -13,7 +13,7 @@ describe "transaction" do
 
   describe "all_cluster_transaction" do
     let(:all_clusters) { clusters.values }
-    let(:shards) { all_clusters.map { |c| c.shards.values }.flatten(1) }
+    let(:shards) { all_clusters.flat_map { |c| c.shards.values } }
 
     it "all shards should begin transaction" do
       User.all_cluster_transaction {

@@ -1,4 +1,4 @@
-require 'active_support/lazy_load_hooks'
+require "active_support/lazy_load_hooks"
 
 module ActiveRecord::Turntable
   module Base
@@ -6,14 +6,14 @@ module ActiveRecord::Turntable
 
     included do
       class_attribute :turntable_connections, :turntable_clusters,
-                        :turntable_enabled, :turntable_sequencer_enabled
+                      :turntable_enabled, :turntable_sequencer_enabled
 
       self.turntable_connections = {}
       self.turntable_clusters = {}.with_indifferent_access
       self.turntable_enabled = false
       self.turntable_sequencer_enabled = false
       class << self
-        delegate :shards_transaction, :with_all, :to => :connection
+        delegate :shards_transaction, :with_all, to: :connection
       end
 
       ActiveSupport.on_load(:turntable_config_loaded) do
@@ -28,19 +28,18 @@ module ActiveRecord::Turntable
       # @param [Hash] options
       def turntable(cluster_name, shard_key_name, options = {})
         class_attribute :turntable_shard_key,
-                          :turntable_cluster, :turntable_cluster_name
+                        :turntable_cluster, :turntable_cluster_name
 
         self.turntable_enabled = true
         self.turntable_cluster_name = cluster_name
         self.turntable_shard_key = shard_key_name
         self.turntable_cluster =
           self.turntable_clusters[cluster_name] ||= Cluster.new(
-                                                      turntable_config[:clusters][cluster_name],
-                                                      options
-                                                    )
+            turntable_config[:clusters][cluster_name],
+            options
+          )
         turntable_replace_connection_pool
       end
-
 
       def turntable_replace_connection_pool
         ch = connection_handler
@@ -52,7 +51,7 @@ module ActiveRecord::Turntable
 
       def initialize_clusters!
         turntable_config[:clusters].each do |name, spec|
-          self.turntable_clusters[name] ||= Cluster.new(spec, {})
+          self.turntable_clusters[name] ||= Cluster.new(spec)
         end
       end
 
@@ -67,9 +66,7 @@ module ActiveRecord::Turntable
       end
 
       def clear_all_connections!
-        turntable_connections.values.each do |pool|
-          pool.disconnect!
-        end
+        turntable_connections.values.each(&:disconnect!)
       end
 
       def sequencer(sequence_name, *args)

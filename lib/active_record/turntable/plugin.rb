@@ -1,4 +1,4 @@
-require 'active_record/turntable'
+require "active_record/turntable"
 
 module ActiveRecord::Turntable
   module Plugin

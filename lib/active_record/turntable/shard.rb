@@ -3,14 +3,14 @@ module ActiveRecord::Turntable
     module Connections; end
 
     DEFAULT_CONFIG = {
-      "connection" => (defined?(Rails) ? Rails.env : "development")
+      "connection" => (defined?(Rails) ? Rails.env : "development"),
     }.with_indifferent_access
 
     attr_reader :name
 
     def initialize(shard_spec)
       @config = DEFAULT_CONFIG.merge(shard_spec)
-      @name = @config["connection"]
+      @name = @config[:connection]
       ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
@@ -26,26 +26,26 @@ module ActiveRecord::Turntable
 
     private
 
-    def connection_klass
-      @connection_klass ||= create_connection_class
-    end
-
-    def get_or_set_connection_class
-      if Connections.const_defined?(name.classify)
-        klass = Connections.const_get(name.classify)
-      else
-        klass = Class.new(ActiveRecord::Base)
-        Connections.const_set(name.classify, klass)
-        klass.abstract_class = true
+      def connection_klass
+        @connection_klass ||= create_connection_class
       end
-      klass
-    end
 
-    def create_connection_class
-      klass = get_or_set_connection_class
-      klass.remove_connection
-      klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
-      klass
-    end
+      def get_or_set_connection_class
+        if Connections.const_defined?(name.classify)
+          klass = Connections.const_get(name.classify)
+        else
+          klass = Class.new(ActiveRecord::Base)
+          Connections.const_set(name.classify, klass)
+          klass.abstract_class = true
+        end
+        klass
+      end
+
+      def create_connection_class
+        klass = get_or_set_connection_class
+        klass.remove_connection
+        klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
+        klass
+      end
   end
 end
