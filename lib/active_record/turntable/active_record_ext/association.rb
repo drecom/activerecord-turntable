@@ -9,7 +9,7 @@ module ActiveRecord::Turntable
       included do
         ActiveRecord::Associations::SingularAssociation.prepend(AssociationExt)
         ActiveRecord::Associations::CollectionAssociation.prepend(AssociationExt)
-        ActiveRecord::Associations::Builder::Association.valid_options += [:foreign_shard_key]
+        ActiveRecord::Associations::Builder::Association::VALID_OPTIONS << :foreign_shard_key
       end
 
       private
