@@ -6,8 +6,7 @@ module ActiveRecord::Turntable
       ::ActiveRecord::Persistence.class_eval do
         # @note Override to add sharding scope on reloading
         def reload(options = nil)
-          clear_aggregation_cache
-          clear_association_cache
+          self.class.connection.clear_query_cache
 
           finder_scope = if turntable_enabled? && self.class.primary_key != self.class.turntable_shard_key.to_s
                            self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
@@ -17,7 +16,7 @@ module ActiveRecord::Turntable
 
           fresh_object =
             if options && options[:lock]
-              finder_scope.lock.find(id)
+              finder_scope.lock(options[:lock]).find(id)
             else
               finder_scope.find(id)
             end
@@ -28,33 +27,48 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding scope on `touch`
-        def touch(*names)
-          raise ActiveRecordError, "cannot touch on a new record object" unless persisted?
+        def touch(*names, time: nil)
+          unless persisted?
+            raise ActiveRecordError, <<-MSG.squish
+              cannot touch on a new or destroyed record object. Consider using
+              persisted?, new_record?, or destroyed? before touching
+            MSG
+          end
 
+          time ||= current_time_from_proper_timezone
           attributes = timestamp_attributes_for_update_in_model
           attributes.concat(names)
 
           unless attributes.empty?
-            current_time = current_time_from_proper_timezone
             changes = {}
 
             attributes.each do |column|
               column = column.to_s
-              changes[column] = write_attribute(column, current_time)
+              changes[column] = write_attribute(column, time)
             end
 
-            changes[self.class.locking_column] = increment_lock if locking_enabled?
+            primary_key = self.class.primary_key
+            scope = if turntable_enabled? && primary_key != self.class.turntable_shard_key.to_s
+                      self.class.unscoped.where(self.class.turntable_shard_key => _read_attribute(turntable_shard_key))
+                    else
+                      self.class.unscoped
+                    end
+            scope = scope.where(primary_key => _read_attribute(primary_key))
+
+            if locking_enabled?
+              locking_column = self.class.locking_column
+              scope = scope.where(locking_column => _read_attribute(locking_column))
+              changes[locking_column] = increment_lock
+            end
 
             clear_attribute_changes(changes.keys)
-            primary_key = self.class.primary_key
+            result = scope.update_all(changes) == 1
 
-            finder_scope = if turntable_enabled? && primary_key != self.class.turntable_shard_key.to_s
-                             self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
-                           else
-                             self.class.unscoped
-                           end
+            if !result && locking_enabled?
+              raise ActiveRecord::StaleObjectError.new(self, "touch")
+            end
 
-            finder_scope.where(primary_key => self[primary_key]).update_all(changes) == 1
+            result
           else
             true
           end
@@ -88,21 +102,11 @@ module ActiveRecord::Turntable
 
         # @note Override to add sharding scope on destroying
         def relation_for_destroy
-          pk         = self.class.primary_key
-          column     = self.class.columns_hash[pk]
-          substitute = self.class.connection.substitute_at(column, 0)
-          klass      = self.class
-
-          relation = self.class.unscoped.where(
-            self.class.arel_table[pk].eq(substitute))
-          relation.bind_values = [[column, id]]
+          klass = self.class
+          relation = klass.unscoped.where(klass.primary_key => id)
 
           if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
-            shard_key_column = klass.columns_hash[klass.turntable_shard_key]
-            shard_key_substitute = klass.connection.substitute_at(shard_key_column)
-
-            relation = relation.where(self.class.arel_table[klass.turntable_shard_key].eq(shard_key_substitute))
-            relation.bind_values << [shard_key_column, self[klass.turntable_shard_key]]
+            relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
           end
           relation
         end
