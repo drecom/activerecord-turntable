@@ -13,7 +13,7 @@ module ActiveRecord::Turntable
 
         relation = scope.where(@klass.primary_key => (id_was || id))
         relation = relation.merge(turntable_scope) if turntable_scope
-        bvs = binds + relation.bind_values
+        bvs = binds + relation.bound_attributes
         um = relation.
              arel.
              compile_update(substitutes, @klass.primary_key)
