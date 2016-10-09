@@ -24,13 +24,22 @@ module ActiveRecord::Turntable
         else
           super
         end
+
+      ensure
+        if @transaction_state && @transaction_state.committed?
+          clear_transaction_record_state
+        end
       end
 
       def add_to_transaction
         if self.class.turntable_enabled?
-          if self.turntable_shard.connection.add_transaction_record(self)
-            remember_transaction_record_state
+          if has_transactional_callbacks?
+            self.turntable_shard.connection.add_transaction_record(self)
+          else
+            sync_with_transaction_state
+            set_transaction_state(self.turntable_shard.connection.transaction_state)
           end
+          remember_transaction_record_state
         else
           super
         end
