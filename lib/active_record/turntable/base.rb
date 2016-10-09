@@ -23,9 +23,17 @@ module ActiveRecord::Turntable
     end
 
     module ConnectionExtension
-      def connection_specification_name
-        return super unless turntable_enabled?
-        "turntable_pool_proxy::#{name}"
+      module ClassMethods
+        def connection_specification_name
+          return super unless turntable_enabled?
+          self.connection_specification_name = "turntable_pool_proxy::#{name}"
+        end
+      end
+
+      def self.prepended(base)
+        class << base
+          prepend ClassMethods
+        end
       end
     end
 
