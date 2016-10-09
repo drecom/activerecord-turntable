@@ -23,9 +23,11 @@ module ActiveRecord::Turntable
       end
     end
 
-    # QueryCache Middleware for turntable shards
-    initializer "turntable.insert_query_cache_middleware" do |app|
-      app.middleware.insert_after ActiveRecord::QueryCache, ActiveRecord::Turntable::Rack::QueryCache
+    # set QueryCache executor hooks for turntable clusters
+    initializer "active_record.set_executor_hooks" do
+      ActiveSupport.on_load(:active_record) do
+        ActiveRecord::Turntable::Rack::QueryCache.install_executor_hooks
+      end
     end
   end
 end
