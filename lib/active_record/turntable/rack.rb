@@ -3,6 +3,5 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Autoload
 
     autoload :ConnectionManagement
-    autoload :QueryCache
   end
 end

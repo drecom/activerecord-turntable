@@ -1,9 +1,9 @@
 require "spec_helper"
 require "active_support/executor"
 
-describe ActiveRecord::Turntable::Rack::QueryCache do
+describe ActiveRecord::Turntable::QueryCache do
   before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
+    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
   end
 
   before do
@@ -13,7 +13,7 @@ describe ActiveRecord::Turntable::Rack::QueryCache do
 
   let(:mw) {
     executor = Class.new(ActiveSupport::Executor)
-    ActiveRecord::Turntable::Rack::QueryCache.install_executor_hooks executor
+    ActiveRecord::Turntable::QueryCache.install_executor_hooks executor
     lambda { |env|
       executor.wrap {
         [200, {}, nil]
