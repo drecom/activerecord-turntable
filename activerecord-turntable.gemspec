@@ -50,8 +50,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-rspec"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "webmock"
-
-  if RUBY_PLATFORM =~ /darwin/
-    spec.add_development_dependency "growl"
-  end
 end
