@@ -1,5 +1,7 @@
 inherit_gem:
-  onkcop: "config/rubocop.yml"
+  onkcop:
+    - "config/rubocop.yml"
+    - "config/rspec.yml"
 
 AllCops:
   TargetRubyVersion: 2.2
