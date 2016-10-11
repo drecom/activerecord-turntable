@@ -121,11 +121,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     end
 
     it "should change updated_at when updating" do
-      cards_user.num = 2
+      cards_user
 
-      expect {
-        cards_user.save!
-      }.to change(cards_user, :updated_at)
+      Timecop.travel(1.day.from_now) do
+        expect {
+          cards_user.num = 2
+          cards_user.save!
+        }.to change(cards_user, :updated_at)
+      end
     end
 
     it "should send shard_key condition when destroying" do
