@@ -28,12 +28,7 @@ module ActiveRecord::Turntable
 
         # @note Override to add sharding scope on `touch`
         def touch(*names, time: nil)
-          unless persisted?
-            raise ActiveRecordError, <<-MSG.squish
-              cannot touch on a new or destroyed record object. Consider using
-              persisted?, new_record?, or destroyed? before touching
-            MSG
-          end
+          raise ActiveRecordError, "cannot touch on a new record object" unless persisted?
 
           time ||= current_time_from_proper_timezone
           attributes = timestamp_attributes_for_update_in_model
@@ -47,6 +42,7 @@ module ActiveRecord::Turntable
               changes[column] = write_attribute(column, time)
             end
 
+            clear_attribute_changes(changes.keys)
             primary_key = self.class.primary_key
             scope = if turntable_enabled? && primary_key != self.class.turntable_shard_key.to_s
                       self.class.unscoped.where(self.class.turntable_shard_key => _read_attribute(turntable_shard_key))
@@ -61,7 +57,6 @@ module ActiveRecord::Turntable
               changes[locking_column] = increment_lock
             end
 
-            clear_attribute_changes(changes.keys)
             result = scope.update_all(changes) == 1
 
             if !result && locking_enabled?
