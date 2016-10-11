@@ -1,5 +1,10 @@
 ## activerecord-turntable 3.0.0.alpha (unreleased) ##
 
+* Rails5 compatibility
+  * Minimum ruby requirement version is `2.2.2`
+  * Rails 4.x support has been dropped.
+
+
 ## activerecord-turntable 2.3.3 ##
 
 ### Bugfix
