@@ -57,6 +57,10 @@ module ActiveRecord::Turntable
     def turntable_config
       ActiveRecord::Turntable::Config.instance
     end
+
+    def turntable_connection_classes
+      ActiveRecord::Turntable::Shard.connection_classes
+    end
   end
 
   require "active_record/turntable/railtie" if defined?(Rails)

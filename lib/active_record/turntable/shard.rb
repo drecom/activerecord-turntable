@@ -1,6 +1,9 @@
 module ActiveRecord::Turntable
   class Shard
     module Connections; end
+    def self.connection_classes
+      Connections.constants.map { |name| Connections.const_get(name) }
+    end
 
     DEFAULT_CONFIG = {
       "connection" => (defined?(Rails) ? Rails.env : "development"),

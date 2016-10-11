@@ -22,15 +22,20 @@ module ActiveRecord
           klasses.each do |k|
             k.connection.clear_query_cache
             k.connection.disable_query_cache! unless enabled
-
-            unless k.connected? && k.connection.transaction_open?
-              k.clear_active_connections!
-            end
           end
         end
 
         def self.install_executor_hooks(executor = ActiveSupport::Executor)
           executor.register_hook(self)
+
+          executor.to_complete do
+            klasses = ActiveRecord::Base.turntable_connection_classes
+            klasses.each do |k|
+              unless k.connected? && k.connection.transaction_open?
+                k.clear_active_connections!
+              end
+            end
+          end
         end
       end
     end

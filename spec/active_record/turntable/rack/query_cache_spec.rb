@@ -1,4 +1,5 @@
 require "spec_helper"
+require "active_support/executor"
 
 describe ActiveRecord::Turntable::Rack::QueryCache do
   before(:all) do
@@ -10,7 +11,15 @@ describe ActiveRecord::Turntable::Rack::QueryCache do
     truncate_shard
   end
 
-  let(:mw) { ActiveRecord::Turntable::Rack::QueryCache.new lambda { |_env| [200, {}] } }
+  let(:mw) {
+    executor = Class.new(ActiveSupport::Executor)
+    ActiveRecord::Turntable::Rack::QueryCache.install_executor_hooks executor
+    lambda { |env|
+      executor.wrap {
+        [200, {}, nil]
+      }
+    }
+  }
   subject { mw.call({}) }
 
   it "should returns 200 response" do
