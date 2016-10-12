@@ -34,7 +34,6 @@ module ActiveRecord::Turntable
     autoload :SeqShard
     autoload :Sequencer
   end
-  autoload :Rack
   autoload :Helpers
 
   included do

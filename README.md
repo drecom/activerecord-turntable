@@ -432,17 +432,6 @@ Use with_all method:
   end
 ```
 
-### Connection Management
-
-Rails's ConnectionManagement middleware keeps ActiveRecord's connection during the process is alive, but Turntable keeps more connections.
-This may cause flooding max connections on your database. So, we made a middleware that disconnects on each request.
-
-if you use turntable's ConnectionManagement middleware, add below line to your initializer.
-
-```ruby
-app.middleware.swap ActiveRecord::ConnectionAdapters::ConnectionManagement, ActiveRecord::Turntable::Rack::ConnectionManagement
-```
-
 ### Performance Exception
 
 To notice queries causing performance problem, Turntable has follow options.
