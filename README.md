@@ -9,9 +9,12 @@ ActiveRecord::Turntable is a database sharding extension for ActiveRecord.
 
 ## Dependencies
 
-activerecord(>=4.0.0)
+activerecord(>=5.0.0, <6.0)
 
-if you are using activerecord 3.x, please use activerecord-turntable version 1.x.
+If you are using with older activerecord versions, use following versions.
+
+* activerecord 3.x - use activerecord-turntable version 1.x.
+* activerecord 4.x - use activerecord-turntable version 2.x.
 
 ## Supported Database
 
