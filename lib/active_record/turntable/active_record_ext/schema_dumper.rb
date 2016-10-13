@@ -19,11 +19,11 @@ module ActiveRecord::Turntable
               pk = @connection.primary_key(table)
             end
 
-            tbl.print = if table =~ /\A(.*)_id_seq\z/
-                          "  create_sequence_for #{remove_prefix_and_suffix(Regexp.last_match(1)).inspect}"
-                        else
-                          "  create_table #{remove_prefix_and_suffix(table).inspect}"
-                        end
+            if table =~ /\A(.*)_id_seq\z/
+              tbl.print "  create_sequence_for #{remove_prefix_and_suffix(Regexp.last_match(1)).inspect}"
+            else
+              tbl.print "  create_table #{remove_prefix_and_suffix(table).inspect}"
+            end
 
             case pk
             when String
