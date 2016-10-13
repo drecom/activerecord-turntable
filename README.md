@@ -25,7 +25,7 @@ Currently supports mysql only.
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-turntable', '~> 2.1.1'
+gem 'activerecord-turntable', '~> 3.0.0.alpha1'
 ```
 
 Run a bundle install:
@@ -139,7 +139,7 @@ Edit turntable.yml and database.yml. See below example config.
           database: sample_app_user3_development
 ```
 
-### Example Migration 
+### Example Migration
 
 Generate a model:
 
@@ -285,7 +285,7 @@ First, add configuration to turntable.yml and database.yml
           seq:
             user_seq: # <-- sequencer name
               seq_type: mysql # <-- sequencer type
-              connection: user_seq_1 # <-- sequencer database connection 
+              connection: user_seq_1 # <-- sequencer database connection
 ```
 
 Add below to the migration:
@@ -372,8 +372,8 @@ end
 transaction helper to execute transaction to all shards in the cluster:
 
 ```ruby
-User.user_cluster_transaction do 
-  # Transaction is opened all shards in "user_cluster" 
+User.user_cluster_transaction do
+  # Transaction is opened all shards in "user_cluster"
 end
 ```
 
@@ -440,7 +440,7 @@ Use with_all method:
 To notice queries causing performance problem, Turntable has follow options.
 
 * raise\_on\_not\_specified\_shard\_query - raises on queries execute on all shards
-* raise\_on\_not\_specified\_shard\_update - raises on updates executed on all shards 
+* raise\_on\_not\_specified\_shard\_update - raises on updates executed on all shards
 
 
 Add to turntable.yml:
