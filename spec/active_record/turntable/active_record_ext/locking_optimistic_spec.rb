@@ -10,8 +10,12 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
     truncate_shard
   end
 
-  before do
+  before(:each) do
     ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_update] = true
+  end
+
+  after(:each) do
+    ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_update] = false
   end
 
   let!(:user_status) do
@@ -24,5 +28,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
   describe "optimistic locking" do
     subject { user_status.update_attributes(hp: 20) }
     it { expect { subject }.to change(user_status, :lock_version).by(1) }
+  end
+
+  describe "Json serialized column is saved" do
+    before do
+      user_status.update_attributes(data: {foo: 'bar'})
+      user_status.reload
+    end
+    subject { user_status.data }
+    it { expect { subject }.to_not raise_error }
   end
 end
