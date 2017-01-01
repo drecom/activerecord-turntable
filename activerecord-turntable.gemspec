@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
     spec.add_development_dependency "pry-byebug"
   end
   spec.add_development_dependency "guard-rspec"
+  spec.add_development_dependency "listen", "= 3.0.6"
   spec.add_development_dependency "coveralls"
 
   if RUBY_PLATFORM =~ /darwin/
