@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mysql2"
 
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rack"
+  spec.add_development_dependency "rack", "< 2"
   spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency "rspec-its"
   spec.add_development_dependency "rspec-collection_matchers"
