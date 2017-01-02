@@ -47,11 +47,20 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
     end
     let(:cards_user) { CardsUser.where(user: user).first }
+    let(:cards_users_history) { cards_users_histories.find { |history| history.user_id == user.id } }
 
     context "associated objects has same turntable_key" do
-      subject { cards_user.cards_users_histories.to_a }
-      it { expect { subject }.to_not raise_error }
-      it { is_expected.to include(*cards_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
+      context "AssociationRelation#to_a" do
+        subject { cards_user.cards_users_histories.to_a }
+        it { expect { subject }.to_not raise_error }
+        it { is_expected.to include(*cards_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
+      end
+
+      context "AssociationRelation#where" do
+        subject { cards_user.cards_users_histories.where(id: cards_users_history.id).to_a }
+        it { expect { subject }.to_not raise_error }
+        it { is_expected.to include(cards_users_history) }
+      end
     end
 
     context "associated objects has different turntable_key" do

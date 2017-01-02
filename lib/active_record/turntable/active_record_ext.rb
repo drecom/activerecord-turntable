@@ -30,7 +30,7 @@ module ActiveRecord::Turntable
       ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
       ActiveRecord::ConnectionAdapters::ConnectionHandler.prepend(ConnectionHandlerExtension)
       ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
-      ActiveRecord::Associations::Association.include(Association)
+      ActiveRecord::Associations::Association.prepend(Association)
       require "active_record/turntable/active_record_ext/fixtures"
       require "active_record/turntable/active_record_ext/migration_proxy"
       require "active_record/turntable/active_record_ext/activerecord_import_ext"
