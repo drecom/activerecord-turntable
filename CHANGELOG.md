@@ -1,3 +1,14 @@
+## activerecord-turntable 2.4.0 ##
+
+### Incompatible Change
+
+* Drop support for ruby 1.9.3
+
+### Bugfix
+
+* Update activerecord 4.2 patches
+  * Fixes optimistic locking with a serialized column causes JSON::Error.
+
 ## activerecord-turntable 2.3.3 ##
 
 ### Bugfix
