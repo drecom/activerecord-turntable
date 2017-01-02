@@ -1,9 +1,16 @@
-## activerecord-turntable 3.0.0.alpha (unreleased) ##
+## activerecord-turntable 3.0.0.alpha2 ##
+
+### Improvement
+
+* Fix to propagate shard conditions to `AssociationRelation` too
+
+## activerecord-turntable 3.0.0.alpha1 ##
+
+### Major Changes
 
 * Rails5 compatibility
   * Minimum ruby requirement version is `2.2.2`
   * Rails 4.x support has been dropped.
-
 
 ## activerecord-turntable 2.3.3 ##
 
