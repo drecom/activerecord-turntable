@@ -122,10 +122,10 @@ module ActiveRecord::Turntable
                 relation = self.class.unscoped
 
                 condition_scope = relation.where(
-                  relation.table[self.class.primary_key].eq(id).and(
-                    relation.table[lock_col].eq(self.class.quote_value(previous_lock_value, column_for_attribute(lock_col)))
-                  )
+                  self.class.primary_key => id,
+                  lock_col => previous_lock_value,
                 )
+
                 if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
                   condition_scope = condition_scope.where(
                     relation.table[klass.turntable_shard_key].eq(
@@ -134,12 +134,11 @@ module ActiveRecord::Turntable
                   )
                 end
 
-                stmt = condition_scope.arel.compile_update(
-                  arel_attributes_with_values_for_update(attribute_names),
-                  self.class.primary_key
+                affected_rows = condition_scope.update_all(
+                  Hash[attributes_for_update(attribute_names).map do |name|
+                    [name, _read_attribute(name)]
+                  end]
                 )
-
-                affected_rows = self.class.connection.update stmt
 
                 unless affected_rows == 1
                   raise ActiveRecord::StaleObjectError.new(self, "update")
