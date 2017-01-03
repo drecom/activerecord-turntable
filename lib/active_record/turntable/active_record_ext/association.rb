@@ -11,16 +11,22 @@ module ActiveRecord::Turntable
 
       protected
 
-      # @note Override to pass shard key conditions
-      def target_scope
-        return super unless should_use_shard_key?
+        # @note Override to pass shard key conditions
+        def target_scope
+          return super unless should_use_shard_key?
 
-        scope = klass.where(
-                  klass.turntable_shard_key =>
-                    owner.send(foreign_shard_key)
-                )
-        super.merge!(scope)
-      end
+          scope = klass.where(
+                    klass.turntable_shard_key =>
+                      owner.send(foreign_shard_key)
+                  )
+          super.merge!(scope)
+        end
+
+      private
+
+        def skip_statement_cache?
+          super || should_use_shard_key?
+        end
     end
   end
 end
