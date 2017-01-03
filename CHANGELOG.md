@@ -1,3 +1,9 @@
+## activerecord-turntable 3.0.0.alpha3 ##
+
+### Bugfix
+
+* Disable statement cache when adding shard conditions automatically
+
 ## activerecord-turntable 3.0.0.alpha2 ##
 
 ### Improvement
