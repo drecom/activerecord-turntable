@@ -1,3 +1,9 @@
+## activerecord-turntable 2.5.0 ##
+
+### Improvement
+
+* Fix to propagate shard conditions to `AssociationRelation` too
+
 ## activerecord-turntable 2.4.0 ##
 
 ### Incompatible Change
