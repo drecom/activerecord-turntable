@@ -38,6 +38,7 @@ module ActiveRecord::Turntable
     autoload :Mixer
     autoload :PoolProxy
     autoload :Shard
+    autoload :ShardingCondition
     autoload :SeqShard
     autoload :Sequencer
   end
