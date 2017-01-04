@@ -40,10 +40,29 @@ module ActiveRecord::Turntable
     end
 
     def shard_for(key)
-      @shards[@algorithm.calculate(key)]
-    rescue
-      raise ActiveRecord::Turntable::CannotSpecifyShardError,
-        "cannot select_shard for key:#{key}"
+      # key is integer or string
+      # but @algorithm.calculate can handle only one type
+      is_numberic = true if Float(key) rescue false
+      if is_numberic
+        # key = numberic(ex : "123", 123)
+        [key.to_i, key.to_s].each do |k|
+          begin
+            return @shards[@algorithm.calculate(k)]
+          rescue
+          end
+        end
+        # not find...
+        raise ActiveRecord::Turntable::CannotSpecifyShardError,
+        "cannot select_shard for key:#{key}, type=#{key.class}"
+      else
+        # key = not number string(ex : "abc")
+        begin
+          @shards[@algorithm.calculate(key)]
+        rescue
+          raise ActiveRecord::Turntable::CannotSpecifyShardError,
+          "cannot select_shard for key:#{key}, type=#{key.class}"
+        end
+      end
     end
 
     def select_shard(key)
