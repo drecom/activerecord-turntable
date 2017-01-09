@@ -19,7 +19,7 @@ module TurntableHelper
 
   def truncate_shard
     ActiveRecord::Base.descendants.each do |klass|
-      next if klass.abstract_class?
+      next if klass.abstract_class? || klass == ActiveRecord::SchemaMigration
       klass.delete_all
     end
   end
