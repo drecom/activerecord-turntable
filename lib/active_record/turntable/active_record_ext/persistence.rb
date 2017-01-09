@@ -27,6 +27,7 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding scope on `touch`
+        # rubocop:disable Style/UnlessElse
         def touch(*names, time: nil)
           raise ActiveRecord::ActiveRecordError, "cannot touch on a new record object" unless persisted?
 
@@ -68,6 +69,7 @@ module ActiveRecord::Turntable
             true
           end
         end
+        # rubocop:enable Style/UnlessElse
 
         # @note Override to add sharding scope on `update_columns`
         def update_columns(attributes)

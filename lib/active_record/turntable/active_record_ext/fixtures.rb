@@ -7,6 +7,7 @@ module ActiveRecord
   class FixtureSet
     extend ActiveRecord::Turntable::Util
 
+    # rubocop:disable Style/MultilineMethodCallBraceLayout
     def self.create_fixtures(fixtures_directory, fixture_set_names, class_names = {}, config = ActiveRecord::Base)
       fixture_set_names = Array(fixture_set_names).map(&:to_s)
       class_names = ClassCache.new class_names, config
@@ -65,6 +66,7 @@ module ActiveRecord
       end
       cached_fixtures(connection, fixture_set_names)
     end
+    # rubocop:enable Style/MultilineMethodCallLayout
   end
 
   module TestFixtures
