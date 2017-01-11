@@ -20,11 +20,7 @@ module ActiveRecord::Turntable
                 connection_memo.next_value_for_sequence(sequence_name)
               end
             elsif column
-              if defined?(type_caster_memo) && type_caster_memo.respond_to?(:type_cast_for_database) # Rails 5.0 and higher
-                connection_memo.quote(type_caster_memo.type_cast_for_database(column.name, val))
-              else # Rails 4.2 and higher
-                connection_memo.quote(column.type_cast_from_user(val), column)
-              end
+              connection_memo.quote(type_caster_memo.type_cast_for_database(column.name, val))
             end
           end
           "(#{my_values.join(',')})"
