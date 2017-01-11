@@ -26,24 +26,30 @@ module ActiveRecord::Turntable
       end
     end
 
-    %w(active_connection?).each do |name|
-      define_method(name.to_sym) do |*_args|
-        @proxy.master.connection_pool.send(name.to_sym) ||
-          @proxy.seq.connection_pool.try(name.to_sym) if @proxy.respond_to?(:seq) ||
-                                                         @proxy.shards.values.any? do |pool|
-                                                           pool.connection_pool.send(name.to_sym)
-                                                         end
+    def active_connection?
+      connection_pools_list.any? { |cp| cp.active_connection? }
+    end
+
+    %w(disconnect!
+       release_connection
+       clear_all_connections!
+       clear_active_connections!
+       clear_reloadable_connections!
+       clear_stale_cached_connections!
+       verify_active_connections!).each do |name|
+      define_method(name.to_sym) do
+        connection_pools_list.each { |cp| cp.public_send(name.to_sym) }
       end
     end
 
-    %w(disconnect! release_connection clear_all_connections! clear_active_connections! clear_reloadable_connections! clear_stale_cached_connections! verify_active_connections!).each do |name|
-      define_method(name.to_sym) do
-        @proxy.master.connection_pool.send(name.to_sym)
-        @proxy.seq.connection_pool.try(name.to_sym) if @proxy.respond_to?(:seq)
-        @proxy.shards.values.each do |pool|
-          pool.connection_pool.send(name.to_sym)
-        end
+    private
+
+      def connection_pools_list
+        pools = []
+        pools << proxy.master.connection_pool
+        pools << proxy.seq.try(:connection_pool) if proxy.respond_to?(:seq)
+        pools.concat(proxy.shards.values.map(&:connection_pool))
+        pools.compact
       end
-    end
   end
 end
