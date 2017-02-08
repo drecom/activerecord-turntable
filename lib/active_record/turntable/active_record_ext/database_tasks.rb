@@ -33,6 +33,7 @@ module ActiveRecord
       end
 
       def each_current_turntable_cluster_connected(environment)
+        old_connection_pool = ActiveRecord::Base.connection_pool
         each_current_turntable_cluster_configuration(environment) do |name, configuration|
           ActiveRecord::Base.clear_active_connections!
           ActiveRecord::Base.establish_connection(configuration)
@@ -40,7 +41,7 @@ module ActiveRecord
           yield(name, configuration)
         end
         ActiveRecord::Base.clear_active_connections!
-        ActiveRecord::Base.establish_connection environment.to_sym
+        ActiveRecord::Base.establish_connection old_connection_pool.spec.config
       end
 
       def each_current_turntable_cluster_configuration(environment)
