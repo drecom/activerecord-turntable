@@ -13,9 +13,17 @@ rvm:
 gemfile:
   - gemfiles/rails5_0.gemfile
 
+env:
+  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
+  - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
+
 before_install: gem update --system
-before_script: ci/setup-tests.sh
-script: ci/run-tests.sh
+
+before_script:
+  - bundle exec rake $SETUP_TASK
+
+script:
+  - bundle exec rake $BUILD_TASK
 
 matrix:
   allow_failures:
