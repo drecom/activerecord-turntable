@@ -18,7 +18,6 @@ describe ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper do
 
   context "#dump" do
     subject { dump_schema }
-    it { is_expected.to match(/create_table "users", force: :cascade, options: ".*?"\sdo\s\|t\|$/) }
     it { is_expected.to match(/create_sequence_for "users", force: :cascade, options: /) }
     it { is_expected.not_to match(/create_table "users_id_seq"/) }
     it { is_expected.not_to match(/create_sequence_for "users_id_seq".*?do/) }
