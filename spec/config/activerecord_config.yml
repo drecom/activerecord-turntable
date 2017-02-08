@@ -1,0 +1,13 @@
+default_connection: <%= defined?(JRUBY_VERSION) ? 'jdbcsqlite3' : 'sqlite3' %>
+
+with_manual_interventions: false
+
+connections:
+  mysql2:
+    arunit:
+      username: root
+      encoding: utf8
+      collation: utf8_unicode_ci
+    arunit2:
+      username: root
+      encoding: utf8

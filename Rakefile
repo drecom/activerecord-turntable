@@ -123,4 +123,43 @@ namespace :turntable do
     desc "reset turntable test databases"
     task :reset => ["turntable:db:drop", "turntable:db:create", "turntable:db:migrate"]
   end
+
+  namespace :activerecord do
+    task(:env) do
+      ENV['ARCONFIG'] ||= File.expand_path('spec/config/activerecord_config.yml', __dir__)
+      ENV['ARVERSION'] ||= if ActiveRecord.gem_version.prerelease?
+                             "master"
+                           else
+                             "v#{ActiveRecord.gem_version}"
+                           end
+    end
+
+    namespace :setup do
+      task :rails => :env do
+        system(*%w|git submodule update --init|)
+        Dir.chdir("spec/rails") do
+          system(*%W|git checkout #{ENV['ARVERSION']}|)
+        end
+        FileUtils.cp_r("spec/rails/activerecord/test", ".")
+        FileUtils.cp_r("spec/rails/activerecord/Rakefile", "activerecord.rake")
+        File.open("test/cases/helper.rb", "a") do |f|
+          f << "require '#{File.expand_path("spec/activerecord_helper", __dir__)}'"
+        end
+      end
+
+      task :db => :rails do
+        system(*%w|bundle exec rake -f activerecord.rake db:mysql:rebuild|)
+      end
+    end
+
+    desc "setup activerecord test"
+    task :setup => ["setup:rails", "setup:db"]
+
+    task :test => :env do
+    desc "run unit tests on activerecord"
+      unless system(*%w|bundle exec rake -f activerecord.rake test:mysql2|)
+        exit(1)
+      end
+    end
+  end
 end
