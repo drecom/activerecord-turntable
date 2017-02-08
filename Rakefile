@@ -137,11 +137,11 @@ namespace :turntable do
     namespace :setup do
       task :rails => :env do
         system(*%w|git submodule update --init|)
-        Dir.chdir("spec/rails") do
+        Dir.chdir("tmp/rails") do
           system(*%W|git checkout #{ENV['ARVERSION']}|)
         end
-        FileUtils.cp_r("spec/rails/activerecord/test", ".")
-        FileUtils.cp_r("spec/rails/activerecord/Rakefile", "activerecord.rake")
+        FileUtils.cp_r("tmp/rails/activerecord/test", ".")
+        FileUtils.cp_r("tmp/rails/activerecord/Rakefile", "activerecord.rake")
         File.open("test/cases/helper.rb", "a") do |f|
           f << "require '#{File.expand_path("spec/activerecord_helper", __dir__)}'"
         end
