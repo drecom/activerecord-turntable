@@ -28,7 +28,7 @@ module ActiveRecord::Turntable
 
         # @note Override to add sharding scope on `touch`
         def touch(*names, time: nil)
-          raise ActiveRecordError, "cannot touch on a new record object" unless persisted?
+          raise ActiveRecord::ActiveRecordError, "cannot touch on a new record object" unless persisted?
 
           time ||= current_time_from_proper_timezone
           attributes = timestamp_attributes_for_update_in_model
@@ -71,8 +71,8 @@ module ActiveRecord::Turntable
 
         # @note Override to add sharding scope on `update_columns`
         def update_columns(attributes)
-          raise ActiveRecordError, "cannot update a new record" if new_record?
-          raise ActiveRecordError, "cannot update a destroyed record" if destroyed?
+          raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
+          raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
 
           attributes.each_key do |key|
             verify_readonly_attribute(key.to_s)
