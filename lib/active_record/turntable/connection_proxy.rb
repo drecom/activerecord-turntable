@@ -198,7 +198,7 @@ module ActiveRecord::Turntable
     end
 
     delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
-             :spec, :connections, :size, :reaper, :table_exists?, to: :connection_pool
+             :spec, :connections, :size, :reaper, to: :connection_pool
 
     %w(columns columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
@@ -206,7 +206,7 @@ module ActiveRecord::Turntable
       end
     end
 
-    %w(table_exists?).each do |name|
+    %w(data_source_exists?).each do |name|
       define_method(name.to_sym) do |*args|
         master.connection_pool.with_connection do |c|
           c.schema_cache.send(name.to_sym, *args)
