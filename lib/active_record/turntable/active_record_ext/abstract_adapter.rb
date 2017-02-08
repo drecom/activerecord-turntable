@@ -34,7 +34,7 @@ module ActiveRecord::Turntable
       end
 
       def turntable_shard_name
-        @turntable_shard_name
+        @turntable_shard_name ||= ""
       end
     end
   end
