@@ -30,7 +30,8 @@ module ActiveRecord::Turntable
       end
 
       def force_connect_all_shards!
-        conf = configurations[Rails.env]
+        conf = configurations[::ActiveRecord::ConnectionHandling::DEFAULT_ENV.call.to_sym]
+
         shards = HashWithIndifferentAccess.new
         shards = shards.merge(conf[:shards]) if conf[:shards]
         shards = shards.merge(conf[:seq]) if conf[:seq]
