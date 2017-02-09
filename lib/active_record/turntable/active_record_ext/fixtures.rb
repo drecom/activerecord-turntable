@@ -24,7 +24,7 @@ module ActiveRecord
 
           fixture_sets = files_to_read.map do |fs_name|
             klass = class_names[fs_name]
-            conn = klass.is_a?(String) ? connection : klass.connection
+            conn = klass ? klass.connection : connection
             fixtures_map[fs_name] = new( # ActiveRecord::FixtureSet.new
               conn,
               fs_name,
@@ -35,12 +35,16 @@ module ActiveRecord
           update_all_loaded_fixtures fixtures_map
 
           ActiveRecord::Base.force_transaction_all_shards!(requires_new: true) do
+            deleted_tables = Hash.new { |h, k| h[k] = Set.new }
             fixture_sets.each do |fs|
               conn = fs.model_class.respond_to?(:connection) ? fs.model_class.connection : connection
               table_rows = fs.table_rows
 
               table_rows.each_key do |table|
-                conn.delete "DELETE FROM #{conn.quote_table_name(table)}", "Fixture Delete"
+                unless deleted_tables[conn].include? table
+                  conn.delete "DELETE FROM #{conn.quote_table_name(table)}", "Fixture Delete"
+                end
+                deleted_tables[conn] << table
               end
 
               table_rows.each do |fixture_set_name, rows|
@@ -48,11 +52,9 @@ module ActiveRecord
                   conn.insert_fixture(row, fixture_set_name)
                 end
               end
-            end
 
-            # Cap primary key sequences to max(pk).
-            if connection.respond_to?(:reset_pk_sequence!)
-              fixture_sets.each do |fs|
+              # Cap primary key sequences to max(pk).
+              if connection.respond_to?(:reset_pk_sequence!)
                 connection.reset_pk_sequence!(fs.table_name)
               end
             end
@@ -66,11 +68,7 @@ module ActiveRecord
   end
 
   module TestFixtures
-    include ActiveRecord::Turntable::Util
-
     def setup_fixtures(config = ActiveRecord::Base)
-      return if ActiveRecord::Base.configurations.blank?
-
       if pre_loaded_fixtures && !use_transactional_fixtures
         raise "pre_loaded_fixtures requires use_transactional_fixtures"
       end
@@ -94,13 +92,13 @@ module ActiveRecord
         end
       # Load fixtures for every test.
       else
-        ActiveRecord::Fixtures.reset_cache
+        ActiveRecord::FixtureSet.reset_cache
         @@already_loaded_fixtures[self.class] = nil
         @loaded_fixtures = load_fixtures(config)
       end
 
       # Instantiate fixtures for every test if requested.
-      instantiate_fixtures(config) if use_instantiated_fixtures
+      instantiate_fixtures if use_instantiated_fixtures
     end
 
     def enlist_fixture_connections

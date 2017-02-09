@@ -1,16 +1,30 @@
 language: ruby
+sudo: false
+
+cache:
+  bundler: true
+
 rvm:
   - 2.2.6
   - 2.3.3
   - 2.4.0
   - ruby-head
+
 gemfile:
   - gemfiles/rails5_0.gemfile
+
+env:
+  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
+  - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
+
+before_install: gem update --system
+
 before_script:
-  - bundle exec rake turntable:db:reset
-script: bundle exec rake spec
+  - bundle exec rake $SETUP_TASK
+
+script:
+  - bundle exec rake $BUILD_TASK
+
 matrix:
   allow_failures:
     - rvm: ruby-head
-sudo: false
-cache: bundler

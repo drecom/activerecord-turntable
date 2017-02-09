@@ -232,7 +232,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     it { is_expected.to be_falsey }
   end
 
-  context "#table_exists?" do
+  context "#data_source_exists?" do
     before do
       establish_connection_to(:test)
       truncate_shard
@@ -246,7 +246,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       @user2.save!
     end
 
-    subject { User.connection.table_exists?(:users) }
+    subject { User.connection.data_source_exists?(:users) }
     it { is_expected.to be_truthy }
   end
 end
