@@ -8,3 +8,4 @@ AllCops:
   Exclude:
     - "test/**/*"
     - "tmp/**/*"
+    - "activerecord.rake"
