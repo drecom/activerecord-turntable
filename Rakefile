@@ -128,7 +128,7 @@ namespace :turntable do
     task(:env) do
       ENV['ARCONFIG'] ||= File.expand_path('spec/config/activerecord_config.yml', __dir__)
       ENV['ARVERSION'] ||= if ActiveRecord.gem_version.prerelease?
-                             "master"
+                             "origin/master"
                            else
                              "v#{ActiveRecord.gem_version}"
                            end
@@ -137,6 +137,7 @@ namespace :turntable do
     namespace :setup do
       task :rails => :env do
         system(*%w|git submodule update --init|)
+        system(*%w|git submodule foreach git fetch origin|)
         Dir.chdir("tmp/rails") do
           system(*%W|git checkout #{ENV['ARVERSION']}|)
         end
