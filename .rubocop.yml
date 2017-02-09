@@ -5,3 +5,6 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 2.2
+  Exclude:
+    - "test/**/*"
+    - "tmp/**/*"
