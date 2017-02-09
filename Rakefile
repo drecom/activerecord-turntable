@@ -155,8 +155,8 @@ namespace :turntable do
     desc "setup activerecord test"
     task :setup => ["setup:rails", "setup:db"]
 
-    task :test => :env do
     desc "run unit tests on activerecord"
+    task :test => :env do
       unless system(*%w|bundle exec rake -f activerecord.rake test:mysql2|)
         exit(1)
       end
