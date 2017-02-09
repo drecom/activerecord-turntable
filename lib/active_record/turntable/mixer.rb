@@ -1,3 +1,4 @@
+# rubocop:disable Style/CaseEquality
 require "active_support/core_ext/object/try"
 require "active_record/turntable/sql_tree_patch"
 
@@ -231,3 +232,4 @@ module ActiveRecord::Turntable
       end
   end
 end
+# rubocop:enable Style/CaseEquality

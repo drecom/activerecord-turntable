@@ -1,3 +1,4 @@
+# rubocop:disable Style/CaseEquality
 require "sql_tree"
 require "active_support/core_ext/kernel/reporting"
 
@@ -350,3 +351,4 @@ module SQLTree::Node
     end
   end
 end
+# rubocop:enable Style/CaseEquality
