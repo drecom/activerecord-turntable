@@ -27,7 +27,7 @@ module ActiveRecord::Turntable
     end
 
     def active_connection?
-      connection_pools_list.any? { |cp| cp.active_connection? }
+      connection_pools_list.any?(&:active_connection?)
     end
 
     %w(disconnect!

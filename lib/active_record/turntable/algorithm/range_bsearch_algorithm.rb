@@ -29,9 +29,9 @@ module ActiveRecord::Turntable::Algorithm
       prev_max = 0
       shards.each_with_index do |h, idx|
         weighted_hash[h[:connection]] += if idx < shards.size - 1
-                                            h[:less_than] - prev_max - 1
-                                          else
-                                            sequence_value - prev_max
+                                           h[:less_than] - prev_max - 1
+                                         else
+                                           sequence_value - prev_max
                                           end
         prev_max = h[:less_than] - 1
       end

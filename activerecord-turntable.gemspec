@@ -1,7 +1,5 @@
 $LOAD_PATH.push File.expand_path("../lib", __FILE__)
 require "active_record/turntable/version"
-
-# rubocop:disable Metrics/BlockLength
 Gem::Specification.new do |spec|
   spec.name = "activerecord-turntable"
   spec.version = ActiveRecord::Turntable::VERSION
@@ -59,4 +57,3 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mocha", "~> 0.14"
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
 end
-# rubocop:enable Metrics/BlockLength

@@ -19,15 +19,6 @@ Lint/EmptyWhen:
     - 'lib/active_record/turntable/sql_tree_patch.rb'
 
 # Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleAlignWith, SupportedStylesAlignWith, AutoCorrect.
-# SupportedStylesAlignWith: keyword, variable, start_of_line
-Lint/EndAlignment:
-  Exclude:
-    - 'lib/active_record/turntable/algorithm/range_algorithm.rb'
-    - 'lib/active_record/turntable/algorithm/range_bsearch_algorithm.rb'
-
-# Offense count: 2
 Lint/HandleExceptions:
   Exclude:
     - 'lib/active_record/turntable/active_record_ext/activerecord_import_ext.rb'
@@ -56,13 +47,6 @@ Lint/ShadowingOuterLocalVariable:
 Lint/UnneededSplatExpansion:
   Exclude:
     - 'Rakefile'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'spec/active_record/turntable/query_cache_spec.rb'
 
 # Offense count: 1
 # Configuration parameters: ContextCreatingMethods, MethodCreatingMethods.
@@ -223,15 +207,6 @@ Style/AccessorMethodName:
   Exclude:
     - 'lib/active_record/turntable/shard.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: always, conditionals
-Style/AndOr:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/persistence.rb'
-    - 'lib/active_record/turntable/mixer.rb'
-
 # Offense count: 15
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
@@ -259,48 +234,12 @@ Style/ClassVars:
     - 'lib/active_record/turntable/sequencer.rb'
     - 'lib/active_record/turntable/sequencer/barrage.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/ClosingParenthesisIndentation:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/association.rb'
-    - 'lib/active_record/turntable/base.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/ElseAlignment:
-  Exclude:
-    - 'lib/active_record/turntable/algorithm/range_algorithm.rb'
-    - 'lib/active_record/turntable/algorithm/range_bsearch_algorithm.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/EmptyLinesAroundAccessModifier:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/schema_dumper.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment, ForceEqualSignAlignment.
-Style/ExtraSpacing:
-  Exclude:
-    - 'db/migrate/*.rb'
-    - 'lib/active_record/turntable/query_cache.rb'
-
 # Offense count: 1
 # Configuration parameters: ExpectMatchingDefinition, Regex, IgnoreExecutableScripts, AllowedAcronyms.
 # AllowedAcronyms: CLI, DSL, ACL, API, ASCII, CPU, CSS, DNS, EOF, GUID, HTML, HTTP, HTTPS, ID, IP, JSON, LHS, QPS, RAM, RHS, RPC, SLA, SMTP, SQL, SSH, TCP, TLS, TTL, UDP, UI, UID, UUID, URI, URL, UTF8, VM, XML, XMPP, XSRF, XSS
 Style/FileName:
   Exclude:
     - 'lib/activerecord-turntable.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
-# SupportedStyles: consistent, special_for_inner_method_call, special_for_inner_method_call_in_parentheses
-Style/FirstParameterIndentation:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/association.rb'
 
 # Offense count: 2
 # Configuration parameters: MinBodyLength.
@@ -312,24 +251,6 @@ Style/GuardClause:
 Style/IfWithSemicolon:
   Exclude:
     - 'spec/active_record/turntable_spec.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: Width.
-Style/IndentationWidth:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/persistence.rb'
-    - 'lib/active_record/turntable/algorithm/range_algorithm.rb'
-    - 'lib/active_record/turntable/algorithm/range_bsearch_algorithm.rb'
-    - 'lib/active_record/turntable/sharding_condition.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: line_count_dependent, lambda, literal
-Style/Lambda:
-  Exclude:
-    - 'spec/active_record/turntable/query_cache_spec.rb'
 
 # Offense count: 4
 Style/MethodCalledOnDoEndBlock:
@@ -357,22 +278,6 @@ Style/ModuleFunction:
   Exclude:
     - 'lib/active_record/turntable/util.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: symmetrical, new_line, same_line
-Style/MultilineMethodCallBraceLayout:
-  Exclude:
-    - 'lib/active_record/turntable/mixer.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
-# SupportedStyles: aligned, indented
-Style/MultilineOperationIndentation:
-  Exclude:
-    - 'lib/active_record/turntable/mixer.rb'
-
 # Offense count: 1
 Style/MultilineTernaryOperator:
   Exclude:
@@ -390,22 +295,6 @@ Style/PercentLiteralDelimiters:
   Exclude:
     - 'Rakefile'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: short, verbose
-Style/PreferredHashMethods:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/database_tasks.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: compact, exploded
-Style/RaiseArgs:
-  Exclude:
-    - 'lib/active_record/turntable/sql_tree_patch.rb'
-
 # Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: AllowMultipleReturnValues.
@@ -421,50 +310,6 @@ Style/RegexpLiteral:
   Exclude:
     - 'Guardfile'
     - 'lib/active_record/turntable/mixer.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment.
-Style/SpaceAroundOperators:
-  Exclude:
-    - 'lib/active_record/turntable/query_cache.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: space, no_space
-Style/SpaceBeforeBlockBraces:
-  Exclude:
-    - 'spec/active_record/turntable/active_record_ext/persistence_spec.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SupportedStylesForEmptyBraces, SpaceBeforeBlockParameters.
-# SupportedStyles: space, no_space
-# SupportedStylesForEmptyBraces: space, no_space
-Style/SpaceInsideBlockBraces:
-  Exclude:
-    - 'lib/active_record/turntable/active_record_ext/clever_load.rb'
-    - 'lib/active_record/turntable/cluster_helper_methods.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, ConsistentQuotesInMultiline.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiterals:
-  Exclude:
-    - 'Rakefile'
-    - 'lib/active_record/turntable/active_record_ext/acts_as_archive_extension.rb'
-    - 'lib/active_record/turntable/sql_tree_patch.rb'
-    - 'spec/activerecord_helper.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoredMethods.
-# IgnoredMethods: respond_to, define_method
-Style/SymbolProc:
-  Exclude:
-    - 'lib/active_record/turntable/pool_proxy.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.

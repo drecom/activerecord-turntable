@@ -76,15 +76,15 @@ module ActiveRecord::Turntable
       when "IN", "=", "=="
         field = tree.lhs.respond_to?(:table) ? tree.lhs : nil
         if tree.rhs.is_a?(SQLTree::Node::SubQuery)
-          if field.try(:table) == table_name and field.name == shard_key
+          if (field.try(:table) == table_name) && (field.name == shard_key)
             find_shard_keys(tree.rhs.where, table_name, shard_key)
           else
             []
           end
         else
           values = Array(tree.rhs)
-          if field.try(:table) == table_name and field.name == shard_key and
-              !tree.rhs.is_a?(SQLTree::Node::SubQuery)
+          if (field.try(:table) == table_name) && (field.name == shard_key) &&
+             !tree.rhs.is_a?(SQLTree::Node::SubQuery)
             values.map(&:value).compact
           else
             []
@@ -143,8 +143,7 @@ module ActiveRecord::Turntable
               tree.select.first.to_sql == '1 AS "one"' # for `SELECT 1 AS one` (AR::Base.exists?)
           return Fader::SelectShardsMergeResult.new(@proxy,
                                                     build_shards_with_same_query(@proxy.shards.values, query),
-                                                    method, query, *args, &block
-                                                   )
+                                                    method, query, *args, &block)
         elsif tree.group_by || tree.order_by || tree.limit.try(:value).to_i > 0
           raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
         elsif shard_keys.present?
@@ -156,8 +155,7 @@ module ActiveRecord::Turntable
           else
             return Fader::SelectShardsMergeResult.new(@proxy,
                                                       Hash[shard_keys.map { |k| [@proxy.cluster.shard_for(k), query] }],
-                                                      method, query, *args, &block
-                                                     )
+                                                      method, query, *args, &block)
           end
         else # scan all shards
           if SQLTree::Node::SelectDeclaration === tree.select.first &&
@@ -178,8 +176,7 @@ module ActiveRecord::Turntable
             end
             return Fader::SelectShardsMergeResult.new(@proxy,
                                                       build_shards_with_same_query(@proxy.shards.values, query),
-                                                      method, query, *args, &block
-                                                     )
+                                                      method, query, *args, &block)
           else
             raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
           end

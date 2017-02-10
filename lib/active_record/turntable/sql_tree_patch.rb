@@ -48,7 +48,7 @@ class SQLTree::Tokenizer
       when "," then            handle_token(SQLTree::Token::COMMA, &block)
       when /\d/ then           tokenize_number(&block)
       when "'" then            tokenize_quoted_string(&block)
-      when "E", "x", 'X' then  tokenize_possible_escaped_string(&block)
+      when "E", "x", "X" then  tokenize_possible_escaped_string(&block)
       when /\w/ then           tokenize_keyword(&block)
       when OPERATOR_CHARS then tokenize_operator(&block)
       when SQLTree.identifier_quote_char then tokenize_quoted_identifier(&block)
@@ -185,7 +185,7 @@ module SQLTree::Node
         end
         table_reference
       else
-        raise SQLTree::Parser::UnexpectedToken.new(tokens.current)
+        raise SQLTree::Parser::UnexpectedToken, tokens.current
       end
     end
   end
@@ -216,7 +216,7 @@ module SQLTree::Node
         tokens.consume(SQLTree::Token::RPAREN)
         self.new(hint_method, hint_key, index_list)
       else
-        raise SQLTree::Parser::UnexpectedToken.new(tokens.current)
+        raise SQLTree::Parser::UnexpectedToken, tokens.current
       end
     end
   end

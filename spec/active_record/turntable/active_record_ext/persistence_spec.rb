@@ -25,16 +25,16 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     u.save
     u
   }
-  let(:user_status){
+  let(:user_status) {
     stat = user.create_user_status(hp: 10, mp: 10)
     stat.updated_at = Time.current - 1.day
     stat.save
     stat
   }
-  let(:card){
+  let(:card) {
     Card.create!(name: "foobar")
   }
-  let(:cards_user){
+  let(:cards_user) {
     user.cards_users.create(card: card)
   }
   context "When creating record" do

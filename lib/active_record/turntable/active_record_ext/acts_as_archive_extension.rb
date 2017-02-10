@@ -23,7 +23,7 @@ module ActiveRecord::Turntable
     end
 
     begin
-      require 'acts_as_archive'
+      require "acts_as_archive"
       ActsAsArchive.prepend ActsAsArchiveExt
     rescue LoadError
     end

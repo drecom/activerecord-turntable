@@ -14,7 +14,7 @@ describe ActiveRecord::Turntable::QueryCache do
   let(:mw) {
     executor = Class.new(ActiveSupport::Executor)
     ActiveRecord::Turntable::QueryCache.install_executor_hooks executor
-    lambda { |env|
+    ->(_env) {
       executor.wrap {
         [200, {}, nil]
       }

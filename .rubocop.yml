@@ -3,6 +3,9 @@ inherit_gem:
     - "config/rubocop.yml"
     - "config/rspec.yml"
 
+inherit_from:
+  - ".rubocop_todo.yml"
+
 AllCops:
   TargetRubyVersion: 2.2
   Exclude:
