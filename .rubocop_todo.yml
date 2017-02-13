@@ -13,11 +13,6 @@ Lint/AssignmentInCondition:
     - 'lib/active_record/turntable/active_record_ext/connection_handler_extension.rb'
     - 'lib/active_record/turntable/active_record_ext/schema_dumper.rb'
 
-# Offense count: 1
-Lint/IneffectiveAccessModifier:
-  Exclude:
-    - 'lib/active_record/turntable/sequencer.rb'
-
 # Offense count: 4
 Lint/RescueException:
   Exclude:
