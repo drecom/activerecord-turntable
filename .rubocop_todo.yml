@@ -84,12 +84,6 @@ RSpec/FilePath:
     - 'spec/active_record/turntable/active_record_ext/fixture_set_spec.rb'
     - 'spec/active_record/turntable/active_record_ext/test_fixtures_spec.rb'
 
-# Offense count: 2
-# Configuration parameters: SupportedStyles.
-# SupportedStyles: have_received, receive
-RSpec/MessageSpies:
-  EnforcedStyle: receive
-
 # Offense count: 21
 # Configuration parameters: Max.
 RSpec/NestedGroups:

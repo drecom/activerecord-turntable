@@ -96,14 +96,16 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
     context "on update once" do
       it "callback should be called once" do
-        expect(user).to receive(:on_update).once
+        allow(user).to receive(:on_update)
         user.save
+        expect(user).to have_received(:on_update).once
       end
     end
     context "on destroy once" do
       it "callback should be called once" do
-        expect(user).to receive(:on_destroy).once
+        allow(user).to receive(:on_destroy)
         user.destroy
+        expect(user).to have_received(:on_destroy).once
       end
     end
   end
