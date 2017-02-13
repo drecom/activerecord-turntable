@@ -25,22 +25,6 @@ Lint/UnneededSplatExpansion:
   Exclude:
     - 'Rakefile'
 
-# Offense count: 1
-# Configuration parameters: ContextCreatingMethods, MethodCreatingMethods.
-Lint/UselessAccessModifier:
-  Exclude:
-    - 'lib/active_record/turntable/sequencer.rb'
-
-# Offense count: 8
-Lint/UselessAssignment:
-  Exclude:
-    - 'lib/active_record/turntable/algorithm/range_algorithm.rb'
-    - 'lib/active_record/turntable/algorithm/range_bsearch_algorithm.rb'
-    - 'lib/active_record/turntable/cluster_helper_methods.rb'
-    - 'lib/active_record/turntable/migration.rb'
-    - 'lib/active_record/turntable/mixer.rb'
-    - 'spec/active_record/turntable/active_record_ext/migration_spec.rb'
-
 # Offense count: 14
 Metrics/AbcSize:
   Max: 106
