@@ -11,6 +11,7 @@ describe ActiveRecord::TestFixtures do
   before do
     establish_connection_to(:test)
     truncate_shard
+    test_fixture_class.fixture_path = fixtures_root
   end
 
   let(:fixtures_root) { File.join(File.dirname(__FILE__), "../../../fixtures") }
@@ -18,10 +19,6 @@ describe ActiveRecord::TestFixtures do
   let(:test_fixture_class) { Class.new(ActiveSupport::TestCase) { include ActiveRecord::TestFixtures } }
   let(:test_fixture) { test_fixture_class.new("test") }
   let(:cards) { YAML.load(ERB.new(IO.read(fixture_file)).result) }
-
-  before do
-    test_fixture_class.fixture_path = fixtures_root
-  end
 
   describe "#setup_fixtures" do
     after do

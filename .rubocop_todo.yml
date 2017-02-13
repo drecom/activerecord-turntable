@@ -95,12 +95,6 @@ RSpec/NestedGroups:
     - 'spec/active_record/turntable/finder_spec.rb'
     - 'spec/active_record/turntable/mixer_spec.rb'
 
-# Offense count: 4
-RSpec/ScatteredSetup:
-  Exclude:
-    - 'spec/active_record/turntable/active_record_ext/locking_optimistic_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/test_fixtures_spec.rb'
-
 # Offense count: 1
 Style/AccessorMethodName:
   Exclude:
