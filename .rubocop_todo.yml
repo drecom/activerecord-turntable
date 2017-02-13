@@ -77,11 +77,6 @@ RSpec/EmptyExampleGroup:
   Exclude:
     - 'spec/active_record/turntable/mixer/fader_spec.rb'
 
-# Offense count: 4
-RSpec/ExpectActual:
-  Exclude:
-    - 'spec/active_record/turntable/mixer_spec.rb'
-
 # Offense count: 3
 # Configuration parameters: CustomTransform, IgnoreMethods.
 RSpec/FilePath:
