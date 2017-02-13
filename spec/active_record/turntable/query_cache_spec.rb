@@ -22,7 +22,7 @@ describe ActiveRecord::Turntable::QueryCache do
   }
   subject { mw.call({}) }
 
-  it "should returns 200 response" do
+  it "returns 200 response" do
     expect(subject.first).to eq(200)
   end
 end

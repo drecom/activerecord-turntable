@@ -6,7 +6,7 @@ describe ActiveRecord::Turntable do
   end
 
   context "#config_file" do
-    it "should return Rails.root/config/turntable.yml default" do
+    it "returns Rails.root/config/turntable.yml default" do
       unless defined?(::Rails); class ::Rails; end; end
       allow(Rails).to receive(:root) { "/path/to/rails_root" }
       ActiveRecord::Base.turntable_config_file = nil
@@ -14,8 +14,8 @@ describe ActiveRecord::Turntable do
     end
   end
 
-  context "#config_file=" do
-    it "should set config_file" do
+  context "#turntable_config_file=" do
+    it "set `#turntable_config_file`" do
       ActiveRecord::Base.include(ActiveRecord::Turntable)
       filename = "hogefuga"
       ActiveRecord::Base.turntable_config_file = filename

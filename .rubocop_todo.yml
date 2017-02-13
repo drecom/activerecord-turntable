@@ -77,16 +77,6 @@ RSpec/EmptyExampleGroup:
   Exclude:
     - 'spec/active_record/turntable/mixer/fader_spec.rb'
 
-# Offense count: 28
-# Configuration parameters: CustomTransform, IgnoredWords.
-RSpec/ExampleWording:
-  Exclude:
-    - 'spec/active_record/turntable/active_record_ext/clever_load_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/persistence_spec.rb'
-    - 'spec/active_record/turntable/connection_proxy_spec.rb'
-    - 'spec/active_record/turntable/query_cache_spec.rb'
-    - 'spec/active_record/turntable_spec.rb'
-
 # Offense count: 4
 RSpec/ExpectActual:
   Exclude:
