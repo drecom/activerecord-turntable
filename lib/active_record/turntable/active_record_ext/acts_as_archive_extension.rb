@@ -25,7 +25,7 @@ module ActiveRecord::Turntable
     begin
       require "acts_as_archive"
       ActsAsArchive.prepend ActsAsArchiveExt
-    rescue LoadError
+    rescue LoadError # rubocop:disable Lint/HandleExceptions
     end
   end
 end

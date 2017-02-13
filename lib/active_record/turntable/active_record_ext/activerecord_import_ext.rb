@@ -32,7 +32,7 @@ module ActiveRecord::Turntable
       require "activerecord-import"
       require "activerecord-import/base"
       (class << ActiveRecord::Base; self; end).prepend(ActiverecordImportExt)
-    rescue LoadError
+    rescue LoadError # rubocop:disable Lint/HandleExceptions
     end
   end
 end
