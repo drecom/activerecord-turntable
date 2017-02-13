@@ -5,7 +5,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to
   end
 

@@ -6,12 +6,12 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
   end
 
-  around(:each) do |example|
+  around do |example|
     old = ActiveRecord::Base.logger
     ActiveRecord::Base.logger = Logger.new(STDOUT)
     example.run

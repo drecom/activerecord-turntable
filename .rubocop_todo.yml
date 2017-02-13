@@ -84,22 +84,6 @@ RSpec/FilePath:
     - 'spec/active_record/turntable/active_record_ext/fixture_set_spec.rb'
     - 'spec/active_record/turntable/active_record_ext/test_fixtures_spec.rb'
 
-# Offense count: 11
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: implicit, each, example
-RSpec/HookArgument:
-  Exclude:
-    - 'spec/active_record/turntable/active_record_ext/association_preloader_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/association_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/clever_load_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/locking_optimistic_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/log_subscriber_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/migration_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/persistence_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/schema_dumper_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/sequencer_spec.rb'
-    - 'spec/active_record/turntable/transaction_spec.rb'
-
 # Offense count: 3
 RSpec/LeadingSubject:
   Exclude:
