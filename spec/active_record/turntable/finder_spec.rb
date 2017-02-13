@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "ActiveRecord::FinderMethods" do
+describe ActiveRecord::FinderMethods do
   before(:all) do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
   end

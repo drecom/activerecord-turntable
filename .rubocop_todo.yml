@@ -71,12 +71,6 @@ Performance/TimesMap:
     - 'spec/active_record/turntable/active_record_ext/association_preloader_spec.rb'
     - 'spec/active_record/turntable/active_record_ext/association_spec.rb'
 
-# Offense count: 2
-RSpec/DescribeClass:
-  Exclude:
-    - 'spec/active_record/turntable/finder_spec.rb'
-    - 'spec/active_record/turntable/transaction_spec.rb'
-
 # Offense count: 1
 # Configuration parameters: CustomIncludeMethods.
 RSpec/EmptyExampleGroup:
