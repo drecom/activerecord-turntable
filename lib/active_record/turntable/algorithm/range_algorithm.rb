@@ -19,7 +19,6 @@ module ActiveRecord::Turntable::Algorithm
     # { connection_name => weight, ... }
     def calculate_used_shards_with_weight(sequence_value)
       current_shard_idx = calculate_idx(sequence_value)
-      last_connection = calculate(sequence_value)
       shards = @config[:shards][0..current_shard_idx]
       weighted_hash = Hash.new { |h, k| h[k] = 0 }
       prev_max = 0

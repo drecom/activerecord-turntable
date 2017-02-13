@@ -116,12 +116,12 @@ module ActiveRecord::Turntable
       def bind_sql(sql, binds)
         # TODO: substitution value should be determined by adapter
         query = sql.is_a?(String) ? sql : @proxy.to_sql(sql, binds ? binds.dup : [])
-        query = if query.include?("\0") && binds.is_a?(Array) && binds[0].is_a?(Array) && binds[0][0].is_a?(ActiveRecord::ConnectionAdapters::Column)
-                  binds = binds.dup
-                  query.gsub("\0") { @proxy.master.connection.quote(*binds.shift.reverse) }
-                else
-                  query
-                end
+        if query.include?("\0") && binds.is_a?(Array) && binds[0].is_a?(Array) && binds[0][0].is_a?(ActiveRecord::ConnectionAdapters::Column)
+          binds = binds.dup
+          query.gsub("\0") { @proxy.master.connection.quote(*binds.shift.reverse) }
+        else
+          query
+        end
       end
 
       def build_select_fader(tree, method, query, *args, &block)

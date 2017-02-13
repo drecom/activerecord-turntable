@@ -1,8 +1,8 @@
 module ActiveRecord::Turntable
   module Helpers
     module TestHelper
-      # all shards
-      def FabricateAll(name, overrides = {}, &block)
+      # Execute fabricate to all turntable shards
+      def FabricateAll(name, overrides = {}, &block) # rubocop:disable Style/MethodName
         obj = Fabrication::Fabricator.generate(name, {
           save: true,
         }, overrides, &block)
