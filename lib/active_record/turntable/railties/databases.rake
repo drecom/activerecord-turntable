@@ -35,9 +35,9 @@ db_namespace = namespace :db do
       # TODO: implement schema:cache:xxxx
       task :dump do
         require "active_record/schema_dumper"
-        config = ActiveRecord::Base.configurations[Rails.env]
-        shard_configs = config["shards"]
-        shard_configs.merge!(config["seq"]) if config["seq"]
+        current_config = ActiveRecord::Base.configurations[Rails.env]
+        shard_configs = current_config["shards"]
+        shard_configs.merge!(current_config["seq"]) if current_config["seq"]
         if shard_configs
           shard_configs.each do |name, config|
             next unless config["database"]
@@ -48,15 +48,15 @@ db_namespace = namespace :db do
             end
           end
         end
-        ActiveRecord::Base.establish_connection(config)
+        ActiveRecord::Base.establish_connection(current_config)
         turntable_namespace["schema:dump"].reenable
       end
 
       desc "Load a schema.rb file into the database"
       task :load do
-        config = ActiveRecord::Base.configurations[Rails.env]
-        shard_configs = config["shards"]
-        shard_configs.merge!(config["seq"]) if config["seq"]
+        current_config = ActiveRecord::Base.configurations[Rails.env]
+        shard_configs = current_config["shards"]
+        shard_configs.merge!(current_config["seq"]) if current_config["seq"]
         if shard_configs
           shard_configs.each do |name, config|
             next unless config["database"]
@@ -69,7 +69,7 @@ db_namespace = namespace :db do
             end
           end
         end
-        ActiveRecord::Base.establish_connection(config)
+        ActiveRecord::Base.establish_connection(current_config)
       end
     end
 
@@ -116,16 +116,16 @@ db_namespace = namespace :db do
     namespace :test do
       # desc "Empty the test database"
       task :purge do
-        config = ActiveRecord::Base.configurations[Rails.env]
-        shard_configs = config["shards"]
-        shard_configs.merge!(config["seq"]) if config["seq"]
+        current_config = ActiveRecord::Base.configurations[Rails.env]
+        shard_configs = current_config["shards"]
+        shard_configs.merge!(current_config["seq"]) if current_config["seq"]
         if shard_configs
           shard_configs.each do |_name, config|
             next unless config["database"]
             ActiveRecord::Tasks::DatabaseTasks.purge config
           end
         end
-        ActiveRecord::Base.establish_connection(config)
+        ActiveRecord::Base.establish_connection(current_config)
       end
     end
   end

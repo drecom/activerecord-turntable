@@ -20,13 +20,6 @@ Lint/RescueException:
     - 'lib/active_record/turntable/mixer.rb'
 
 # Offense count: 5
-Lint/ShadowingOuterLocalVariable:
-  Exclude:
-    - 'lib/active_record/turntable/algorithm/range_algorithm.rb'
-    - 'lib/active_record/turntable/algorithm/range_bsearch_algorithm.rb'
-    - 'lib/active_record/turntable/railties/databases.rake'
-
-# Offense count: 5
 # Cop supports --auto-correct.
 Lint/UnneededSplatExpansion:
   Exclude:
