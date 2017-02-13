@@ -58,7 +58,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
         user.save!
-      }.to_not raise_error
+      }.not_to raise_error
       expect(strio.string).to match(/WHERE `users`\.`id` = #{user.id}[^\s]*$/)
     end
 
@@ -75,7 +75,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     it "doesn't change the behavior when destroying" do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
-      expect { user.destroy }.to_not raise_error
+      expect { user.destroy }.not_to raise_error
       expect(strio.string).to match(/WHERE `users`\.`id` = #{user.id}[^\s]*$/)
     end
   end
@@ -118,7 +118,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
         cards_user.save!
-      }.to_not raise_error
+      }.not_to raise_error
       expect(strio.string).to match(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/)
     end
 
@@ -138,7 +138,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
         cards_user.destroy
-      }.to_not raise_error
+      }.not_to raise_error
       expect(strio.string).to match(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/)
     end
 
@@ -151,7 +151,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { cards_user.reload }.to_not raise_error
+      expect { cards_user.reload }.not_to raise_error
 
       expect(strio.string.split("\n").select { |stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
@@ -161,7 +161,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { cards_user.touch }.to_not raise_error
+      expect { cards_user.touch }.not_to raise_error
       expect(strio.string.split("\n").select { |stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
@@ -170,7 +170,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { cards_user.lock! }.to_not raise_error
+      expect { cards_user.lock! }.not_to raise_error
       expect(strio.string.split("\n").select { |stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
     end
 
@@ -179,7 +179,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       strio = StringIO.new
       ActiveRecord::Base.logger = Logger.new(strio)
 
-      expect { cards_user.update_columns(num: 10) }.to_not raise_error
+      expect { cards_user.update_columns(num: 10) }.not_to raise_error
       expect(strio.string.split("\n").select { |stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
     end
   end
@@ -191,7 +191,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
         card.save!
-      }.to_not raise_error
+      }.not_to raise_error
       expect(strio.string).to match(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/)
     end
 
@@ -200,7 +200,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       ActiveRecord::Base.logger = Logger.new(strio)
       expect {
         card.destroy
-      }.to_not raise_error
+      }.not_to raise_error
       expect(strio.string).to match(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/)
     end
   end

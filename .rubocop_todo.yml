@@ -95,17 +95,6 @@ RSpec/NestedGroups:
     - 'spec/active_record/turntable/finder_spec.rb'
     - 'spec/active_record/turntable/mixer_spec.rb'
 
-# Offense count: 21
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: not_to, to_not
-RSpec/NotToNot:
-  Exclude:
-    - 'spec/active_record/turntable/active_record_ext/association_preloader_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/association_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/persistence_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/sequencer_spec.rb'
-    - 'spec/active_record/turntable/sql_tree_patch_spec.rb'
-
 # Offense count: 4
 RSpec/ScatteredSetup:
   Exclude:
