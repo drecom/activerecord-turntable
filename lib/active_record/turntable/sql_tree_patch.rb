@@ -38,6 +38,7 @@ class SQLTree::Tokenizer
   end
 
   # @note Override to handle x'..' binary string
+  # rubocop:disable Lint/EmptyWhen:
   def each_token(&block) # :yields: SQLTree::Token
     while next_char
       case current_char
@@ -58,6 +59,7 @@ class SQLTree::Tokenizer
     # Make sure to yield any tokens that are still stashed on the queue.
     empty_keyword_queue!(&block)
   end
+  # rubocop:enable Lint/EmptyWhen:
   alias_method :each, :each_token
 
   def tokenize_possible_escaped_string(&block)

@@ -13,11 +13,6 @@ Lint/AssignmentInCondition:
     - 'lib/active_record/turntable/active_record_ext/connection_handler_extension.rb'
     - 'lib/active_record/turntable/active_record_ext/schema_dumper.rb'
 
-# Offense count: 1
-Lint/EmptyWhen:
-  Exclude:
-    - 'lib/active_record/turntable/sql_tree_patch.rb'
-
 # Offense count: 2
 Lint/HandleExceptions:
   Exclude:
