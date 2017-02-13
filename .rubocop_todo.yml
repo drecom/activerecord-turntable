@@ -95,11 +95,6 @@ RSpec/NestedGroups:
     - 'spec/active_record/turntable/finder_spec.rb'
     - 'spec/active_record/turntable/mixer_spec.rb'
 
-# Offense count: 1
-Style/AccessorMethodName:
-  Exclude:
-    - 'lib/active_record/turntable/shard.rb'
-
 # Offense count: 15
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
