@@ -15,7 +15,7 @@ describe ActiveRecord::Turntable::Migration do
 
     context "With clusters definitions" do
       let(:migration_class) {
-        klass = Class.new(ActiveRecord::Migration[5.0]) {
+        Class.new(ActiveRecord::Migration[5.0]) {
           clusters :user_cluster
         }
       }
@@ -27,7 +27,7 @@ describe ActiveRecord::Turntable::Migration do
 
     context "With shards definitions" do
       let(:migration_class) {
-        klass = Class.new(ActiveRecord::Migration[5.0]) {
+        Class.new(ActiveRecord::Migration[5.0]) {
           shards :user_shard_01
         }
       }
