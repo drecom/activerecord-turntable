@@ -82,7 +82,6 @@ RSpec/EmptyExampleGroup:
 RSpec/FilePath:
   Exclude:
     - 'spec/active_record/turntable/active_record_ext/fixture_set_spec.rb'
-    - 'spec/active_record/turntable/active_record_ext/migration_spec.rb'
     - 'spec/active_record/turntable/active_record_ext/test_fixtures_spec.rb'
 
 # Offense count: 11

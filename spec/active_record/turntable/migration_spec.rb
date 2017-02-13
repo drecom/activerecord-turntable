@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe ActiveRecord::Turntable::Migration do
   before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
+    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
   end
 
   before(:each) do
