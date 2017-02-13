@@ -39,6 +39,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   }
   context "When creating record" do
     context "with blob column" do
+      subject { user }
       let(:blob_value) { "\123\123\123" }
       let(:user) {
         u = User.new(nickname: "x", blob: blob_value)
@@ -46,7 +47,6 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
         u.save
         u
       }
-      subject { user }
       its(:blob) { is_expected.to eq(user.reload.blob) }
     end
   end
