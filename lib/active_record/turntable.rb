@@ -45,13 +45,13 @@ module ActiveRecord::Turntable
     DEFAULT_PATH = File.dirname(File.dirname(__FILE__))
 
     def turntable_config_file
-      @@turntable_config_file ||=
+      @turntable_config_file ||=
         File.join(defined?(::Rails) ?
                    ::Rails.root.to_s : DEFAULT_PATH, "config/turntable.yml")
     end
 
     def turntable_config_file=(filename)
-      @@turntable_config_file = filename
+      @turntable_config_file = filename
     end
 
     def turntable_config

@@ -13,26 +13,28 @@ module ActiveRecord::Turntable
       autoload :Barrage
     end
 
-    @@sequence_types = {
+    class_attribute :sequence_types
+    class_attribute :sequences
+    class_attribute :tables
+
+    self.sequence_types = {
       api: Api,
       mysql: Mysql,
       barrage: Barrage,
     }
-
-    @@sequences = {}
-    @@tables = {}
-    cattr_reader :sequences, :tables
+    self.sequences = {}
+    self.tables = {}
 
     class << self
       def build(klass, sequence_name = nil, cluster_name = nil)
         sequence_name ||= current_cluster_config_for(cluster_name || klass)[:seq].keys.first
         seq_config = current_cluster_config_for(cluster_name || klass)[:seq][sequence_name]
         seq_type = (seq_config[:seq_type] ? seq_config[:seq_type].to_sym : :mysql)
-        @@tables[klass.table_name] ||= (@@sequences[sequence_name(klass.table_name, klass.primary_key)] ||= @@sequence_types[seq_type].new(klass, seq_config))
+        tables[klass.table_name] ||= (sequences[sequence_name(klass.table_name, klass.primary_key)] ||= sequence_types[seq_type].new(klass, seq_config))
       end
 
       def has_sequencer?(table_name)
-        !!@@tables[table_name]
+        !!tables[table_name]
       end
 
       def sequence_name(table_name, pk)

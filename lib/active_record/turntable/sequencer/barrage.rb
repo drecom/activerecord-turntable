@@ -1,7 +1,8 @@
 module ActiveRecord::Turntable
   class Sequencer
     class Barrage < Sequencer
-      @@unique_barrage_instance = {}
+      class_attribute :unique_barrage_instance
+      self.unique_barrage_instance = {}
 
       def initialize(klass, options = {})
         require "barrage"
@@ -20,7 +21,7 @@ module ActiveRecord::Turntable
       private
 
         def barrage
-          @@unique_barrage_instance[@options] ||= ::Barrage.new(@options)
+          self.unique_barrage_instance[@options] ||= ::Barrage.new(@options)
         end
     end
   end

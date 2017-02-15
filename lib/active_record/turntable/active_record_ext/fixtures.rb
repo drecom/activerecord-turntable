@@ -70,7 +70,7 @@ module ActiveRecord
   end
 
   module TestFixtures
-    # rubocop:disable Style/RedundantException
+    # rubocop:disable Style/ClassVars, Style/RedundantException
     def setup_fixtures(config = ActiveRecord::Base)
       if pre_loaded_fixtures && !use_transactional_fixtures
         raise RuntimeError, "pre_loaded_fixtures requires use_transactional_fixtures"
@@ -103,7 +103,7 @@ module ActiveRecord
       # Instantiate fixtures for every test if requested.
       instantiate_fixtures if use_instantiated_fixtures
     end
-    # rubocop:enable Style/RedundantException
+    # rubocop:enable Style/ClassVars, Style/RedundantException
 
     def enlist_fixture_connections
       ActiveRecord::Base.connection_handler.connection_pool_list.map(&:connection) +
