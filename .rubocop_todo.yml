@@ -129,11 +129,6 @@ Style/MethodCalledOnDoEndBlock:
     - 'lib/active_record/turntable/sql_tree_patch.rb'
 
 # Offense count: 1
-Style/MultilineTernaryOperator:
-  Exclude:
-    - 'lib/active_record/turntable.rb'
-
-# Offense count: 1
 Style/NestedTernaryOperator:
   Exclude:
     - 'lib/active_record/turntable/mixer.rb'
