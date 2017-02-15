@@ -120,11 +120,6 @@ Style/GuardClause:
   Exclude:
     - 'lib/active_record/turntable/sql_tree_patch.rb'
 
-# Offense count: 1
-Style/IfWithSemicolon:
-  Exclude:
-    - 'spec/active_record/turntable_spec.rb'
-
 # Offense count: 4
 Style/MethodCalledOnDoEndBlock:
   Exclude:

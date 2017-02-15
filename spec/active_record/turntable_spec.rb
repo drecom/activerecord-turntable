@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable do
 
   context "#config_file" do
     it "returns Rails.root/config/turntable.yml default" do
-      unless defined?(::Rails); class ::Rails; end; end
+      stub_const("Rails", Class.new)
       allow(Rails).to receive(:root) { "/path/to/rails_root" }
       ActiveRecord::Base.turntable_config_file = nil
       expect(ActiveRecord::Base.turntable_config_file).to eq("/path/to/rails_root/config/turntable.yml")
