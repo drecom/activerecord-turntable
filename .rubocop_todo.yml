@@ -134,12 +134,6 @@ Style/MethodMissing:
     - 'lib/active_record/turntable/connection_proxy.rb'
 
 # Offense count: 1
-# Configuration parameters: SupportedStyles.
-# SupportedStyles: snake_case, camelCase
-Style/MethodName:
-  EnforcedStyle: snake_case
-
-# Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: module_function, extend_self
 Style/ModuleFunction:
