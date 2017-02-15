@@ -114,8 +114,9 @@ module ActiveRecord::Turntable
       end
 
       def bind_sql(sql, binds)
+        binds = binds ? binds.dup : []
         # TODO: substitution value should be determined by adapter
-        query = sql.is_a?(String) ? sql : @proxy.to_sql(sql, binds ? binds.dup : [])
+        query = sql.is_a?(String) ? sql : @proxy.to_sql(sql, binds)
         if query.include?("\0") && binds.is_a?(Array) && binds[0].is_a?(Array) && binds[0][0].is_a?(ActiveRecord::ConnectionAdapters::Column)
           binds = binds.dup
           query.gsub("\0") { @proxy.master.connection.quote(*binds.shift.reverse) }

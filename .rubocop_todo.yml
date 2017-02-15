@@ -128,11 +128,6 @@ Style/MethodCalledOnDoEndBlock:
     - 'lib/active_record/turntable/mixer/fader/update_shards_merge_result.rb'
     - 'lib/active_record/turntable/sql_tree_patch.rb'
 
-# Offense count: 1
-Style/NestedTernaryOperator:
-  Exclude:
-    - 'lib/active_record/turntable/mixer.rb'
-
 # Offense count: 5
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
