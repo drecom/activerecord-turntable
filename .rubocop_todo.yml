@@ -129,11 +129,6 @@ Style/MethodCalledOnDoEndBlock:
     - 'lib/active_record/turntable/sql_tree_patch.rb'
 
 # Offense count: 1
-Style/MethodMissing:
-  Exclude:
-    - 'lib/active_record/turntable/connection_proxy.rb'
-
-# Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: module_function, extend_self
 Style/ModuleFunction:
