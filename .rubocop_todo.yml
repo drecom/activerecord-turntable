@@ -129,13 +129,6 @@ Style/MethodCalledOnDoEndBlock:
     - 'lib/active_record/turntable/sql_tree_patch.rb'
 
 # Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: module_function, extend_self
-Style/ModuleFunction:
-  Exclude:
-    - 'lib/active_record/turntable/util.rb'
-
-# Offense count: 1
 Style/MultilineTernaryOperator:
   Exclude:
     - 'lib/active_record/turntable.rb'
