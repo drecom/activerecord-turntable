@@ -144,15 +144,6 @@ Style/RedundantReturn:
 
 # Offense count: 2
 # Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.
-# SupportedStyles: slashes, percent_r, mixed
-Style/RegexpLiteral:
-  Exclude:
-    - 'Guardfile'
-    - 'lib/active_record/turntable/mixer.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, AllowSafeAssignment.
 # SupportedStyles: require_parentheses, require_no_parentheses, require_parentheses_when_complex
 Style/TernaryParentheses:

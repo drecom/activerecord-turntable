@@ -12,7 +12,7 @@ module ActiveRecord::Turntable
 
     delegate :logger, to: ActiveRecord::Base
 
-    NOT_USED_FOR_SHARDING_OPERATORS_REGEXP = /\A(NOT IN|IS|IS NOT|BETWEEN|LIKE|\!\=|<<|>>|<>|>\=|<=|[\*\+\-\/\%\|\&><])\z/
+    NOT_USED_FOR_SHARDING_OPERATORS_REGEXP = /\A(NOT IN|IS|IS NOT|BETWEEN|LIKE|!=|<<|>>|<>|>=|<=|[*+%|&><-])\z/
 
     def initialize(proxy)
       @proxy = proxy
