@@ -22,17 +22,13 @@ describe ActiveRecord::FinderMethods do
     context "pass an ID that exists" do
       subject { User.find(1) }
 
-      it "returns user" do
-        is_expected.to eq(user)
-      end
+      it { is_expected.to eq(user) }
     end
 
     context "pass an ID that doesn't exist" do
       subject { User.find(2) }
 
-      it "raises error" do
-        expect { subject }.to raise_error
-      end
+      it { expect { subject }.to raise_error(ActiveRecord::RecordNotFound) }
     end
   end
 end

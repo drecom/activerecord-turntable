@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe ActiveRecord::Turntable::ActiveRecordExt::Association do
+describe ActiveRecord::Turntable::ActiveRecordExt::AssociationPreloader do
   before(:all) do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
@@ -71,7 +71,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       context "when foreign_shard_key option is not passed" do
         subject { CardsUser.where(user: user).preload(:events_users_histories).first }
 
-        it { expect { subject }.to raise_error }
+        it { expect { subject }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError) }
       end
     end
   end

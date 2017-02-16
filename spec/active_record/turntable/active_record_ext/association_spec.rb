@@ -72,9 +72,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       end
 
       context "when foreign_shard_key option is not passed" do
-        subject { CardsUser.where(user: user).events_users_histories }
+        subject { cards_user.events_users_histories.to_a }
 
-        it { expect { subject }.to raise_error }
+        it { expect { subject }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError) }
       end
     end
   end
