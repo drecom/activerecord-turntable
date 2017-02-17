@@ -6,7 +6,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
 
@@ -27,7 +27,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       context "With their associations" do
         subject { users.map { |u| u.association(:user_status) } }
 
-        it "should be association target loaded" do
+        it "makes association target loaded" do
           is_expected.to all(be_loaded)
         end
       end
@@ -35,7 +35,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       context "With their targets" do
         subject { users.map { |u| u.association(:user_status).target } }
 
-        it "should be loaded target object" do
+        it "loads target object" do
           is_expected.to all(be_instance_of(UserStatus))
         end
       end
@@ -49,7 +49,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       context "With their associations" do
         subject { user_statuses.map { |us| us.association(:user) } }
 
-        it "should target loaded" do
+        it "makes target loaded" do
           is_expected.to all(be_loaded)
         end
       end
@@ -57,7 +57,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       context "With their targets" do
         subject { user_statuses.map { |us| us.association(:user).target } }
 
-        it "should be loaded target object" do
+        it "loads target object" do
           is_expected.to all(be_instance_of(User))
         end
       end
@@ -65,7 +65,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
   end
 
   context "When a model has has_many relation" do
-    it "should send query only 2 times." do
+    it "sends query only 2 times." do
       skip "not implemented yet"
     end
   end

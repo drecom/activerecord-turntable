@@ -11,9 +11,8 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
     end
 
-    let(:cluster) { ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
     subject { ActiveRecord::Turntable::ConnectionProxy.new(User, cluster) }
-
+    let(:cluster) { ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
     its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
@@ -23,7 +22,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       truncate_shard
     end
 
-    it "should be saved to user_shard_1 with id = 1" do
+    it "is saved to user_shard_1 with id = 1" do
       user = User.new
       user.id = 1
       expect {
@@ -31,7 +30,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       }.not_to raise_error
     end
 
-    it "should be saved to user_shard_2 with id = 30000" do
+    it "is saved to user_shard_2 with id = 30000" do
       user = User.new
       user.id = 30000
       expect {
@@ -39,7 +38,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       }.not_to raise_error
     end
 
-    it "should be saved to user_shard_2 with id = 30000 with SQL injection attack" do
+    it "is saved to user_shard_2 with id = 30000 with SQL injection attack" do
       user = User.new
       user.id = 30000
       user.nickname = "hogehgoge'00"
@@ -49,7 +48,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       user.reload
     end
 
-    it "should should be saved the same string when includes escaped string" do
+    it "is saved the same string when includes escaped string" do
       user = User.new
       user.id = 30000
       user.nickname = "hoge@\n@\\@@\\nhoge\\\nhoge\\n"
@@ -86,14 +85,14 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       @user2.save!
     end
 
-    it "should be saved to user_shard_1 with id = 1" do
+    it "is saved to user_shard_1 with id = 1" do
       @user1.nickname = "foobar"
       expect {
         @user1.save!
       }.not_to raise_error
     end
 
-    it "should be saved to user_shard_2 with id = 30000" do
+    it "is saved to user_shard_2 with id = 30000" do
       @user2.nickname = "hogehoge"
       expect {
         @user2.save!
@@ -104,7 +103,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       expect(User.where(id: [1, 30000]).all.size).to eq(2)
     end
 
-    it "count should be 2" do
+    it "User.count is 2" do
       expect(User.count).to eq(2)
     end
 

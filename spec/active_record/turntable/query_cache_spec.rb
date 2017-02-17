@@ -11,18 +11,18 @@ describe ActiveRecord::Turntable::QueryCache do
     truncate_shard
   end
 
+  subject { mw.call({}) }
   let(:mw) {
     executor = Class.new(ActiveSupport::Executor)
     ActiveRecord::Turntable::QueryCache.install_executor_hooks executor
-    lambda { |env|
+    ->(_env) {
       executor.wrap {
         [200, {}, nil]
       }
     }
   }
-  subject { mw.call({}) }
 
-  it "should returns 200 response" do
+  it "returns 200 response" do
     expect(subject.first).to eq(200)
   end
 end

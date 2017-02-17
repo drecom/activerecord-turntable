@@ -53,6 +53,7 @@ module ActiveRecord::Turntable
       end
     end
 
+    # rubocop:disable Style/MethodMissing
     def method_missing(method, *args, &block)
       clear_query_cache_if_needed(method)
       if shard_fixed?
@@ -69,6 +70,7 @@ module ActiveRecord::Turntable
         connection.send(method, *args, &block)
       end
     end
+    # rubocop:enable Style/MethodMissing
 
     def respond_to_missing?(method, include_private = false)
       connection.send(:respond_to?, method, include_private)

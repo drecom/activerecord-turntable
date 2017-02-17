@@ -2,10 +2,10 @@ require "spec_helper"
 
 describe ActiveRecord::Turntable::Migration do
   before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
+    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
   end
@@ -15,7 +15,7 @@ describe ActiveRecord::Turntable::Migration do
 
     context "With clusters definitions" do
       let(:migration_class) {
-        klass = Class.new(ActiveRecord::Migration[5.0]) {
+        Class.new(ActiveRecord::Migration[5.0]) {
           clusters :user_cluster
         }
       }
@@ -27,7 +27,7 @@ describe ActiveRecord::Turntable::Migration do
 
     context "With shards definitions" do
       let(:migration_class) {
-        klass = Class.new(ActiveRecord::Migration[5.0]) {
+        Class.new(ActiveRecord::Migration[5.0]) {
           shards :user_shard_01
         }
       }

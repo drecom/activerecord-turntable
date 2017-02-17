@@ -27,6 +27,7 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding scope on `touch`
+        # rubocop:disable Style/UnlessElse
         def touch(*names, time: nil)
           raise ActiveRecord::ActiveRecordError, "cannot touch on a new record object" unless persisted?
 
@@ -68,6 +69,7 @@ module ActiveRecord::Turntable
             true
           end
         end
+        # rubocop:enable Style/UnlessElse
 
         # @note Override to add sharding scope on `update_columns`
         def update_columns(attributes)
@@ -95,30 +97,30 @@ module ActiveRecord::Turntable
 
         private
 
-        # @note Override to add sharding scope on destroying
-        def relation_for_destroy
-          klass = self.class
-          relation = klass.unscoped.where(klass.primary_key => id)
+          # @note Override to add sharding scope on destroying
+          def relation_for_destroy
+            klass = self.class
+            relation = klass.unscoped.where(klass.primary_key => id)
 
-          if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
-            relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
+            if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
+              relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
+            end
+            relation
           end
-          relation
-        end
 
-        # @note Override to add sharding scope on updating
-        def _update_record(attribute_names = self.attribute_names)
-          klass = self.class
-          attributes_values = arel_attributes_with_values_for_update(attribute_names)
-          if attributes_values.empty?
-            0
-          else
-            scope = if klass.turntable_enabled? and klass.primary_key != klass.turntable_shard_key.to_s
-                      klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
-                    end
-            klass.unscoped._update_record attributes_values, id, id_was, scope
+          # @note Override to add sharding scope on updating
+          def _update_record(attribute_names = self.attribute_names)
+            klass = self.class
+            attributes_values = arel_attributes_with_values_for_update(attribute_names)
+            if attributes_values.empty?
+              0
+            else
+              scope = if klass.turntable_enabled? && (klass.primary_key != klass.turntable_shard_key.to_s)
+                        klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+                      end
+              klass.unscoped._update_record attributes_values, id, id_was, scope
+            end
           end
-        end
       end
     end
   end

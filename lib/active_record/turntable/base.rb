@@ -52,7 +52,7 @@ module ActiveRecord::Turntable
           self.turntable_clusters[cluster_name] ||= Cluster.new(
             turntable_config[:clusters][cluster_name],
             options
-        )
+          )
         prepend ConnectionExtension
         turntable_replace_connection_pool
       end

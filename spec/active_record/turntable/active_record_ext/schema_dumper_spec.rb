@@ -6,7 +6,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper do
     ActiveRecord::SchemaDumper.prepend(ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper)
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
   end
 

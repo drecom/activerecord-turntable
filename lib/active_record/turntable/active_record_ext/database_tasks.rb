@@ -73,7 +73,7 @@ module ActiveRecord
           config = ActiveRecord::Base.configurations[environ]
           next unless config
           %w(shards seq).each do |name|
-            configurations += config[name].to_a if config.key?(name)
+            configurations += config[name].to_a if config.has_key?(name)
           end
         end
         configurations

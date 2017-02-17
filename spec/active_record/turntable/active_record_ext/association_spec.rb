@@ -5,7 +5,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
   end
@@ -38,7 +38,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   context "When a model with has_one relation" do
     context "When the has_one associated object doesn't exists" do
       subject { user.user_status }
-      it { expect { subject }.to_not raise_error }
+      it { expect { subject }.not_to raise_error }
     end
   end
 
@@ -52,13 +52,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
     context "associated objects has same turntable_key" do
       context "AssociationRelation#to_a" do
         subject { cards_user.cards_users_histories.to_a }
-        it { expect { subject }.to_not raise_error }
+        it { expect { subject }.not_to raise_error }
         it { is_expected.to include(*cards_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
       end
 
       context "AssociationRelation#where" do
         subject { cards_user.cards_users_histories.where(id: cards_users_history.id).to_a }
-        it { expect { subject }.to_not raise_error }
+        it { expect { subject }.not_to raise_error }
         it { is_expected.to include(cards_users_history) }
       end
     end
@@ -67,14 +67,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       context "when foreign_shard_key option passed" do
         subject { cards_user.events_users_histories_with_foreign_shard_key.to_a }
 
-        it { expect { subject }.to_not raise_error }
+        it { expect { subject }.not_to raise_error }
         it { is_expected.to include(*events_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
       end
 
       context "when foreign_shard_key option is not passed" do
-        subject { CardsUser.where(user: user).events_users_histories }
+        subject { cards_user.events_users_histories.to_a }
 
-        it { expect { subject }.to raise_error }
+        it { expect { subject }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError) }
       end
     end
   end

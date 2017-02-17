@@ -17,7 +17,7 @@ module ActiveRecord
       end
 
       def self.complete(enabled)
-        klasses =  ActiveRecord::Base.turntable_connections.values
+        klasses = ActiveRecord::Base.turntable_connections.values
         klasses.each do |k|
           k.connection.clear_query_cache
           k.connection.disable_query_cache! unless enabled

@@ -52,7 +52,6 @@ module ActiveRecord::Turntable::Migration
       options = options.merge(id: false)
 
       # TODO: pkname should be pulled from table definitions
-      pkname = "id"
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
       create_table(sequence_table_name, options) do |t|
         t.integer :id, limit: 8
@@ -62,7 +61,6 @@ module ActiveRecord::Turntable::Migration
 
     def drop_sequence_for(table_name, options = {})
       # TODO: pkname should be pulled from table definitions
-      pkname = "id"
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
       drop_table(sequence_table_name)
     end

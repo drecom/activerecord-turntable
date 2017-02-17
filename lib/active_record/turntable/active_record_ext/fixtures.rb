@@ -7,6 +7,7 @@ module ActiveRecord
   class FixtureSet
     extend ActiveRecord::Turntable::Util
 
+    # rubocop:disable Style/MultilineMethodCallBraceLayout
     def self.create_fixtures(fixtures_directory, fixture_set_names, class_names = {}, config = ActiveRecord::Base)
       fixture_set_names = Array(fixture_set_names).map(&:to_s)
       class_names = ClassCache.new class_names, config
@@ -65,12 +66,14 @@ module ActiveRecord
       end
       cached_fixtures(connection, fixture_set_names)
     end
+    # rubocop:enable Style/MultilineMethodCallLayout
   end
 
   module TestFixtures
+    # rubocop:disable Style/ClassVars, Style/RedundantException
     def setup_fixtures(config = ActiveRecord::Base)
       if pre_loaded_fixtures && !use_transactional_fixtures
-        raise "pre_loaded_fixtures requires use_transactional_fixtures"
+        raise RuntimeError, "pre_loaded_fixtures requires use_transactional_fixtures"
       end
 
       @fixture_cache = {}
@@ -100,6 +103,7 @@ module ActiveRecord
       # Instantiate fixtures for every test if requested.
       instantiate_fixtures if use_instantiated_fixtures
     end
+    # rubocop:enable Style/ClassVars, Style/RedundantException
 
     def enlist_fixture_connections
       ActiveRecord::Base.connection_handler.connection_pool_list.map(&:connection) +

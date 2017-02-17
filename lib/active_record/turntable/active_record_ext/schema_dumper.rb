@@ -5,6 +5,7 @@ module ActiveRecord::Turntable
       SEQUENCE_TABLE_REGEXP = /\A(.*)_id_seq\z/
 
       private
+
         # @note Override to dump database sequencer method
         def table(table, stream)
           unless matchdata = table.match(SEQUENCE_TABLE_REGEXP)

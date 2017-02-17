@@ -30,11 +30,11 @@ module ActiveRecord::Turntable
           self.each do |obj|
             matched_object = case reflection.macro
                              when :has_one
-                               foreign_objects.find {|fo|
+                               foreign_objects.find { |fo|
                                  obj.send(reflection.association_primary_key) == fo.send(reflection.foreign_key)
                                }
                              when :belongs_to
-                               foreign_objects.find {|fo|
+                               foreign_objects.find { |fo|
                                  obj.send(reflection.foreign_key) == fo.send(reflection.association_primary_key)
                                }
                              end

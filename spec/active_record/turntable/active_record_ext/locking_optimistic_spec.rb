@@ -5,12 +5,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
-  end
-
-  before do
     ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_update] = true
   end
 

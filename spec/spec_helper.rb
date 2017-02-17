@@ -7,10 +7,7 @@ require "rspec/collection_matchers"
 require "webmock/rspec"
 require "pry"
 require "timecop"
-begin
-  require "pry-byebug"
-rescue LoadError
-end
+require "pry-byebug"
 
 require "activerecord-turntable"
 

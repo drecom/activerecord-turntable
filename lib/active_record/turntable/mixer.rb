@@ -1,3 +1,4 @@
+# rubocop:disable Style/CaseEquality
 require "active_support/core_ext/object/try"
 require "active_record/turntable/sql_tree_patch"
 
@@ -11,7 +12,7 @@ module ActiveRecord::Turntable
 
     delegate :logger, to: ActiveRecord::Base
 
-    NOT_USED_FOR_SHARDING_OPERATORS_REGEXP = /\A(NOT IN|IS|IS NOT|BETWEEN|LIKE|\!\=|<<|>>|<>|>\=|<=|[\*\+\-\/\%\|\&><])\z/
+    NOT_USED_FOR_SHARDING_OPERATORS_REGEXP = /\A(NOT IN|IS|IS NOT|BETWEEN|LIKE|!=|<<|>>|<>|>=|<=|[*+%|&><-])\z/
 
     def initialize(proxy)
       @proxy = proxy
@@ -75,15 +76,15 @@ module ActiveRecord::Turntable
       when "IN", "=", "=="
         field = tree.lhs.respond_to?(:table) ? tree.lhs : nil
         if tree.rhs.is_a?(SQLTree::Node::SubQuery)
-          if field.try(:table) == table_name and field.name == shard_key
+          if (field.try(:table) == table_name) && (field.name == shard_key)
             find_shard_keys(tree.rhs.where, table_name, shard_key)
           else
             []
           end
         else
           values = Array(tree.rhs)
-          if field.try(:table) == table_name and field.name == shard_key and
-              !tree.rhs.is_a?(SQLTree::Node::SubQuery)
+          if (field.try(:table) == table_name) && (field.name == shard_key) &&
+             !tree.rhs.is_a?(SQLTree::Node::SubQuery)
             values.map(&:value).compact
           else
             []
@@ -113,14 +114,15 @@ module ActiveRecord::Turntable
       end
 
       def bind_sql(sql, binds)
+        binds = binds ? binds.dup : []
         # TODO: substitution value should be determined by adapter
-        query = sql.is_a?(String) ? sql : @proxy.to_sql(sql, binds ? binds.dup : [])
-        query = if query.include?("\0") && binds.is_a?(Array) && binds[0].is_a?(Array) && binds[0][0].is_a?(ActiveRecord::ConnectionAdapters::Column)
-                  binds = binds.dup
-                  query.gsub("\0") { @proxy.master.connection.quote(*binds.shift.reverse) }
-                else
-                  query
-                end
+        query = sql.is_a?(String) ? sql : @proxy.to_sql(sql, binds)
+        if query.include?("\0") && binds.is_a?(Array) && binds[0].is_a?(Array) && binds[0][0].is_a?(ActiveRecord::ConnectionAdapters::Column)
+          binds = binds.dup
+          query.gsub("\0") { @proxy.master.connection.quote(*binds.shift.reverse) }
+        else
+          query
+        end
       end
 
       def build_select_fader(tree, method, query, *args, &block)
@@ -142,8 +144,7 @@ module ActiveRecord::Turntable
               tree.select.first.to_sql == '1 AS "one"' # for `SELECT 1 AS one` (AR::Base.exists?)
           return Fader::SelectShardsMergeResult.new(@proxy,
                                                     build_shards_with_same_query(@proxy.shards.values, query),
-                                                    method, query, *args, &block
-                                                   )
+                                                    method, query, *args, &block)
         elsif tree.group_by || tree.order_by || tree.limit.try(:value).to_i > 0
           raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
         elsif shard_keys.present?
@@ -155,8 +156,7 @@ module ActiveRecord::Turntable
           else
             return Fader::SelectShardsMergeResult.new(@proxy,
                                                       Hash[shard_keys.map { |k| [@proxy.cluster.shard_for(k), query] }],
-                                                      method, query, *args, &block
-                                                     )
+                                                      method, query, *args, &block)
           end
         else # scan all shards
           if SQLTree::Node::SelectDeclaration === tree.select.first &&
@@ -177,8 +177,7 @@ module ActiveRecord::Turntable
             end
             return Fader::SelectShardsMergeResult.new(@proxy,
                                                       build_shards_with_same_query(@proxy.shards.values, query),
-                                                      method, query, *args, &block
-                                                     )
+                                                      method, query, *args, &block)
           else
             raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
           end
@@ -231,3 +230,4 @@ module ActiveRecord::Turntable
       end
   end
 end
+# rubocop:enable Style/CaseEquality

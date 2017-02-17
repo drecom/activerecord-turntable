@@ -14,6 +14,7 @@ module ActiveRecord::Turntable
       end
 
       # @note override for append current shard name
+      # rubocop:disable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
       def log(sql, name = "SQL", binds = [], statement_name = nil)
         @instrumenter.instrument(
           "sql.active_record",
@@ -26,6 +27,7 @@ module ActiveRecord::Turntable
       rescue => e
         raise translate_exception_class(e, sql)
       end
+      # rubocop:enable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
 
       protected :translate_exception_class, :log
 

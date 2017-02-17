@@ -1,11 +1,11 @@
 require "spec_helper"
 
-describe ActiveRecord::Turntable::ActiveRecordExt::Association do
+describe ActiveRecord::Turntable::ActiveRecordExt::AssociationPreloader do
   before(:all) do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
   end
@@ -42,7 +42,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
 
     context "associated objects has same turntable_key" do
       subject { CardsUser.where(user: user).preload(:cards_users_histories).first }
-      it { expect { subject }.to_not raise_error }
+      it { expect { subject }.not_to raise_error }
 
       it "its association should be loaded" do
         expect(subject.association(:cards_users_histories)).to be_loaded
@@ -57,7 +57,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       context "when foreign_shard_key option passed" do
         subject { CardsUser.where(user: user).preload(:events_users_histories_with_foreign_shard_key).first }
 
-        it { expect { subject }.to_not raise_error }
+        it { expect { subject }.not_to raise_error }
 
         it "its association should be loaded" do
           expect(subject.association(:events_users_histories_with_foreign_shard_key)).to be_loaded
@@ -71,7 +71,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       context "when foreign_shard_key option is not passed" do
         subject { CardsUser.where(user: user).preload(:events_users_histories).first }
 
-        it { expect { subject }.to raise_error }
+        it { expect { subject }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError) }
       end
     end
   end
