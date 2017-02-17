@@ -1,4 +1,4 @@
-require 'active_record/migration'
+require "active_record/migration"
 
 module ActiveRecord
   class MigrationProxy

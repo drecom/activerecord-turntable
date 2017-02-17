@@ -5,7 +5,7 @@ module ActiveRecord::Turntable
 
       included do
         class << ActiveRecord::Base
-          delegate :clever_load!, :to => :all
+          delegate :clever_load!, to: :all
         end
       end
 
@@ -13,7 +13,7 @@ module ActiveRecord::Turntable
         # load records
         records = self.to_a
         klass = records.first.class
-        association_key = Util.ar42_or_later? ? association_name.to_s : association_name
+        association_key = association_name.to_s
         reflection = klass.reflections[association_key]
 
         if reflection
@@ -30,11 +30,11 @@ module ActiveRecord::Turntable
           self.each do |obj|
             matched_object = case reflection.macro
                              when :has_one
-                               foreign_objects.find {|fo|
+                               foreign_objects.find { |fo|
                                  obj.send(reflection.association_primary_key) == fo.send(reflection.foreign_key)
                                }
                              when :belongs_to
-                               foreign_objects.find {|fo|
+                               foreign_objects.find { |fo|
                                  obj.send(reflection.foreign_key) == fo.send(reflection.association_primary_key)
                                }
                              end

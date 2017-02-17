@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm do
   before(:all) do
@@ -31,7 +31,7 @@ describe ActiveRecord::Turntable::Algorithm do
       end
 
       it "called with 10 returns {\"user_shard_1\" => 10}" do
-        expect(algorithm.calculate_used_shards_with_weight(10)).to eq({"user_shard_1" => 10})
+        expect(algorithm.calculate_used_shards_with_weight(10)).to eq({ "user_shard_1" => 10 })
       end
 
       it "called with 65000 returns 2 items" do
@@ -39,7 +39,7 @@ describe ActiveRecord::Turntable::Algorithm do
       end
 
       it "called with 65000 returns {\"user_shard_1\" => 39999, \"user_shard_2\" => 25001}" do
-        expect(algorithm.calculate_used_shards_with_weight(65000)).to eq({"user_shard_1" => 39999, "user_shard_2" => 25001})
+        expect(algorithm.calculate_used_shards_with_weight(65000)).to eq({ "user_shard_1" => 39999, "user_shard_2" => 25001 })
       end
     end
   end
@@ -70,7 +70,7 @@ describe ActiveRecord::Turntable::Algorithm do
       end
 
       it "called with 10 returns {\"user_shard_1\" => 10}" do
-        expect(algorithm.calculate_used_shards_with_weight(10)).to eq({"user_shard_1" => 10})
+        expect(algorithm.calculate_used_shards_with_weight(10)).to eq({ "user_shard_1" => 10 })
       end
 
       it "called with 65000 returns 2 items" do
@@ -78,7 +78,7 @@ describe ActiveRecord::Turntable::Algorithm do
       end
 
       it "called with 65000 returns {\"user_shard_1\" => 39999, \"user_shard_2\" => 25001}" do
-        expect(algorithm.calculate_used_shards_with_weight(65000)).to eq({"user_shard_1" => 39999, "user_shard_2" => 25001})
+        expect(algorithm.calculate_used_shards_with_weight(65000)).to eq({ "user_shard_1" => 39999, "user_shard_2" => 25001 })
       end
     end
   end

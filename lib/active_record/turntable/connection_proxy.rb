@@ -1,10 +1,10 @@
-require 'active_record/turntable/connection_proxy/mixable'
+require "active_record/turntable/connection_proxy/mixable"
 module ActiveRecord::Turntable
   class ConnectionProxy
     include Mixable
 
     # for expiring query cache
-    CLEAR_CACHE_METHODS = [:update, :insert, :delete, :exec_insert, :exec_update, :exec_delete, :insert_many]
+    CLEAR_CACHE_METHODS = [:update, :insert, :delete, :exec_insert, :exec_update, :exec_delete, :insert_many].freeze
 
     attr_reader :klass
     attr_writer :spec
@@ -22,9 +22,9 @@ module ActiveRecord::Turntable
     delegate :shards_transaction, to: :cluster
 
     delegate :create_table, :rename_table, :drop_table, :add_column, :remove_colomn,
-      :change_column, :change_column_default, :rename_column, :add_index,
-      :remove_index, :initialize_schema_information,
-      :dump_schema_information, :execute_ignore_duplicate, to: :master_connection
+             :change_column, :change_column_default, :rename_column, :add_index,
+             :remove_index, :initialize_schema_information,
+             :dump_schema_information, :execute_ignore_duplicate, to: :master_connection
 
     def transaction(options = {}, &block)
       connection.transaction(options, &block)
@@ -38,7 +38,7 @@ module ActiveRecord::Turntable
     end
 
     def enable_query_cache!
-      klass.turntable_connections.each do |k,v|
+      klass.turntable_connections.each do |_k, v|
         v.connection.enable_query_cache!
       end
     end
@@ -48,25 +48,29 @@ module ActiveRecord::Turntable
     end
 
     def clear_query_cache
-      klass.turntable_connections.each do |k,v|
+      klass.turntable_connections.each do |_k, v|
         v.connection.clear_query_cache
       end
     end
 
+    # rubocop:disable Style/MethodMissing
     def method_missing(method, *args, &block)
       clear_query_cache_if_needed(method)
       if shard_fixed?
         connection.send(method, *args, &block)
       elsif mixable?(method, *args)
         fader = @mixer.build_fader(method, *args, &block)
-        logger.debug { "[ActiveRecord::Turntable] Sending method: #{method}, " +
-          "sql: #{args.first}, " +
-          "shards: #{fader.shards_query_hash.keys.map(&:name)}" }
+        logger.debug {
+          "[ActiveRecord::Turntable] Sending method: #{method}, " \
+          "sql: #{args.first}, " \
+          "shards: #{fader.shards_query_hash.keys.map(&:name)}"
+        }
         fader.execute
       else
         connection.send(method, *args, &block)
       end
     end
+    # rubocop:enable Style/MethodMissing
 
     def respond_to_missing?(method, include_private = false)
       connection.send(:respond_to?, method, include_private)
@@ -76,9 +80,7 @@ module ActiveRecord::Turntable
       master.connection.to_sql(arel, binds)
     end
 
-    def cluster
-      @cluster
-    end
+    attr_reader :cluster
 
     def shards
       @cluster.shards
@@ -113,7 +115,7 @@ module ActiveRecord::Turntable
     end
 
     def current_shard=(shard)
-      logger.debug { "Changing #{klass}'s shard to #{shard.name}"}
+      logger.debug { "Changing #{klass}'s shard to #{shard.name}" }
       current_shard_entry[object_id] = shard
     end
 
@@ -136,7 +138,8 @@ module ActiveRecord::Turntable
     def with_shard(shard)
       shard = cluster.to_shard(shard)
 
-      old_shard, old_fixed = current_shard, fixed_shard
+      old_shard = current_shard
+      old_fixed = fixed_shard
       self.current_shard = shard
       self.fixed_shard = shard
       yield
@@ -197,7 +200,7 @@ module ActiveRecord::Turntable
     end
 
     delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
-               :spec, :connections, :size, :reaper, :table_exists?, to: :connection_pool
+             :spec, :connections, :size, :reaper, to: :connection_pool
 
     %w(columns columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
@@ -205,7 +208,7 @@ module ActiveRecord::Turntable
       end
     end
 
-    %w(table_exists?).each do |name|
+    %w(data_source_exists?).each do |name|
       define_method(name.to_sym) do |*args|
         master.connection_pool.with_connection do |c|
           c.schema_cache.send(name.to_sym, *args)
@@ -239,12 +242,12 @@ module ActiveRecord::Turntable
 
     private
 
-    def fixed_shard_entry
-      Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
-    end
+      def fixed_shard_entry
+        Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
+      end
 
-    def current_shard_entry
-      Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
-    end
+      def current_shard_entry
+        Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
+      end
   end
 end

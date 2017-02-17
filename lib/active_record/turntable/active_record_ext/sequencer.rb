@@ -1,23 +1,14 @@
 module ActiveRecord::Turntable::ActiveRecordExt
   module Sequencer
-    extend ActiveSupport::Concern
-
-    included do
-      include DatabaseStatements
-      alias_method_chain :prefetch_primary_key?, :turntable
-    end
-
-    module DatabaseStatements
-      def default_sequence_name(table_name, pk = nil)
-        if ActiveRecord::Turntable::Sequencer.has_sequencer?(table_name)
-          ActiveRecord::Turntable::Sequencer.sequence_name(table_name, pk)
-        else
-          super
-        end
+    def default_sequence_name(table_name, pk = nil)
+      if ActiveRecord::Turntable::Sequencer.has_sequencer?(table_name)
+        ActiveRecord::Turntable::Sequencer.sequence_name(table_name, pk)
+      else
+        super
       end
     end
 
-    def prefetch_primary_key_with_turntable?(table_name = nil)
+    def prefetch_primary_key?(table_name = nil)
       ActiveRecord::Turntable::Sequencer.has_sequencer?(table_name)
     end
 

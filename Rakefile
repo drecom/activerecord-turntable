@@ -1,25 +1,25 @@
 require "bundler/gem_tasks"
-require 'rubygems'
+require "rubygems"
 
-require 'rspec/core'
-require 'rspec/core/rake_task'
+require "rspec/core"
+require "rspec/core/rake_task"
 RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = FileList['spec/**/*_spec.rb']
+  spec.pattern = FileList["spec/**/*_spec.rb"]
 end
 
-require 'active_record'
+require "active_record"
 require "active_record/turntable/active_record_ext/database_tasks"
 
 namespace :turntable do
   namespace :db do
     task :rails_env do
       unless defined? RAILS_ENV
-        RAILS_ENV = ENV['RAILS_ENV'] ||= 'test'
+        RAILS_ENV = ENV["RAILS_ENV"] ||= "test"
       end
     end
 
     task :load_config => :rails_env do
-      yaml_file = File.join(File.dirname(__FILE__), 'spec/config/database.yml')
+      yaml_file = File.join(File.dirname(__FILE__), "spec/config/database.yml")
       ActiveRecord::Base.configurations = YAML.load ERB.new(IO.read(yaml_file)).result
     end
 
@@ -38,12 +38,12 @@ namespace :turntable do
     desc "migrate turntable test tables"
     task :migrate => :load_config do
       ActiveRecord::Base.establish_connection RAILS_ENV.to_sym
-      require 'active_record/turntable'
-      ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
-      ActiveRecord::ConnectionAdapters::SchemaStatements.send(:include, ActiveRecord::Turntable::Migration::SchemaStatementsExt)
+      require "active_record/turntable"
+      ActiveRecord::Base.include(ActiveRecord::Turntable)
+      ActiveRecord::ConnectionAdapters::SchemaStatements.include(ActiveRecord::Turntable::Migration::SchemaStatementsExt)
 
       configurations = [ActiveRecord::Base.configurations[RAILS_ENV]]
-      configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).map {|v| v[1]}.flatten.uniq
+      configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).map { |v| v[1] }.flatten.uniq
 
       configurations.each do |configuration|
         ActiveRecord::Base.establish_connection configuration
@@ -101,15 +101,15 @@ namespace :turntable do
 
         ActiveRecord::Base.connection.create_table :cards_users_histories do |t|
           t.belongs_to :cards_user,    :null => false
-          t.belongs_to :user,    :null => false
+          t.belongs_to :user, :null => false
           t.timestamps
         end
         ActiveRecord::Base.connection.create_sequence_for :cards_users_histories
 
         ActiveRecord::Base.connection.create_table :events_users_histories do |t|
-          t.belongs_to :events_user,    :null => false
+          t.belongs_to :events_user, :null => false
           t.belongs_to :cards_user,    :null => false
-          t.belongs_to :user,    :null => false
+          t.belongs_to :user, :null => false
           t.timestamps
         end
         ActiveRecord::Base.connection.create_sequence_for :events_users_histories
@@ -123,5 +123,45 @@ namespace :turntable do
 
     desc "reset turntable test databases"
     task :reset => ["turntable:db:drop", "turntable:db:create", "turntable:db:migrate"]
+  end
+
+  namespace :activerecord do
+    task(:env) do
+      ENV["ARCONFIG"] ||= File.expand_path("spec/config/activerecord_config.yml", __dir__)
+      ENV["ARVERSION"] ||= if ActiveRecord.gem_version.prerelease?
+                             "origin/master"
+                           else
+                             "v#{ActiveRecord.gem_version}"
+                           end
+    end
+
+    namespace :setup do
+      task :rails => :env do
+        system(*%w|git submodule update --init|)
+        system(*%w|git submodule foreach git fetch origin|)
+        Dir.chdir("tmp/rails") do
+          system(*%W|git checkout #{ENV['ARVERSION']}|)
+        end
+        FileUtils.cp_r("tmp/rails/activerecord/test", ".")
+        FileUtils.cp_r("tmp/rails/activerecord/Rakefile", "activerecord.rake")
+        File.open("test/cases/helper.rb", "a") do |f|
+          f << "require '#{File.expand_path("spec/activerecord_helper", __dir__)}'"
+        end
+      end
+
+      task :db => :rails do
+        system(*%w|bundle exec rake -f activerecord.rake db:mysql:rebuild|)
+      end
+    end
+
+    desc "setup activerecord test"
+    task :setup => ["setup:rails", "setup:db"]
+
+    desc "run unit tests on activerecord"
+    task :test => :env do
+      unless system(*%w|bundle exec rake -f activerecord.rake test:mysql2|)
+        exit(1)
+      end
+    end
   end
 end

@@ -1,19 +1,19 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe "transaction" do
+describe ActiveRecord::Turntable::ClusterHelperMethods do
   before(:all) do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
   end
   let(:clusters) { ActiveRecord::Base.turntable_clusters }
 
-  describe "all_cluster_transaction" do
+  describe ".all_cluster_transaction" do
     let(:all_clusters) { clusters.values }
-    let(:shards) { all_clusters.map { |c| c.shards.values }.flatten(1) }
+    let(:shards) { all_clusters.flat_map { |c| c.shards.values } }
 
     it "all shards should begin transaction" do
       User.all_cluster_transaction {
@@ -22,7 +22,7 @@ describe "transaction" do
     end
   end
 
-  describe "cluster_transaction" do
+  describe ".cluster_transaction" do
     let(:cluster) { clusters[:user_cluster] }
     let(:shards) { cluster.shards.values }
 

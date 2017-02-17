@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm do
   before(:all) do
@@ -27,9 +27,8 @@ describe ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm do
 
     context "#calculate with 10000000" do
       it "raises ActiveRecord::Turntable::CannotSpecifyShardError" do
-        expect { @alg.calculate(10000000) }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError)
+        expect { @alg.calculate(10_000_000) }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError)
       end
     end
   end
-
 end

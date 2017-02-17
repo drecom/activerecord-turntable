@@ -3,23 +3,14 @@
 #
 # ActiveRecord Sharding Plugin
 #
-require 'active_record/turntable/version'
-require 'active_record'
-require 'active_record/fixtures'
-require 'active_support/concern'
-require 'active_record/turntable/error'
-require 'active_record/turntable/util'
-require 'logger'
-require 'singleton'
-
-# for 4.0.x series
-module ActiveRecord
-  unless respond_to?(:gem_version)
-    class << self
-      alias_method :gem_version, :version
-    end
-  end
-end
+require "active_record/turntable/version"
+require "active_record"
+require "active_record/fixtures"
+require "active_support/concern"
+require "active_record/turntable/error"
+require "active_record/turntable/util"
+require "logger"
+require "singleton"
 
 module ActiveRecord::Turntable
   extend ActiveSupport::Concern
@@ -37,12 +28,12 @@ module ActiveRecord::Turntable
     autoload :Migration
     autoload :Mixer
     autoload :PoolProxy
+    autoload :QueryCache
     autoload :Shard
     autoload :ShardingCondition
     autoload :SeqShard
     autoload :Sequencer
   end
-  autoload :Rack
   autoload :Helpers
 
   included do
@@ -54,17 +45,23 @@ module ActiveRecord::Turntable
     DEFAULT_PATH = File.dirname(File.dirname(__FILE__))
 
     def turntable_config_file
-      @@turntable_config_file ||=
-        File.join(defined?(::Rails) ?
-                   ::Rails.root.to_s : DEFAULT_PATH, 'config/turntable.yml')
+      @turntable_config_file ||= File.join(turntable_app_root_path, "config/turntable.yml")
     end
 
     def turntable_config_file=(filename)
-      @@turntable_config_file = filename
+      @turntable_config_file = filename
+    end
+
+    def turntable_app_root_path
+      defined?(::Rails.root) ? ::Rails.root.to_s : DEFAULT_PATH
     end
 
     def turntable_config
       ActiveRecord::Turntable::Config.instance
+    end
+
+    def turntable_connection_classes
+      ActiveRecord::Turntable::Shard.connection_classes
     end
   end
 

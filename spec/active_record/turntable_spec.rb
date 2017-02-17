@@ -1,22 +1,22 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable do
   before(:all) do
-    ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
+    ActiveRecord::Base.include(ActiveRecord::Turntable)
   end
 
   context "#config_file" do
-    it "should return Rails.root/config/turntable.yml default" do
-      unless defined?(::Rails); class ::Rails; end; end
+    it "returns Rails.root/config/turntable.yml default" do
+      stub_const("Rails", Class.new)
       allow(Rails).to receive(:root) { "/path/to/rails_root" }
       ActiveRecord::Base.turntable_config_file = nil
       expect(ActiveRecord::Base.turntable_config_file).to eq("/path/to/rails_root/config/turntable.yml")
     end
   end
 
-  context "#config_file=" do
-    it "should set config_file" do
-      ActiveRecord::Base.send(:include, ActiveRecord::Turntable)
+  context "#turntable_config_file=" do
+    it "set `#turntable_config_file`" do
+      ActiveRecord::Base.include(ActiveRecord::Turntable)
       filename = "hogefuga"
       ActiveRecord::Base.turntable_config_file = filename
       expect(ActiveRecord::Base.turntable_config_file).to eq(filename)

@@ -6,7 +6,7 @@ module ActiveRecord::Turntable
       include ShardingCondition
 
       def self.prepended(mod)
-        ActiveRecord::Associations::Builder::Association.valid_options << :foreign_shard_key
+        ActiveRecord::Associations::Builder::Association::VALID_OPTIONS << :foreign_shard_key
       end
 
       protected
@@ -16,9 +16,9 @@ module ActiveRecord::Turntable
           return super unless should_use_shard_key?
 
           scope = klass.where(
-                    klass.turntable_shard_key =>
-                      owner.send(foreign_shard_key)
-                  )
+            klass.turntable_shard_key =>
+              owner.send(foreign_shard_key)
+          )
           super.merge!(scope)
         end
 

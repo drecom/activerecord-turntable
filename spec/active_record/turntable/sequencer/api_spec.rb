@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Api do
   before(:all) do
@@ -10,7 +10,7 @@ describe ActiveRecord::Turntable::Sequencer::Api do
   let(:klass) { Class.new }
   let(:api_host) { "example.example" }
   let(:api_port) { 80 }
-  let(:options) { { "api_host" => api_host, "api_port" => api_port } }
+  let(:options) { { api_host: api_host, api_port: api_port }.with_indifferent_access }
   let(:api_response) { 1024 }
 
   let(:next_sequence_uri) { "http://#{api_host}/sequences/#{sequence_name}/new" }
@@ -18,7 +18,7 @@ describe ActiveRecord::Turntable::Sequencer::Api do
 
   describe "#next_sequence_value" do
     before do
-      stub_request(:get, next_sequence_uri).to_return(:body => api_response.to_s)
+      stub_request(:get, next_sequence_uri).to_return(body: api_response.to_s)
     end
 
     subject { sequencer.next_sequence_value(sequence_name) }
@@ -28,7 +28,7 @@ describe ActiveRecord::Turntable::Sequencer::Api do
 
   describe "#current_sequence_value" do
     before do
-      stub_request(:get, current_sequence_uri).to_return(:body => api_response.to_s)
+      stub_request(:get, current_sequence_uri).to_return(body: api_response.to_s)
     end
 
     subject { sequencer.current_sequence_value(sequence_name) }

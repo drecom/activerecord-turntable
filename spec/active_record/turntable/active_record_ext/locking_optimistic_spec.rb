@@ -1,16 +1,13 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
   before(:all) do
     reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
   end
 
-  before(:each) do
+  before do
     establish_connection_to(:test)
     truncate_shard
-  end
-
-  before(:each) do
     ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_update] = true
   end
 

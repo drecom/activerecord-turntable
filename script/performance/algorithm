@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
-require 'rspec'
-require File.join(File.dirname(__FILE__), '../../../spec/spec_helper')
-require 'benchmark'
+require "rspec"
+require File.join(File.dirname(__FILE__), "../../spec/spec_helper")
+require "benchmark"
 
 def setup_algorithm(n, alg = "Range")
   config = {
     "shards" => n.times.map do |i|
-      {"connection" => "connection_#{i}", "less_than" => (i+1) * 100}
-    end
-  }
+      { connection: "connection_#{i}", less_than: (i + 1) * 100 }
+    end,
+  }.with_indifferent_access
   "ActiveRecord::Turntable::Algorithm::#{alg}Algorithm".constantize.new(config)
 end
 
@@ -18,15 +18,14 @@ Benchmark.bm(40) do |x|
       algorithm = setup_algorithm(n, alg)
       x.report("#{alg}: selrand(#{n}) * 1000") {
         1000.times do
-          algorithm.calculate(rand(n*100))
+          algorithm.calculate(rand(n * 100))
         end
       }
       x.report("#{alg}: sellast(#{n}) * 1000") {
         1000.times do
-          algorithm.calculate(n*100-1)
+          algorithm.calculate(n * 100 - 1)
         end
       }
     end
   end
 end
-

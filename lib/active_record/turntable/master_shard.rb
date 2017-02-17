@@ -1,21 +1,27 @@
 module ActiveRecord::Turntable
   class MasterShard < Shard
     def initialize(klass)
-      (klass and klass.connection_pool) or
+      (klass and original_connection_pool(klass)) or
         raise MasterShardNotConnected, "connection_pool is nil"
       @klass = klass
-      @name  = 'master'
+      @name  = "master"
     end
 
     def connection_pool
       if ActiveRecord::Base == @klass
         ActiveRecord::Base.connection_pool
       else
-        # use parentclass connection which is turntable disabled
-        klass = @klass.superclass
+        # use original parent class connection which is turntable disabled
+        original_connection_pool
+      end
+    end
+
+    private
+
+      def original_connection_pool(klass = @klass)
         candidate_connection_pool = nil
-        while !candidate_connection_pool
-          if klass == ActiveRecord::Base or !klass.turntable_enabled?
+        until candidate_connection_pool
+          if klass == ActiveRecord::Base || !klass.turntable_enabled?
             candidate_connection_pool = klass.connection_pool
           else
             klass = klass.superclass
@@ -23,6 +29,5 @@ module ActiveRecord::Turntable
         end
         candidate_connection_pool
       end
-    end
   end
 end
