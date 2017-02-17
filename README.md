@@ -13,8 +13,8 @@ activerecord(>=5.0.0, <6.0)
 
 If you are using with older activerecord versions, use following versions.
 
-* activerecord 3.x - use activerecord-turntable version 1.x.
-* activerecord 4.x - use activerecord-turntable version 2.x.
+* activerecord 4.x - use activerecord-turntable version 2.x.([stable-2-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-2-x))
+* activerecord 3.x - use activerecord-turntable version 1.x.([stable-1-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-1-x))
 
 ## Supported Database
 
