@@ -70,6 +70,7 @@ Performance/TimesMap:
     - 'script/performance/algorithm'
     - 'spec/active_record/turntable/active_record_ext/association_preloader_spec.rb'
     - 'spec/active_record/turntable/active_record_ext/association_spec.rb'
+    - 'spec/active_record/turntable/cluster_helper_methods_spec.rb'
 
 # Offense count: 1
 # Configuration parameters: CustomIncludeMethods.
