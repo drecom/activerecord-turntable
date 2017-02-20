@@ -40,4 +40,60 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
       }
     end
   end
+
+  describe ".weighted_random_shard_with" do
+    let(:cluster) { clusters[:user_cluster] }
+    let(:shards) { cluster.shards.values }
+
+    context "When checking `shard_fixed?` from given block" do
+      subject { User.weighted_random_shard_with(&block) }
+      let(:block) { -> { User.connection.shard_fixed? } }
+      it { is_expected.to be true }
+    end
+
+    # OPTIMIZE: slow spec that iterates 1000 times to check probablities
+    context "When checking current target shard from given block" do
+      subject do
+        result_array = Array.new(shard_size, 0)
+
+        try_count.times do
+          shard = User.weighted_random_shard_with { User.connection.current_shard }
+          result_array[shards.index(shard)] += 1
+        end
+
+        result_array.map { |v| v / try_count.to_f }
+      end
+
+      let(:try_count) { 1000 }
+      let(:weighted_shards) do
+        Hash[shards.map.with_index do |shard, idx|
+          [shard, shard_users_counts[idx]]
+        end]
+      end
+      let(:shard_size) { 3 }
+      let(:shard_users_counts) do
+        shard_size.times.map { |idx| users_in_each_shard[idx] }
+      end
+      let(:all_users_count) { shard_users_counts.sum }
+
+      where(:users_in_each_shard, :probabilities_in_each_shard) do
+        [
+          [[10, 10, 10], [0.333, 0.333, 0.333]],
+          [[1,  8,  1], [0.1, 0.8, 0.1]],
+          [[10, 0,  10], [0.5, 0, 0.5]],
+        ]
+      end
+
+      with_them do
+        it do
+          allow(cluster).to receive(:weighted_shards).and_return(weighted_shards)
+          result = subject
+          probabilities_matcher = shard_size.times.map do |idx|
+            be_within(0.05).of(probabilities_in_each_shard[idx])
+          end
+          expect(result).to match_array(probabilities_matcher)
+        end
+      end
+    end
+  end
 end
