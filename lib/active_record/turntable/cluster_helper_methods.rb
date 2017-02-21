@@ -49,6 +49,7 @@ module ActiveRecord::Turntable
         shard, _weight = shards_weight.find { |_k, v|
           (idx -= v) < 0
         }
+        shard ||= shards_weight.keys.first
         self.connection.with_recursive_shards(shard.name, *klasses, &block)
       end
 

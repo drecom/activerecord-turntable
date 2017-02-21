@@ -12,3 +12,6 @@ AllCops:
     - "test/**/*"
     - "tmp/**/*"
     - "activerecord.rake"
+
+RSpec/NestedGroups:
+  Max: 4

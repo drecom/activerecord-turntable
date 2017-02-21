@@ -48,7 +48,20 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
     context "When checking `shard_fixed?` from given block" do
       subject { User.weighted_random_shard_with(&block) }
       let(:block) { -> { User.connection.shard_fixed? } }
-      it { is_expected.to be true }
+
+      context "When users table has no record" do
+        it {
+          allow(User).to receive(:current_sequence).and_return(0)
+          is_expected.to be true
+        }
+      end
+
+      context "When users table has any records" do
+        it {
+          allow(User).to receive(:current_sequence).and_return(1)
+          is_expected.to be true
+        }
+      end
     end
 
     # OPTIMIZE: slow spec that iterates 1000 times to check probablities
