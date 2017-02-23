@@ -20,6 +20,14 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
         expect(shards.map(&:connection).map(&:open_transactions)).to all(be == 1)
       }
     end
+
+    it "`requires_new` option should be passed to original transaction method" do
+      User.all_cluster_transaction {
+        User.all_cluster_transaction(requires_new: true) {
+          expect(shards.map(&:connection).map(&:open_transactions)).to all(be > 1)
+        }
+      }
+    end
   end
 
   describe ".cluster_transaction" do

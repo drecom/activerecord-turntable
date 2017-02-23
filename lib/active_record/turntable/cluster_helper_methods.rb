@@ -54,12 +54,12 @@ module ActiveRecord::Turntable
 
       def all_cluster_transaction(options = {})
         clusters = turntable_clusters.values
-        recursive_cluster_transaction(clusters) { yield }
+        recursive_cluster_transaction(clusters, options) { yield }
       end
 
       def recursive_cluster_transaction(clusters, options = {}, &block)
         current_cluster = clusters.shift
-        current_cluster.shards_transaction do
+        current_cluster.shards_transaction([], options) do
           if clusters.present?
             recursive_cluster_transaction(clusters, options, &block)
           else
