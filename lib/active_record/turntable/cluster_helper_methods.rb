@@ -46,9 +46,10 @@ module ActiveRecord::Turntable
         shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence)
         sum = shards_weight.values.inject(&:+)
         idx = rand(sum)
-        shard = shards_weight.find { |_k, v|
+        shard, _weight = shards_weight.find { |_k, v|
           (idx -= v) < 0
         }
+        shard ||= shards_weight.keys.first
         self.connection.with_recursive_shards(shard.name, *klasses, &block)
       end
 
