@@ -53,7 +53,7 @@ module ActiveRecord::Turntable
                          else
                            klass_or_name.turntable_cluster_name.to_s
                          end
-          ActiveRecord::Base.turntable_config[:clusters][cluster_name]
+          ActiveRecord::Base.turntable_configuration[:clusters][cluster_name]
         end
     end
 

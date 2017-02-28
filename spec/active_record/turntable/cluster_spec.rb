@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Cluster do
-  let(:cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:user_cluster] }
+  let(:cluster_config) { ActiveRecord::Base.turntable_configuration[:clusters][:user_cluster] }
   let(:cluster) { ActiveRecord::Turntable::Cluster.new(cluster_config) }
-  let(:mysql_mod_cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:mysql_mod_cluster] }
+  let(:mysql_mod_cluster_config) { ActiveRecord::Base.turntable_configuration[:clusters][:mysql_mod_cluster] }
   let(:mysql_mod_cluster) { ActiveRecord::Turntable::Cluster.new(mysql_mod_cluster_config) }
   let(:in_range_shard_key_value) { cluster_config[:shards].last[:less_than] - 1 }
   let(:out_of_range_shard_key_value) { cluster_config[:shards].last[:less_than] }

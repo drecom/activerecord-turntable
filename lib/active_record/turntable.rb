@@ -26,6 +26,7 @@ module ActiveRecord::Turntable
     autoload :ConfigurationMethods
     autoload :ConnectionProxy
     autoload :Compatibility
+    autoload :Deprecation
     autoload :MasterShard
     autoload :Migration
     autoload :Mixer

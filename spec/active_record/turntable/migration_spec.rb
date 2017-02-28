@@ -10,7 +10,7 @@ describe ActiveRecord::Turntable::Migration do
           clusters :user_cluster
         }
       }
-      let(:cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:user_cluster] }
+      let(:cluster_config) { ActiveRecord::Base.turntable_configuration[:clusters][:user_cluster] }
       let(:user_cluster_shards) { cluster_config[:shards].map { |s| s[:connection] } }
 
       it { is_expected.to eq(user_cluster_shards) }

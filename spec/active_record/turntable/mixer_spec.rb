@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe ActiveRecord::Turntable::Mixer do
   before do
-    @cluster = ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
+    @cluster = ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_configuration[:clusters][:user_cluster])
     @connection_proxy = ActiveRecord::Turntable::ConnectionProxy.new(User, @cluster)
     @mixer = ActiveRecord::Turntable::Mixer.new(@connection_proxy)
   end

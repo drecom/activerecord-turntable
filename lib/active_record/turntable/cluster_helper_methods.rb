@@ -3,7 +3,7 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      ActiveSupport.on_load(:turntable_config_loaded) do
+      ActiveSupport.on_load(:turntable_configuration_loaded) do
         turntable_clusters.each do |name, _cluster|
           turntable_define_cluster_methods(name)
         end

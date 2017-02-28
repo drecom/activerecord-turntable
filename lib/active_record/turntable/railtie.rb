@@ -13,9 +13,14 @@ module ActiveRecord::Turntable
     end
 
     # initialize
-    initializer "turntable.initialize_clusters" do
+    initializer "turntable.initialize_clusters" do |app|
+      app.paths.add "config/turntable", with: "config/turntable.yml"
+
       ActiveSupport.on_load(:active_record) do
-        if File.exist?(ActiveRecord::Base.turntable_config_file)
+        path = app.paths["config/turntable"].existent.first
+        self.turntable_configuration_file = path
+
+        if File.exist?(ActiveRecord::Base.turntable_configuration_file)
           ActiveRecord::Turntable::Config.load!
         else
           warn("[activerecord-turntable] config/turntable.yml is not found. skipped initliazing cluster.")

@@ -16,9 +16,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
 
   context "With has_many association" do
     around do |example|
-      ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
+      ActiveRecord::Base.turntable_configuration.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
       example.run
-      ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = false
+      ActiveRecord::Base.turntable_configuration.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = false
     end
 
     let(:user_item) { UserItem.where(user: @user).first }

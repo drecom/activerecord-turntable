@@ -16,7 +16,7 @@ module ActiveRecord::Turntable
         delegate :shards_transaction, :with_all, to: :connection
       end
 
-      ActiveSupport.on_load(:turntable_config_loaded) do
+      ActiveSupport.on_load(:turntable_configuration_loaded) do
         self.initialize_clusters!
       end
       include ClusterHelperMethods
@@ -35,7 +35,7 @@ module ActiveRecord::Turntable
         self.turntable_shard_key = shard_key_name
         self.turntable_cluster =
           self.turntable_clusters[cluster_name] ||= Cluster.new(
-            turntable_config[:clusters][cluster_name],
+            turntable_configuration[:clusters][cluster_name],
             options
           )
         turntable_replace_connection_pool
@@ -51,7 +51,7 @@ module ActiveRecord::Turntable
       end
 
       def initialize_clusters!
-        turntable_config[:clusters].each do |name, spec|
+        turntable_configuration[:clusters].each do |name, spec|
           self.turntable_clusters[name] ||= Cluster.new(spec)
         end
       end
