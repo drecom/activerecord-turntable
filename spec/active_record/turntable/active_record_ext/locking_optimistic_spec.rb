@@ -11,7 +11,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
     ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_update] = true
   end
 
-  after(:each) do
+  after do
     ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_update] = false
   end
 
@@ -29,10 +29,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
 
   describe "Json serialized column is saved" do
     before do
-      user_status.update_attributes(data: {foo: 'bar'})
+      user_status.update_attributes(data: { foo: "bar" })
       user_status.reload
     end
     subject { user_status.data }
-    it { expect { subject }.to_not raise_error }
+    it { expect { subject }.not_to raise_error }
   end
 end

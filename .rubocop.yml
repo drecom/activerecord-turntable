@@ -15,3 +15,11 @@ AllCops:
 
 RSpec/NestedGroups:
   Max: 4
+
+Style/ExtraSpacing:
+  Exclude:
+    - "activerecord-turntable.gemspec"
+
+Style/SpaceAroundOperators:
+  Exclude:
+    - "activerecord-turntable.gemspec"
