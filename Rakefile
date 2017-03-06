@@ -110,6 +110,7 @@ namespace :turntable do
           t.belongs_to :events_user, :null => false
           t.belongs_to :cards_user,    :null => false
           t.belongs_to :user, :null => false
+          t.string :type, :default => nil
           t.timestamps
         end
         ActiveRecord::Base.connection.create_sequence_for :events_users_histories
