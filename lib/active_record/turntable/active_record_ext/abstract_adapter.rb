@@ -36,7 +36,7 @@ module ActiveRecord::Turntable
       end
 
       def turntable_shard_name
-        @turntable_shard_name ||= ""
+        instance_variable_defined?(:@turntable_shard_name) ? @turntable_shard_name : nil
       end
     end
   end
