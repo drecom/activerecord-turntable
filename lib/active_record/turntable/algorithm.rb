@@ -7,6 +7,7 @@ module ActiveRecord::Turntable
       autoload :RangeAlgorithm
       autoload :RangeBsearchAlgorithm
       autoload :ModuloAlgorithm
+      autoload :HashSlotAlgorithm
     end
 
     def class_for(name_or_class)

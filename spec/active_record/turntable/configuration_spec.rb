@@ -15,7 +15,7 @@ describe ActiveRecord::Turntable::Configuration do
       let(:yaml_path) { File.expand_path("../../config/turntable.yml", __dir__) }
 
       it { expect { subject }.not_to raise_error }
-      its(:clusters) { is_expected.to have(4).items }
+      its(:clusters) { is_expected.to have(5).items }
       its(:sequencers) { is_expected.to have(1).item }
     end
 
@@ -25,7 +25,7 @@ describe ActiveRecord::Turntable::Configuration do
       let(:config_path) { File.expand_path("../../config/turntable.rb", __dir__) }
 
       it { expect { subject }.not_to raise_error }
-      its(:clusters) { is_expected.to have(4).items }
+      its(:clusters) { is_expected.to have(5).items }
       its(:sequencers) { is_expected.to have(1).item }
     end
   end

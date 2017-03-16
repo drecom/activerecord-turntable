@@ -55,5 +55,20 @@ test:
         - connection: user_shard_1
         - connection: user_shard_2
         - connection: user_shard_3
+    hash_slot_cluster:
+      algorithm: hash_slot
+      seq:
+        user_seq:
+          seq_type: mysql
+          connection: user_seq
+      shards:
+        - connection: user_shard_1
+          less_than: 4096
+        - connection: user_shard_2
+          less_than: 8192
+        - connection: user_shard_3
+          less_than: 12288
+        - connection: user_shard_4
+          less_than: 16384
   raise_on_not_specified_shard_query: false
   raise_on_not_specified_shard_update: false
