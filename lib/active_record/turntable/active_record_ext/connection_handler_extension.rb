@@ -11,7 +11,9 @@ module ActiveRecord::Turntable
               # A connection was established in an ancestor process that must have
               # subsequently forked. We can't reuse the connection, but we can copy
               # the specification and establish a new connection with it.
-              establish_connection(ancestor_pool.spec).tap do |pool|
+              spec = ancestor_pool.spec
+              spec = spec.to_hash if spec.respond_to?(:to_hash)
+              establish_connection(spec).tap do |pool|
                 pool.schema_cache = ancestor_pool.schema_cache if ancestor_pool.schema_cache
               end
             else
