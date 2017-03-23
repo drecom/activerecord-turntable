@@ -43,7 +43,7 @@ module ActiveRecord::Turntable
               changes[column] = write_attribute(column, time)
             end
 
-            clear_attribute_changes(changes.keys)
+            clear_attribute_changes(changes.keys) unless Util.ar51_or_later?
             primary_key = self.class.primary_key
             scope = if turntable_enabled? && primary_key != self.class.turntable_shard_key.to_s
                       self.class.unscoped.where(self.class.turntable_shard_key => _read_attribute(turntable_shard_key))
@@ -58,12 +58,14 @@ module ActiveRecord::Turntable
               changes[locking_column] = increment_lock
             end
 
+            clear_attribute_changes(changes.keys) if Util.ar51_or_later?
             result = scope.update_all(changes) == 1
 
             if !result && locking_enabled?
               raise ActiveRecord::StaleObjectError.new(self, "touch")
             end
 
+            @_trigger_update_callback = result
             result
           else
             true
@@ -113,13 +115,17 @@ module ActiveRecord::Turntable
             klass = self.class
             attributes_values = arel_attributes_with_values_for_update(attribute_names)
             if attributes_values.empty?
-              0
+              rows_affected = 0
+              @_trigger_update_callback = true
             else
               scope = if klass.turntable_enabled? && (klass.primary_key != klass.turntable_shard_key.to_s)
                         klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
                       end
-              klass.unscoped._update_record attributes_values, id, id_was, scope
+              previous_id = Util.ar51_or_later? ? id_in_database : id_was
+              rows_affected = klass.unscoped._update_record attributes_values, id, previous_id, scope
+              @_trigger_update_callback = rows_affected > 0
             end
+            rows_affected
           end
       end
     end
