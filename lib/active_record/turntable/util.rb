@@ -9,7 +9,7 @@ module ActiveRecord::Turntable
     end
 
     def ar_version
-      ActiveRecord.gem_version
+      ActiveRecord.gem_version.release
     end
 
     module_function :ar_version_equals_or_later?,
