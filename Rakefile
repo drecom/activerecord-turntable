@@ -129,7 +129,8 @@ namespace :turntable do
   namespace :activerecord do
     task(:env) do
       ENV["ARCONFIG"] ||= File.expand_path("spec/config/activerecord_config.yml", __dir__)
-      ENV["ARVERSION"] ||= if ActiveRecord.gem_version.prerelease?
+      ENV["ARVERSION"] ||= if ActiveRecord.gem_version.prerelease? &&
+                              !ActiveRecord.gem_version.segments.include?("rc")
                              "origin/master"
                            else
                              "v#{ActiveRecord.gem_version}"
