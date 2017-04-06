@@ -34,8 +34,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   end
 
   context "With has_many association" do
-    before do
+    around do |example|
       ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
+      example.run
+      ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = false
     end
     let(:cards_user) { CardsUser.where(user: user).first }
     let(:cards_users_history) { cards_users_histories.find { |history| history.user_id == user.id } }
