@@ -4,7 +4,7 @@ require "logger"
 describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   around do |example|
     old = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
+    ActiveRecord::Base.logger = Logger.new("/dev/null")
     example.run
     ActiveRecord::Base.logger = old
   end
