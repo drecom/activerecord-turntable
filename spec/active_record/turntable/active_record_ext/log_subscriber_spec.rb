@@ -1,14 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
-  before do
-    establish_connection_to
-  end
-
   class TestLogSubscriber < ActiveRecord::LogSubscriber
     attr_reader :debugs
 

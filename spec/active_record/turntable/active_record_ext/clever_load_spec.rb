@@ -2,14 +2,7 @@ require "spec_helper"
 require "logger"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
   before do
-    establish_connection_to(:test)
-    truncate_shard
-
     @user1 = User.new({ nickname: "user1" })
     @user1.id = 1
     @user1.save

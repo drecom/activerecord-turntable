@@ -1,13 +1,7 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Mixer do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
-  end
-
   before do
-    establish_connection_to(:test)
-    truncate_shard
     @cluster = ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
     @connection_proxy = ActiveRecord::Turntable::ConnectionProxy.new(User, @cluster)
   end

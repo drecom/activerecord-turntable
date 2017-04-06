@@ -1,15 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Association do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
-  before do
-    establish_connection_to(:test)
-    truncate_shard
-  end
-
   let!(:user) do
     user = User.new({ nickname: "user1" })
     user.id = 1

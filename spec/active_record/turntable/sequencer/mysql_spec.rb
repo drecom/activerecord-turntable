@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Mysql do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
   let(:sequencer) { ActiveRecord::Turntable::Sequencer::Mysql.new(klass, options) }
   let(:sequence_name) { "users_id_seq" }
   let(:options) { {} }

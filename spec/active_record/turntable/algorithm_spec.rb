@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
-  end
-
   describe ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm do
     let(:algorithm) { ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
     context "#calculate" do
