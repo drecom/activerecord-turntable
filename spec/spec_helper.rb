@@ -18,6 +18,8 @@ require "rspec/rails"
 require "webmock/rspec"
 require "timecop"
 require "pry-byebug"
+require "factory_girl"
+require "faker"
 
 require "coveralls"
 Coveralls.wear!
@@ -40,6 +42,11 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     reload_turntable!(File.join(File.dirname(__FILE__), "config/turntable.yml"), :test)
+  end
+
+  config.include FactoryGirl::Syntax::Methods
+  config.before(:suite) do
+    FactoryGirl.find_definitions
   end
 
   config.before(:each) do
