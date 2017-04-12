@@ -1,17 +1,11 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::ClusterHelperMethods do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
-  end
-
-  before do
-    establish_connection_to(:test)
-    truncate_shard
-  end
   let(:clusters) { ActiveRecord::Base.turntable_clusters }
 
   describe ".all_cluster_transaction" do
+    self.use_transactional_tests = false
+
     let(:all_clusters) { clusters.values }
     let(:shards) { all_clusters.flat_map { |c| c.shards.values } }
 
@@ -31,6 +25,8 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
   end
 
   describe ".cluster_transaction" do
+    self.use_transactional_tests = false
+
     let(:cluster) { clusters[:user_cluster] }
     let(:shards) { cluster.shards.values }
 

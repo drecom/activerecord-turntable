@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm::ModuloAlgorithm do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
   context "When initialized" do
     before do
       @alg = ActiveRecord::Turntable::Algorithm::ModuloAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:mod_cluster])

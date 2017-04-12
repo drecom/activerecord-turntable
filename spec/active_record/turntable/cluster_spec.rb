@@ -1,14 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Cluster do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
-  end
-
-  before do
-    establish_connection_to(:test)
-    truncate_shard
-  end
   let(:cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:user_cluster] }
   let(:cluster) { ActiveRecord::Turntable::Cluster.new(cluster_config) }
   let(:mysql_mod_cluster_config) { ActiveRecord::Base.turntable_config[:clusters][:mysql_mod_cluster] }

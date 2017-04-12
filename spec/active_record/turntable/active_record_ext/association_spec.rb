@@ -1,15 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Association do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
-  before do
-    establish_connection_to(:test)
-    truncate_shard
-  end
-
   let!(:user) do
     user = User.new({ nickname: "user1" })
     user.id = 1
@@ -43,8 +34,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
   end
 
   context "With has_many association" do
-    before do
+    around do |example|
       ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
+      example.run
+      ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = false
     end
     let(:cards_user) { CardsUser.where(user: user).first }
     let(:cards_users_history) { cards_users_histories.find { |history| history.user_id == user.id } }

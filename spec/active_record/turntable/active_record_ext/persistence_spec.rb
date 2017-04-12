@@ -2,18 +2,9 @@ require "spec_helper"
 require "logger"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
-  before do
-    establish_connection_to(:test)
-    truncate_shard
-  end
-
   around do |example|
     old = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
+    ActiveRecord::Base.logger = Logger.new("/dev/null")
     example.run
     ActiveRecord::Base.logger = old
   end
@@ -25,18 +16,22 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     u.save
     u
   }
+
   let(:user_status) {
     stat = user.create_user_status(hp: 10, mp: 10)
     stat.updated_at = Time.current - 1.day
     stat.save
     stat
   }
+
   let(:card) {
     Card.create!(name: "foobar")
   }
+
   let(:cards_user) {
     user.cards_users.create(card: card)
   }
+
   context "When creating record" do
     context "with blob column" do
       subject { user }
@@ -85,7 +80,6 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
       class ::User
         after_destroy :on_destroy
         after_save    :on_update
-
         def on_destroy
         end
 

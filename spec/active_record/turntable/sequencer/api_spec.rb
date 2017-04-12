@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Api do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
   let(:sequencer) { ActiveRecord::Turntable::Sequencer::Api.new(klass, options) }
   let(:sequence_name) { "hogefuga" }
   let(:klass) { Class.new }

@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Base do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../config/turntable.yml"))
-  end
-
   context "When installed to ActiveRecord::Base" do
     it "ActiveRecord::Base respond_to 'turntable'" do
       expect(ActiveRecord::Base).to respond_to(:turntable)
@@ -12,10 +8,6 @@ describe ActiveRecord::Turntable::Base do
   end
 
   context "When enable turntable on STI models" do
-    before do
-      establish_connection_to(:test)
-    end
-
     subject { klass.new }
 
     context "With a STI parent class" do

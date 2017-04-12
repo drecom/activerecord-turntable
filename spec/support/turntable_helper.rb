@@ -1,27 +1,13 @@
 require "active_record"
 
 module TurntableHelper
-  def reload_turntable!(config_file_name = nil)
+  def reload_turntable!(config_file_name = nil, env = :test)
     ActiveRecord::Base.include(ActiveRecord::Turntable)
+    ActiveRecord::SchemaDumper.prepend(ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper)
     ActiveRecord::Base.turntable_config_file = config_file_name
     ActiveRecord::Turntable::Config.load!(ActiveRecord::Base.turntable_config_file, :test)
-  end
-
-  def establish_connection_to(env = :test)
-    silence_warnings {
-      Object.const_set("RAILS_ENV", env.to_s)
-      Object.const_set("Rails", Object.new)
-      allow(Rails).to receive(:env) { ActiveSupport::StringInquirer.new(RAILS_ENV) }
-      ActiveRecord::Base.logger = Logger.new("/dev/null")
-    }
+    ActiveRecord::Base.logger = Logger.new("/dev/null")
     ActiveRecord::Base.establish_connection(env)
-  end
-
-  def truncate_shard
-    ActiveRecord::Base.descendants.each do |klass|
-      next if klass.abstract_class? || klass == ActiveRecord::SchemaMigration
-      klass.delete_all
-    end
   end
 
   def migrate(version)

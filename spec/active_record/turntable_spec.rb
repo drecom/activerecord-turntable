@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable do
-  before(:all) do
-    ActiveRecord::Base.include(ActiveRecord::Turntable)
-  end
-
   context "#config_file" do
     it "returns Rails.root/config/turntable.yml default" do
       stub_const("Rails", Class.new)

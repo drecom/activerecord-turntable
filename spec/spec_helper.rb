@@ -2,15 +2,22 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "rubygems"
 require "bundler/setup"
+
+require "rails"
+require "action_view"
+require "action_dispatch"
+require "action_controller"
+
+require "activerecord-turntable"
+require "active_record/turntable/active_record_ext/fixtures"
+
 require "rspec/its"
 require "rspec/collection_matchers"
 require "rspec/parameterized"
+require "rspec/rails"
 require "webmock/rspec"
-require "pry"
 require "timecop"
 require "pry-byebug"
-
-require "activerecord-turntable"
 
 require "coveralls"
 Coveralls.wear!
@@ -29,6 +36,11 @@ RSpec.configure do |config|
 
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
+  config.use_transactional_fixtures = true
+
+  config.before(:suite) do
+    reload_turntable!(File.join(File.dirname(__FILE__), "config/turntable.yml"), :test)
+  end
 
   config.before(:each) do
     Dir[File.join(File.dirname(File.dirname(__FILE__)), "spec/models/*.rb")].each { |f| require f }

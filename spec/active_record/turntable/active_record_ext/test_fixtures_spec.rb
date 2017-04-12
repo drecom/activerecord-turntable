@@ -4,13 +4,7 @@ require "active_record"
 require "active_record/turntable/active_record_ext/fixtures"
 
 describe ActiveRecord::TestFixtures do
-  before(:all) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "../../../config/turntable.yml"))
-  end
-
   before do
-    establish_connection_to(:test)
-    truncate_shard
     test_fixture_class.fixture_path = fixtures_root
   end
 
