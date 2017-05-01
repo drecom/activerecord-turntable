@@ -28,7 +28,7 @@ module ActiveRecord::Turntable
     autoload :ConnectionProxy
     autoload :Compatibility
     autoload :Deprecation
-    autoload :MasterShard
+    autoload :DefaultShard
     autoload :Migration
     autoload :Mixer
     autoload :PoolProxy

@@ -12,8 +12,8 @@ module ActiveRecord::Turntable
 
     def initialize(klass, options = {})
       @klass = klass
-      @master_shard = MasterShard.new(klass)
-      @default_current_shard = @master_shard
+      @default_shard = DefaultShard.new(klass)
+      @default_current_shard = @default_shard
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
     end
 
@@ -25,7 +25,7 @@ module ActiveRecord::Turntable
              :change_column, :change_column_default, :rename_column, :add_index,
              :remove_index, :initialize_schema_information,
              :dump_schema_information, :execute_ignore_duplicate,
-             :query_cache_enabled, to: :master_connection
+             :query_cache_enabled, to: :default_connection
 
     def cluster
       klass.turntable_cluster
@@ -55,7 +55,7 @@ module ActiveRecord::Turntable
     end
 
     def enable_query_cache!
-      master_connection.enable_query_cache!
+      default_connection.enable_query_cache!
 
       klass.turntable_connections.each do |_k, v|
         v.connection.enable_query_cache!
@@ -63,7 +63,7 @@ module ActiveRecord::Turntable
     end
 
     def disable_query_cache!
-      master_connection.disable_query_cache!
+      default_connection.disable_query_cache!
 
       klass.turntable_connections.each do |_k, v|
         v.connection.disable_query_cache!
@@ -75,7 +75,7 @@ module ActiveRecord::Turntable
     end
 
     def clear_query_cache
-      master_connection.clear_query_cache
+      default_connection.clear_query_cache
 
       klass.turntable_connections.each do |_k, v|
         v.connection.clear_query_cache
@@ -107,7 +107,7 @@ module ActiveRecord::Turntable
     end
 
     def to_sql(arel, binds = [])
-      master.connection.to_sql(arel, binds)
+      default_connection.to_sql(arel, binds)
     end
 
     def shards
@@ -126,12 +126,12 @@ module ActiveRecord::Turntable
       fixed_shard_entry[object_id] = shard
     end
 
-    def master
-      @master_shard
+    def default_shard
+      @default_shard
     end
 
-    def master_connection
-      master.connection
+    def default_connection
+      default_shard.connection
     end
 
     def current_shard
@@ -200,10 +200,10 @@ module ActiveRecord::Turntable
       end
     end
 
-    # Send queries to master connection and all shards in this cluster
+    # Send queries to default connection and all shards in this cluster
     # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
-    def with_master_and_all(continue_on_error = false)
-      ([master] + cluster.shards).map do |shard|
+    def with_default_and_all(continue_on_error = false)
+      ([default_shard] + cluster.shards).map do |shard|
         begin
           with_shard(shard) {
             yield
@@ -217,8 +217,8 @@ module ActiveRecord::Turntable
       end
     end
 
-    def with_master(&block)
-      with_shard(master) do
+    def with_default_shard(&block)
+      with_shard(default_shard) do
         yield
       end
     end
@@ -228,13 +228,13 @@ module ActiveRecord::Turntable
 
     %w(columns columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
-        master.connection_pool.send(name.to_sym)
+        default_shard.connection_pool.send(name.to_sym)
       end
     end
 
     %w(data_source_exists?).each do |name|
       define_method(name.to_sym) do |*args|
-        master.connection_pool.with_connection do |c|
+        default_shard.connection_pool.with_connection do |c|
           c.schema_cache.send(name.to_sym, *args)
         end
       end
@@ -242,26 +242,26 @@ module ActiveRecord::Turntable
 
     def columns(*args)
       if args.size > 0
-        master.connection_pool.columns[*args]
+        default_shard.connection_pool.columns[*args]
       else
-        master.connection_pool.columns
+        default_shard.connection_pool.columns
       end
     end
 
     def pk_and_sequence_for(*args)
-      master.connection.send(:pk_and_sequence_for, *args)
+      default_shard.connection.send(:pk_and_sequence_for, *args)
     end
 
     def primary_key(*args)
-      master.connection.send(:primary_key, *args)
+      default_shard.connection.send(:primary_key, *args)
     end
 
     def supports_views?(*args)
-      master.connection.send(:supports_views?, *args)
+      default_shard.connection.send(:supports_views?, *args)
     end
 
     def spec
-      @spec ||= master.connection_pool.spec
+      @spec ||= default_shard.connection_pool.spec
     end
 
     private

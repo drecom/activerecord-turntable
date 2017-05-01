@@ -4,7 +4,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
   context "When initialized" do
     subject { ActiveRecord::Turntable::ConnectionProxy.new(User, cluster) }
     let(:cluster) { ActiveRecord::Base.turntable_configuration.cluster(:user_cluster) }
-    its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
+    its(:default_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
   context "User insert with id" do
