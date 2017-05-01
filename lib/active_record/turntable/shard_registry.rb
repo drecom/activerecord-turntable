@@ -1,6 +1,6 @@
 module ActiveRecord::Turntable
   class ShardRegistry
-    ShardMap = Struct.new(:range, :shard) do
+    ShardMap = Struct.new(:range, :shard, :slaves) do
       delegate :connection, :connection_pool, :name, to: :shard
     end
 
@@ -12,9 +12,8 @@ module ActiveRecord::Turntable
     end
 
     def add(setting)
-      shard = (@shards_names_hash[setting.name] ||= Shard.new(setting.name))
+      shard = (@shards_names_hash[setting.name] ||= Shard.new(setting.name, setting.slaves))
       @shard_maps << ShardMap.new(setting.range, shard)
-
       @shard_maps.sort_by! { |m| m.range.min }
     end
 

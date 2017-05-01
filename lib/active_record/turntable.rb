@@ -35,6 +35,7 @@ module ActiveRecord::Turntable
     autoload :Shard
     autoload :ShardingCondition
     autoload :ShardRegistry
+    autoload :SlaveRegistry
     autoload :SeqShard
     autoload :Sequencer
     autoload :SequencerRegistry

@@ -11,7 +11,7 @@ module ActiveRecord::Turntable
         autoload :SelectShardsMergeResult
         autoload :InsertShardsMergeResult
         autoload :UpdateShardsMergeResult
-        # calcurations
+        # calculations
         autoload :CalculateShardsSumResult
       end
 

@@ -183,6 +183,12 @@ module ActiveRecord::Turntable
       end
     end
 
+    def with_master
+    end
+
+    def with_slave
+    end
+
     # Send queries to all shards in this cluster
     # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
     def with_all(continue_on_error = false)

@@ -5,10 +5,11 @@ module ActiveRecord::Turntable
       Connections.constants.map { |name| Connections.const_get(name) }
     end
 
-    attr_accessor :name
+    attr_accessor :name, :slaves
 
-    def initialize(name = defined?(Rails) ? Rails.env : "development")
+    def initialize(name = defined?(Rails) ? Rails.env : "development", slaves = [])
       @name = name
+      @slaves = slaves.map { |s| Shard.new(s) }
       ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
@@ -17,9 +18,42 @@ module ActiveRecord::Turntable
     end
 
     def connection
-      connection_pool.connection.tap do |conn|
-        conn.turntable_shard_name ||= name
+      if use_slave?
+        current_slave_shard.connection
+      else
+        connection_pool.connection.tap do |conn|
+          conn.turntable_shard_name ||= name
+        end
       end
+    end
+
+    def support_slave?
+      @slaves.size > 0
+    end
+
+    def use_slave?
+      support_slave? && @use_slave
+    end
+
+    def current_slave_shard
+      SlaveRegistry.slave_for(self) || SlaveRegistry.set_slave_for(self, any_slave)
+    end
+
+    def with_slave(slave = nil)
+      slave ||= (current_slave || any_slave)
+      old = current_slave
+      set_current_slave(slave)
+      yield
+    ensure
+      set_current_slave(old)
+    end
+
+    def with_master
+      old = current_slave
+      set_current_slave(nil)
+      yield
+    ensure
+      set_current_slave(old)
     end
 
     private
@@ -44,6 +78,14 @@ module ActiveRecord::Turntable
           klass.abstract_class = true
         end
         klass
+      end
+
+      def set_current_slave_shard(slave)
+        SlaveRegistry.set_slave_for(self, slave)
+      end
+
+      def any_slave
+        slaves.sample
       end
   end
 end
