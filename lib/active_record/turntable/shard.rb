@@ -5,11 +5,12 @@ module ActiveRecord::Turntable
       Connections.constants.map { |name| Connections.const_get(name) }
     end
 
-    attr_accessor :name, :slaves
+    attr_accessor :cluster, :name, :slaves
 
-    def initialize(name = defined?(Rails) ? Rails.env : "development", slaves = [])
+    def initialize(cluster, name = defined?(Rails) ? Rails.env : "development", slaves = [])
+      @cluster = cluster
       @name = name
-      @slaves = slaves.map { |s| Shard.new(s) }
+      @slaves = slaves.map { |s| SlaveShard.new(cluster, s) }
       ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
@@ -32,28 +33,11 @@ module ActiveRecord::Turntable
     end
 
     def use_slave?
-      support_slave? && @use_slave
+      support_slave? && cluster.slave_enabled?
     end
 
     def current_slave_shard
       SlaveRegistry.slave_for(self) || SlaveRegistry.set_slave_for(self, any_slave)
-    end
-
-    def with_slave(slave = nil)
-      slave ||= (current_slave || any_slave)
-      old = current_slave
-      set_current_slave(slave)
-      yield
-    ensure
-      set_current_slave(old)
-    end
-
-    def with_master
-      old = current_slave
-      set_current_slave(nil)
-      yield
-    ensure
-      set_current_slave(old)
     end
 
     private

@@ -42,7 +42,7 @@ module ActiveRecord::Turntable
                                 else
                                   current_lower_limit
                                 end
-                  shard current_lower_limit..upper_limit, to: shard_conf[:connection]
+                  shard current_lower_limit..upper_limit, to: shard_conf[:connection], slaves: Array.wrap(shard_conf[:slaves])
                   current_lower_limit = upper_limit + 1
                 end
               end

@@ -7,7 +7,7 @@ module ActiveRecord::Turntable
     # for expiring query cache
     CLEAR_CACHE_METHODS = [:update, :insert, :delete, :exec_insert, :exec_update, :exec_delete, :insert_many].freeze
 
-    attr_reader :klass
+    attr_reader :klass, :default_shard, :default_current_shard
     attr_writer :spec
 
     def initialize(klass, options = {})
@@ -32,7 +32,9 @@ module ActiveRecord::Turntable
     end
 
     def transaction(options = {}, &block)
-      connection.transaction(options, &block)
+      with_master {
+        connection.transaction(options, &block)
+      }
     end
 
     def cache
@@ -126,10 +128,6 @@ module ActiveRecord::Turntable
       fixed_shard_entry[object_id] = shard
     end
 
-    def default_shard
-      @default_shard
-    end
-
     def default_connection
       default_shard.connection
     end
@@ -184,9 +182,19 @@ module ActiveRecord::Turntable
     end
 
     def with_master
+      old = cluster.slave_enabled?
+      cluster.set_slave_enabled(false)
+      yield
+    ensure
+      cluster.set_slave_enabled(old)
     end
 
     def with_slave
+      old = cluster.slave_enabled?
+      cluster.set_slave_enabled(true)
+      yield
+    ensure
+      cluster.set_slave_enabled(old)
     end
 
     # Send queries to all shards in this cluster

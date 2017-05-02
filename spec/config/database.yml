@@ -18,12 +18,21 @@ test:
     user_shard_1:
       <<: *default
       database: turntable_user_shard_1_test
+    user_shard_1_1:
+      <<: *default
+      database: turntable_user_shard_1_1_test
     user_shard_2:
       <<: *default
       database: turntable_user_shard_2_test
+    user_shard_2_1:
+      <<: *default
+      database: turntable_user_shard_2_1_test
     user_shard_3:
       <<: *default
       database: turntable_user_shard_3_test
+    user_shard_3_1:
+      <<: *default
+      database: turntable_user_shard_3_1_test
     user_shard_4:
       <<: *default
       database: turntable_user_shard_4_test

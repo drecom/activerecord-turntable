@@ -1,4 +1,4 @@
-require "activerecord/turntable/shard"
+require "active_record/turntable/shard"
 
 module ActiveRecord::Turntable
   class SlaveShard < Shard
