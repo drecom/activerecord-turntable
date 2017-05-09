@@ -11,13 +11,13 @@ describe ActiveRecord::Turntable::Base do
     subject { klass.new }
 
     context "With a STI parent class" do
-      let(:klass) { EventsUsersHistory }
+      let(:klass) { UserEventHistory }
 
       its(:connection) { expect { subject }.not_to raise_error }
     end
 
     context "With a STI subclass" do
-      let(:klass) { SpecialEventsUsersHistory }
+      let(:klass) { SpecialUserEventHistory }
 
       its(:connection) { expect { subject }.not_to raise_error }
     end

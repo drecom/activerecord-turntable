@@ -8,10 +8,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
 
   context "When a model has has_one relation" do
     context "When call clever_load!" do
-      let(:users) { User.all.clever_load!(:user_status) }
+      let(:users) { User.all.clever_load!(:user_profile) }
 
       context "With their associations" do
-        subject { users.map { |u| u.association(:user_status) } }
+        subject { users.map { |u| u.association(:user_profile) } }
 
         it "makes association target loaded" do
           is_expected.to all(be_loaded)
@@ -19,10 +19,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       end
 
       context "With their targets" do
-        subject { users.map { |u| u.association(:user_status).target } }
+        subject { users.map { |u| u.association(:user_profile).target } }
 
         it "loads target object" do
-          is_expected.to all(be_instance_of(UserStatus))
+          is_expected.to all(be_instance_of(UserProfile))
         end
       end
     end
@@ -30,10 +30,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
 
   context "When a model has belongs_to relation" do
     context "When call clever_load!" do
-      let(:user_statuses) { UserStatus.all.clever_load!(:user) }
+      let(:user_profilees) { UserProfile.all.clever_load!(:user) }
 
       context "With their associations" do
-        subject { user_statuses.map { |us| us.association(:user) } }
+        subject { user_profilees.map { |us| us.association(:user) } }
 
         it "makes target loaded" do
           is_expected.to all(be_loaded)
@@ -41,7 +41,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
       end
 
       context "With their targets" do
-        subject { user_statuses.map { |us| us.association(:user).target } }
+        subject { user_profilees.map { |us| us.association(:user).target } }
 
         it "loads target object" do
           is_expected.to all(be_instance_of(User))
