@@ -42,7 +42,12 @@ module ActiveRecord::Turntable
             end
             tbl.print ", force: :cascade"
 
-            table_options = @connection.table_options(table)
+            table_options = case @connection.table_options(table)
+                            when Hash
+                              @connection.table_options(table)[:options]
+                            else
+                              @connection.table_options(table)
+                            end
             tbl.print ", options: #{table_options.inspect}" unless table_options.blank?
 
             if comment = @connection.table_comment(table).presence
