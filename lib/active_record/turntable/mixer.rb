@@ -61,7 +61,7 @@ module ActiveRecord::Turntable
         lkeys = find_shard_keys(tree.lhs, table_name, shard_key)
         rkeys = find_shard_keys(tree.rhs, table_name, shard_key)
         if lkeys.present? && rkeys.present?
-          lkeys + rkeys
+          (lkeys + rkeys).uniq
         else
           []
         end
@@ -69,7 +69,7 @@ module ActiveRecord::Turntable
         lkeys = find_shard_keys(tree.lhs, table_name, shard_key)
         rkeys = find_shard_keys(tree.rhs, table_name, shard_key)
         if lkeys.present? || rkeys.present?
-          lkeys + rkeys
+          (lkeys + rkeys).uniq
         else
           []
         end
@@ -135,6 +135,7 @@ module ActiveRecord::Turntable
                                        @proxy.klass.table_name,
                                        @proxy.klass.turntable_shard_key.to_s)
                      end
+        shard_keys.uniq!
 
         if shard_keys.size == 1 # shard
           return Fader::SpecifiedShard.new(@proxy,
