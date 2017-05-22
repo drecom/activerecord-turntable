@@ -1,3 +1,18 @@
+## activerecord-turntable 3.0.0 ##
+
+### Bugfixes
+
+* Fixes schema dumper patches that dumps tables options incorrectly.
+* Re-enable the `AR::LogSubscriber::IGNORE_PAYLOAD_NAMES` (thx @misoobu)
+* Make cluster transaction helpers to preserve transaction options(e.g. :requires_new)
+* Fixes shard names are not written to logs correctly (thx @i2bskn)
+* Fixes ConnectionNotEstablished Error with STI subclasses #48
+
+### Improvements
+
+* Update activerecord-import patches for performance improvements (thx @misoobu)
+
+
 ## activerecord-turntable 3.0.0.alpha3 ##
 
 ### Bugfix
