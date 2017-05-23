@@ -1,5 +1,5 @@
 module ActiveRecord
   module Turntable
-    VERSION = "3.0.0.alpha3".freeze
+    VERSION = "3.0.0".freeze
   end
 end
