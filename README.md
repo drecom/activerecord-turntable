@@ -25,7 +25,7 @@ Currently supports mysql only.
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-turntable', '~> 3.0.0.alpha1'
+gem 'activerecord-turntable', '~> 3.0.0'
 ```
 
 Run a bundle install:
@@ -179,13 +179,13 @@ Those rake tasks would be executed to shards too.
 Add turntable [shard_key_name] to the model class:
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   turntable :user_cluster, :id
   sequencer :user_seq
   has_one :status
 end
 
-class Status < ActiveRecord::Base
+class Status < ApplicationRecord
   turntable :user_cluster, :user_id
   sequencer :user_seq
   belongs_to :user
@@ -297,7 +297,7 @@ create_sequence_for(:users) # <-- this line creates sequence table named `users_
 Next, add sequencer definition to the model:
 
 ```ruby
-  class User < ActiveRecord::Base
+  class User < ApplicationRecord
     turntable :id
     sequencer :user_seq # <-- this line enables sequencer module
     has_one :status
@@ -341,7 +341,7 @@ Then, add configuration to turntable.yml:
 Next, add sequencer definition to the model:
 
 ```ruby
-  class User < ActiveRecord::Base
+  class User < ApplicationRecord
     turntable :id
     sequencer :barrage_seq # <-- this line enables sequencer module
     has_one :status
@@ -369,7 +369,7 @@ end
 
 ### cluster_transaction
 
-transaction helper to execute transaction to all shards in the cluster:
+When executing transaction on all shards in the cluster, use `#{cluster_name}_transaction` method:
 
 ```ruby
 User.user_cluster_transaction do
@@ -404,8 +404,7 @@ to specify shard:
 ## Limitations
 
 * Queries includes "ORDER BY", "GROUP BY" and "LIMIT" clauses cannot be distributed.
-* "has many through" and "habtm" relationships may causes wrong results. ex) `User-Friend-User` relation
-
+* "has many through" and "habtm" relationships may returns unexpected results. ex) `User-Friend-User` relation
 
 ## TIPS
 
@@ -414,25 +413,80 @@ to specify shard:
 Use `with_shard` method:
 
 ```ruby
-    AR::Base.connection.with_shard(shard1) do
+    AR::Base.with_shard(shard1) do
       # something queries to shard1
     end
 ```
+
+`with_shard` method accepts following types to specify a shard:
+
+* ActiveRecord::Turntable::Shard object
+* AcitveRecord::Base object - `AR::Base#turntable_shard` will be used
+* Numeric, String - a shard key value
+* Symbol - shard name symbol
 
 To access shard objects, use below:
 
 * AR::Base.connection.shards # \\{shard_name => shard_obj,....}
 * AR::Base#turntable_shard # Returns current object's shard
-* AR::Base.connection.select_shard(shard_key_value) #=> shard
+* AR::Base.connection.shard_for(shard_key_value) #=> shard
 
 ### Send query to all shards
 
 Use with_all method:
 
 ```ruby
-  User.connection.with_all do
+  User.with_all do
     User.order("created_at DESC").limit(3).all
-  end
+  end # => Returns Array of results
+```
+
+### Cannot specify error is raised between associations
+
+Normally, activerecord-turntable detects shard keys on associated models, but auto-detection will fail with following conditions:
+
+* foreign key column != shard key column
+* Using different shard key names
+
+For example:
+
+```ruby
+class User
+  # shard key:
+  # foreign key: main_user_item_id
+  belongs_to :main_user_item, class_name: "UserItem", required: false
+end
+
+class UserItem
+  # shard key name: :user_id
+  turntable :user_cluster, :user_id
+end
+```
+
+This example raises CannotSpecifyShardError
+
+```ruby
+> user.main_user_item
+  User Load [Shard: master] (0.4ms)  SELECT  `users`.* FROM `users` ORDER BY `users`.`id` ASC LIMIT 1
+[ActiveRecord::Turntable] Error on Building Fader: SELECT  `user_items`.* FROM `user_items` WHERE `user_items`.`id` = 2198059200000 LIMIT 1, on_method: select_all, err: cannot specifyshard for query: SELECT "user_items".* FROM `user_items` WHERE (`user_items`.`id` = 2198059200000) LIMIT 1
+ActiveRecord::Turntable::CannotSpecifyShardError: cannot specify shard for query: SELECT "user_items".* FROM `user_items` WHERE (`user_items`.`id` = 2198059200000) LIMIT 1
+```
+
+Use foreign_shard_key option to pass a shard key condition:
+
+```
+-belongs_to :main_user_item, class_name: "UserItem"
++belongs_to :main_user_item, class_name: "UserItem", foreign_shard_key: :id
+```
+
+```ruby
+> user.main_user_item
+  User Load [Shard: master] (0.2ms)  SELECT  `users`.* FROM `users` ORDER BY `users`.`id` ASC LIMIT 1
+[ActiveRecord::Turntable] Sending method: select_all, sql: #<Arel::SelectManager:0x007f8080bd0670>, shards: ["user_shard_1"]
+Changing UserItem's shard to user_shard_1
+  UserItem Load [Shard: user_shard_1] (0.2ms)  SELECT  `user_items`.* FROM `user_items` WHERE `user_items`.`user_id` = 1 AND `user_items`.`id` = 2198059200000 LIMIT 1
+Changing UserItem's shard to master
+=> #<UserItem id: 2198059200000, user_id: 1, item_id: 1, created_at: "2017-05-23 04:41:13", updated_at: "2017-05-23 04:41:13">
 ```
 
 ### Performance Exception
