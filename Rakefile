@@ -144,6 +144,7 @@ namespace :turntable do
         Dir.chdir("tmp/rails") do
           system(*%W|git checkout #{ENV['ARVERSION']}|)
         end
+        FileUtils.rm_r("test") if File.directory?("test")
         FileUtils.cp_r("tmp/rails/activerecord/test", ".")
         FileUtils.cp_r("tmp/rails/activerecord/Rakefile", "activerecord.rake")
         File.open("test/cases/helper.rb", "a") do |f|
