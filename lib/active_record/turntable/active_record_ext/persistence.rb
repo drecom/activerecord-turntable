@@ -29,7 +29,12 @@ module ActiveRecord::Turntable
         # @note Override to add sharding scope on `touch`
         # rubocop:disable Style/UnlessElse
         def touch(*names, time: nil)
-          raise ActiveRecord::ActiveRecordError, "cannot touch on a new record object" unless persisted?
+          unless persisted?
+            raise ActiveRecord::ActiveRecordError, <<-MSG.squish
+              cannot touch on a new or destroyed record object. Consider using
+              persisted?, new_record?, or destroyed? before touching
+            MSG
+          end
 
           time ||= current_time_from_proper_timezone
           attributes = timestamp_attributes_for_update_in_model
@@ -125,6 +130,9 @@ module ActiveRecord::Turntable
               rows_affected = klass.unscoped._update_record attributes_values, id, previous_id, scope
               @_trigger_update_callback = rows_affected > 0
             end
+
+            yield(self) if block_given?
+
             rows_affected
           end
       end
