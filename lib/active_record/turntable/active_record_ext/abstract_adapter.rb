@@ -15,17 +15,33 @@ module ActiveRecord::Turntable
 
       # @note override for append current shard name
       # rubocop:disable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
-      def log(sql, name = "SQL", binds = [], statement_name = nil)
-        @instrumenter.instrument(
-          "sql.active_record",
-          :sql                  => sql,
-          :name                 => name,
-          :connection_id        => object_id,
-          :statement_name       => statement_name,
-          :binds                => binds,
-          :turntable_shard_name => turntable_shard_name) { yield }
-      rescue => e
-        raise translate_exception_class(e, sql)
+      if ActiveRecord::Turntable::Util.ar_version_equals_or_later?("5.0.3")
+        def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil)
+          @instrumenter.instrument(
+            "sql.active_record",
+            sql:                  sql,
+            name:                 name,
+            binds:                binds,
+            type_casted_binds:    type_casted_binds,
+            statement_name:       statement_name,
+            connection_id:        object_id,
+            turntable_shard_name: turntable_shard_name) { yield }
+        rescue => e
+          raise translate_exception_class(e, sql)
+        end
+      else
+        def log(sql, name = "SQL", binds = [], statement_name = nil)
+          @instrumenter.instrument(
+            "sql.active_record",
+            :sql                  => sql,
+            :name                 => name,
+            :connection_id        => object_id,
+            :statement_name       => statement_name,
+            :binds                => binds,
+            :turntable_shard_name => turntable_shard_name) { yield }
+        rescue => e
+          raise translate_exception_class(e, sql)
+        end
       end
       # rubocop:enable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
 
