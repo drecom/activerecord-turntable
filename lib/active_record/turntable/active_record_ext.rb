@@ -16,6 +16,7 @@ module ActiveRecord::Turntable
       autoload :AssociationPreloader
       autoload :Association
       autoload :LockingOptimistic
+      autoload :QueryCache
     end
 
     included do
@@ -31,6 +32,7 @@ module ActiveRecord::Turntable
       ActiveRecord::ConnectionAdapters::ConnectionHandler.prepend(ConnectionHandlerExtension)
       ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
       ActiveRecord::Associations::Association.prepend(Association)
+      ActiveRecord::QueryCache.prepend(QueryCache)
       require "active_record/turntable/active_record_ext/fixtures"
       require "active_record/turntable/active_record_ext/migration_proxy"
       require "active_record/turntable/active_record_ext/activerecord_import_ext"
