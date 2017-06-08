@@ -54,5 +54,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
         expect(subscriber.debugs.first).to match(/#{REGEXP_CYAN}Model Load \(0\.0ms\) \[Shard: shard_1\]#{REGEXP_CLEAR}/)
       end
     end
+
+    context "When payload includes `:binds`" do
+      it "logs binds parameters" do
+        binds = [ActiveRecord::Relation::QueryAttribute.new("id", 10, ActiveRecord::Type::Value.new)]
+        subscriber.sql(TestEvent.new(name: "Model Load", binds: binds))
+        expect(subscriber.debugs.first).to match(/\[\["id", 10\]\]/)
+      end
+    end
   end
 end

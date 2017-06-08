@@ -19,10 +19,14 @@ module ActiveRecord::Turntable
         binds = nil
 
         unless (payload[:binds] || []).empty?
-          casted_params = type_casted_binds(payload[:binds], payload[:type_casted_binds])
-          binds = "  " + payload[:binds].zip(casted_params).map { |attr, value|
-            render_bind(attr, value)
-          }.inspect
+          if Util.ar_version_equals_or_later?("5.0.3")
+            casted_params = type_casted_binds(payload[:binds], payload[:type_casted_binds])
+            binds = "  " + payload[:binds].zip(casted_params).map { |attr, value|
+              render_bind(attr, value)
+            }.inspect
+          else
+            binds = "  " + payload[:binds].map { |attr| render_bind(attr) }.inspect
+          end
         end
 
         name = colorize_payload_name(name, payload[:name])
