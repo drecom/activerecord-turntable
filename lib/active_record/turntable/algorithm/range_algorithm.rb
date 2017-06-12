@@ -9,7 +9,7 @@ module ActiveRecord::Turntable::Algorithm
       idx = calculate_idx(key)
       @config[:shards][idx][:connection]
     rescue
-      raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key}"
+      raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key.inspect}"
     end
 
     def calculate_idx(key)
