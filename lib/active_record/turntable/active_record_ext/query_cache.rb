@@ -3,7 +3,9 @@ module ActiveRecord::Turntable
     module QueryCache
       def self.prepended(klass)
         class << klass
-          if Util.ar_version_equals_or_later?("5.0.1")
+          if Util.ar_version_equals_or_later?("5.1.0")
+            prepend(ClassMethods::AR5_1)
+          elsif Util.ar_version_equals_or_later?("5.0.1")
             prepend(ClassMethods::AR5_0_1)
           else
             prepend(ClassMethods::AR5_0)
@@ -12,26 +14,24 @@ module ActiveRecord::Turntable
       end
 
       module ClassMethods
-        module AR5_0
+        module AR5_1
           def run
             result = super
 
             pools = ActiveRecord::Base.turntable_connections.values
-            pools.each do |k|
-              k.connection.enable_query_cache!
+            pools.each do |pool|
+              pool.enable_query_cache!
             end
 
-            result
+            [*result, pools]
           end
 
           def complete(state)
-            enabled, _connection_id = state
-            super
+            caching_pool, caching_was_enabled, turntable_pools = state
+            super([caching_pool, caching_was_enabled])
 
-            klasses = ActiveRecord::Base.turntable_connections.values
-            klasses.each do |k|
-              k.connection.clear_query_cache
-              k.connection.disable_query_cache! unless enabled
+            turntable_pools.each do |pool|
+              pool.disable_query_cache! unless caching_was_enabled
             end
           end
         end
@@ -54,6 +54,30 @@ module ActiveRecord::Turntable
 
             turntable_pools.each do |pool|
               pool.disable_query_cache! unless caching_was_enabled
+            end
+          end
+        end
+
+        module AR5_0
+          def run
+            result = super
+
+            pools = ActiveRecord::Base.turntable_connections.values
+            pools.each do |k|
+              k.connection.enable_query_cache!
+            end
+
+            result
+          end
+
+          def complete(state)
+            enabled, _connection_id = state
+            super
+
+            klasses = ActiveRecord::Base.turntable_connections.values
+            klasses.each do |k|
+              k.connection.clear_query_cache
+              k.connection.disable_query_cache! unless enabled
             end
           end
         end
