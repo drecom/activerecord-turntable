@@ -15,7 +15,8 @@ gemfile:
   - gemfiles/rails5_0_1.gemfile
   - gemfiles/rails5_0_2.gemfile
   - gemfiles/rails5_0_3.gemfile
-  - gemfiles/rails5_1.gemfile
+  - gemfiles/rails5_1_0.gemfile
+  - gemfiles/rails5_1_1.gemfile
   - gemfiles/rails_edge.gemfile
 
 env:
@@ -41,7 +42,7 @@ matrix:
     - rvm: 2.4.1
       gemfile: gemfiles/rails_edge.gemfile
     - rvm: 2.3.4
-      gemfile: gemfiles/rails5_0_3.gemfile
+      gemfile: gemfiles/rails5_1_1.gemfile
   allow_failures:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_edge.gemfile
