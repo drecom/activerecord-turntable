@@ -24,9 +24,9 @@ module ActiveRecord::Turntable
     end
 
     # set QueryCache executor hooks for turntable clusters
-    initializer "active_record.set_executor_hooks" do
+    initializer "turntable.set_executor_hooks" do
       ActiveSupport.on_load(:active_record) do
-        ActiveRecord::Turntable::QueryCache.install_executor_hooks
+        ActiveRecord::Turntable::ActiveRecordExt::QueryCache.install_turntable_executor_hooks
       end
     end
   end

@@ -1,4 +1,5 @@
 require "active_record/turntable/connection_proxy/mixable"
+
 module ActiveRecord::Turntable
   class ConnectionProxy
     include Mixable
@@ -24,22 +25,45 @@ module ActiveRecord::Turntable
     delegate :create_table, :rename_table, :drop_table, :add_column, :remove_colomn,
              :change_column, :change_column_default, :rename_column, :add_index,
              :remove_index, :initialize_schema_information,
-             :dump_schema_information, :execute_ignore_duplicate, to: :master_connection
+             :dump_schema_information, :execute_ignore_duplicate,
+             :query_cache_enabled, to: :master_connection
 
     def transaction(options = {}, &block)
       connection.transaction(options, &block)
     end
 
     def cache
+      old = query_cache_enabled
       enable_query_cache!
       yield
     ensure
-      clear_query_cache
+      unless old
+        disable_query_cache!
+        clear_query_cache
+      end
+    end
+
+    def uncached
+      old = query_cache_enabled
+      disable_query_cache!
+      yield
+    ensure
+      enable_query_cache! if old
     end
 
     def enable_query_cache!
+      master_connection.enable_query_cache!
+
       klass.turntable_connections.each do |_k, v|
         v.connection.enable_query_cache!
+      end
+    end
+
+    def disable_query_cache!
+      master_connection.disable_query_cache!
+
+      klass.turntable_connections.each do |_k, v|
+        v.connection.disable_query_cache!
       end
     end
 
@@ -48,10 +72,13 @@ module ActiveRecord::Turntable
     end
 
     def clear_query_cache
+      master_connection.clear_query_cache
+
       klass.turntable_connections.each do |_k, v|
         v.connection.clear_query_cache
       end
     end
+
 
     # rubocop:disable Style/MethodMissing
     def method_missing(method, *args, &block)

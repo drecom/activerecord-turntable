@@ -28,7 +28,6 @@ module ActiveRecord::Turntable
     autoload :Migration
     autoload :Mixer
     autoload :PoolProxy
-    autoload :QueryCache
     autoload :Shard
     autoload :ShardingCondition
     autoload :SeqShard
