@@ -1,3 +1,16 @@
+## activerecord-turntable 3.0.1 ##
+
+### Minor Changes
+
+* Restore LogSubscriber log format to the same as 2.x
+
+### Bugfixes
+
+* Fix ActiveRecord 5.0.x compatibilities
+  * Fixes SchemaDumper fails dumping sequence tables on v5.0.0
+  * Follow AbstractAdapter#log implementation changes on v5.0.3
+  * Fix QueryCache to work with v5.0.1 or later
+
 ## activerecord-turntable 3.0.0 ##
 
 ### Bugfixes
