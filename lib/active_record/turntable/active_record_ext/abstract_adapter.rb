@@ -1,6 +1,13 @@
 module ActiveRecord::Turntable
   module ActiveRecordExt
     module AbstractAdapter
+      extend Compatibility
+
+      def self.prepended(klass)
+        klass.prepend(self.compatible_module)
+        klass.class_eval { protected :log }
+      end
+
       def translate_exception_class(e, sql)
         begin
           message = "#{e.class.name}: #{e.message}: #{sql} : #{turntable_shard_name}"
@@ -12,10 +19,11 @@ module ActiveRecord::Turntable
         exception.set_backtrace e.backtrace
         exception
       end
+      protected :translate_exception_class
 
       # @note override for append current shard name
       # rubocop:disable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
-      if ActiveRecord::Turntable::Util.ar51_or_later?
+      module V5_1
         def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil)
           @instrumenter.instrument(
             "sql.active_record",
@@ -33,7 +41,9 @@ module ActiveRecord::Turntable
         rescue => e
           raise translate_exception_class(e, sql)
         end
-      elsif ActiveRecord::Turntable::Util.ar_version_equals_or_later?("5.0.3")
+      end
+
+      module V5_0_3
         def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil) # :doc:
           @instrumenter.instrument(
             "sql.active_record",
@@ -47,7 +57,9 @@ module ActiveRecord::Turntable
         rescue => e
           raise translate_exception_class(e, sql)
         end
-      else
+      end
+
+      module V5_0
         def log(sql, name = "SQL", binds = [], statement_name = nil)
           @instrumenter.instrument(
             "sql.active_record",
@@ -63,7 +75,6 @@ module ActiveRecord::Turntable
       end
       # rubocop:enable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
 
-      protected :translate_exception_class, :log
 
       def turntable_shard_name=(name)
         @turntable_shard_name = name.to_s
