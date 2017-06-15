@@ -20,11 +20,14 @@ module ActiveRecord::Turntable
 
             table_options = @connection.table_options(table)
             if table_options.present?
-              options = respond_to?(:format_options) ? format_options(table_options) : table_options.inspect
-              tbl.print ", options: #{options}"
+              if respond_to?(:format_options, true)
+                tbl.print ", #{format_options(table_options)}"
+              else
+                tbl.print ", options: #{table_options.inspect}"
+              end
             end
 
-            if comment = @connection.table_comment(table).presence
+            if Util.ar_version_earlier_than?("5.0.1") && comment = @connection.table_comment(table).presence
               tbl.print ", comment: #{comment.inspect}"
             end
             tbl.puts

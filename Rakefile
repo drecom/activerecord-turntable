@@ -48,7 +48,7 @@ namespace :turntable do
       configurations.each do |configuration|
         ActiveRecord::Base.establish_connection configuration
 
-        ActiveRecord::Base.connection.create_table :users do |t|
+        ActiveRecord::Base.connection.create_table :users, comment: "comment" do |t|
           t.string :nickname
           t.string :thumbnail_url
           t.binary :blob
@@ -56,7 +56,7 @@ namespace :turntable do
           t.datetime :deleted_at
           t.timestamps
         end
-        ActiveRecord::Base.connection.create_sequence_for :users
+        ActiveRecord::Base.connection.create_sequence_for :users, comment: "comment"
 
         ActiveRecord::Base.connection.create_table :user_statuses do |t|
           t.belongs_to :user, :null => false

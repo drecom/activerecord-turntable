@@ -9,7 +9,12 @@ describe ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper do
 
   context "#dump" do
     subject { dump_schema }
-    it { is_expected.to match(/create_sequence_for "users", force: :cascade, options: /) }
+
+    if ActiveRecord::Turntable::Util.ar_version_equals_or_later?("5.0.1")
+      it { is_expected.to match(/create_sequence_for "users", force: :cascade, options: "[^"]+", comment: "[^"]+"$/) }
+    else
+      it { is_expected.to match(/create_sequence_for "users", force: :cascade, options: "[^"]+"/) }
+    end
     it { is_expected.not_to match(/create_table "users_id_seq"/) }
     it { is_expected.not_to match(/create_sequence_for "users_id_seq".*?do/) }
   end
