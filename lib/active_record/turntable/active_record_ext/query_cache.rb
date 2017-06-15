@@ -3,18 +3,14 @@ module ActiveRecord::Turntable
     module QueryCache
       def self.prepended(klass)
         class << klass
-          if Util.ar_version_equals_or_later?("5.1.0")
-            prepend(ClassMethods::AR5_1)
-          elsif Util.ar_version_equals_or_later?("5.0.1")
-            prepend(ClassMethods::AR5_0_1)
-          else
-            prepend(ClassMethods::AR5_0)
-          end
+          prepend ClassMethods.compatible_module
         end
       end
 
       module ClassMethods
-        module AR5_1
+        extend Compatibility
+
+        module V5_1
           def run
             result = super
 
@@ -36,7 +32,7 @@ module ActiveRecord::Turntable
           end
         end
 
-        module AR5_0_1
+        module V5_0_1
           def run
             result = super
 
@@ -58,7 +54,7 @@ module ActiveRecord::Turntable
           end
         end
 
-        module AR5_0
+        module V5_0
           def run
             result = super
 
