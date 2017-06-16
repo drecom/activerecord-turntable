@@ -129,7 +129,8 @@ namespace :turntable do
   namespace :activerecord do
     task(:env) do
       ENV["ARCONFIG"] ||= File.expand_path("spec/config/activerecord_config.yml", __dir__)
-      ENV["ARVERSION"] ||= if ActiveRecord.gem_version.prerelease?
+      ENV["ARVERSION"] ||= if ActiveRecord.gem_version.prerelease? &&
+                              !ActiveRecord.gem_version.segments.include?("rc")
                              "origin/master"
                            else
                              "v#{ActiveRecord.gem_version}"
@@ -143,6 +144,7 @@ namespace :turntable do
         Dir.chdir("tmp/rails") do
           system(*%W|git checkout #{ENV['ARVERSION']}|)
         end
+        FileUtils.rm_r("test") if File.directory?("test")
         FileUtils.cp_r("tmp/rails/activerecord/test", ".")
         FileUtils.cp_r("tmp/rails/activerecord/Rakefile", "activerecord.rake")
         File.open("test/cases/helper.rb", "a") do |f|

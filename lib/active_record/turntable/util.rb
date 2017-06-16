@@ -9,11 +9,16 @@ module ActiveRecord::Turntable
     end
 
     def ar_version
-      ActiveRecord.gem_version
+      ActiveRecord.gem_version.release
+    end
+
+    def ar51_or_later?
+      ar_version_equals_or_later?("5.1")
     end
 
     module_function :ar_version_equals_or_later?,
                     :ar_version_earlier_than?,
-                    :ar_version
+                    :ar_version,
+                    :ar51_or_later?
   end
 end
