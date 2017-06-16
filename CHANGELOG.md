@@ -1,3 +1,13 @@
+## activerecord-turntable 3.1.0 ##
+
+### Major Changes
+
+* Support activerecord v5.1.x
+
+### Bugfix
+
+* Fix schema dumper to dump sequence table options correctly (activerecord >= 5.0.1)
+
 ## activerecord-turntable 3.0.1 ##
 
 ### Minor Changes
