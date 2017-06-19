@@ -5,7 +5,16 @@ FactoryGirl.define do
 
     after(:build) do |user, _evaluator|
       create(:user_status, user: user)
-      create(:cards_user, user: user)
+    end
+
+    trait :with_cards_users do
+      transient do
+        cards_users_count 10
+      end
+
+      after(:build) do |user, evaluator|
+        create_list(:cards_user, evaluator.cards_users_count, user: user)
+      end
     end
 
     trait :in_shard2 do

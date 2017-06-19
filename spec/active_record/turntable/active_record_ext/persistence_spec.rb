@@ -5,7 +5,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   context "#reload" do
     subject { cards_user.reload }
 
-    let(:user) { create(:user) }
+    let(:user) { create(:user, :with_cards_users) }
     let!(:cards_user) { user.cards_users.first }
 
     it { is_expected.to be_instance_of(CardsUser) }
@@ -69,7 +69,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   end
 
   context "When the model is sharded by other key" do
-    let(:user) { create(:user) }
+    let!(:user) { create(:user, :with_cards_users) }
     let!(:cards_user) { user.cards_users.first }
 
     context "When updating" do
