@@ -3,45 +3,53 @@ require "spec_helper"
 describe ActiveRecord::Turntable::ConnectionProxy do
   context "When initialized" do
     subject { ActiveRecord::Turntable::ConnectionProxy.new(User, cluster) }
+
     let(:cluster) { ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
 
     its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
   context "User insert with id" do
-    it "is saved to user_shard_1 with id = 1" do
-      user = User.new
-      user.id = 1
-      expect {
-        user.save!
-      }.not_to raise_error
+    subject { User.create!(id: user_id) }
+
+    where(:user_id) do
+      [1, 20000, 20001]
     end
 
-    it "is saved to user_shard_2 with id = 30000" do
-      user = User.new
-      user.id = 30000
-      expect {
-        user.save!
-      }.not_to raise_error
+    with_them do
+      it { expect { subject }.not_to raise_error }
+      it do
+        user = subject
+        expect(user).to be_saved_to(user.turntable_shard)
+      end
     end
 
-    it "is saved to user_shard_2 with id = 30000 with SQL injection attack" do
-      user = User.new
-      user.id = 30000
-      user.nickname = "hogehgoge'00"
-      expect {
-        user.save!
-      }.not_to raise_error
-      user.reload
+    context "With a SQL Injection intensional value" do
+      subject { User.create!(id: user_id, nickname: nickname_with_injection) }
+
+      let(:user_id) { 30000 }
+      let(:nickname_with_injection) { "hogehgoge'00" }
+
+      it { expect { subject }.not_to raise_error }
+      it do
+        user = subject
+        user.reload
+        expect(user.nickname).to eq(nickname_with_injection)
+      end
     end
 
-    it "is saved the same string when includes escaped string" do
-      user = User.new
-      user.id = 30000
-      user.nickname = "hoge@\n@\\@@\\nhoge\\\nhoge\\n"
-      user.save!
-      user.reload
-      expect(user.nickname).to eq("hoge@\n@\\@@\\nhoge\\\nhoge\\n")
+    context "With an escaped strings value" do
+      subject { User.create!(id: user_id, nickname: nickname_with_escaped_string) }
+
+      let(:user_id) { 30000 }
+      let(:nickname_with_escaped_string) { "hoge@\n@\\@@\\nhoge\\\nhoge\\n" }
+
+      it { expect { subject }.not_to raise_error }
+      it do
+        user = subject
+        user.reload
+        expect(user.nickname).to eq(nickname_with_escaped_string)
+      end
     end
   end
 
@@ -57,31 +65,27 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
   context "When have 2 Users in different shards" do
     before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.save!
+      @user_in_shard1 = create(:user, :in_shard1)
+      @user_in_shard2 = create(:user, :in_shard2)
     end
 
-    it "is saved to user_shard_1 with id = 1" do
-      @user1.nickname = "foobar"
-      expect {
-        @user1.save!
-      }.not_to raise_error
+    context "When updating user in shard1" do
+      subject { @user_in_shard1.update_attributes!(nickname: new_nickname) }
+
+      let(:new_nickname) { Faker::Name.unique.name }
+
+      it { expect { subject }.not_to raise_error }
     end
 
-    it "is saved to user_shard_2 with id = 30000" do
-      @user2.nickname = "hogehoge"
-      expect {
-        @user2.save!
-      }.not_to raise_error
+    context "When updating user in shard2" do
+      subject { @user_in_shard2.update_attributes!(nickname: new_nickname) }
+
+      let(:new_nickname) { Faker::Name.unique.name }
+
+      it { expect { subject }.not_to raise_error }
     end
 
-    it "User.where('id IN (1, 30000)') returns 2 record" do
-      expect(User.where(id: [1, 30000]).all.size).to eq(2)
-    end
+    it { expect(User.where(id: [@user_in_shard1.id, @user_in_shard2.id]).all.size).to eq(2) }
 
     it "User.count is 2" do
       expect(User.count).to eq(2)
@@ -92,24 +96,17 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
   end
 
-  context "When calling with_all" do
+  context "#with_all" do
     before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.nickname = "user1"
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.nickname = "user2"
-      @user2.save!
+      @user_in_shard1 = create(:user, :in_shard1)
+      @user_in_shard2 = create(:user, :in_shard2)
     end
 
-    context "do; User.count; end" do
-      subject {
-        User.connection.with_all do
-          User.count
-        end
-      }
+    context "When calling User.count within the block" do
+      subject do
+        User.connection.with_all { User.count }
+      end
+
       it { is_expected.to have(3).items }
 
       it "returns User.count of each shards" do
@@ -119,101 +116,74 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       end
     end
 
-    context "call with true" do
+    context "With false argument" do
+      context "When block raises error" do
+        subject { User.connection.with_all(false) { raise "Unknown Error" } }
+
+        it { expect { subject }.to raise_error }
+      end
+    end
+
+    context "With false argument" do
       context "block raises error" do
-        subject {
-          User.connection.with_all(true) do
-            raise "Unko Error"
-          end
-        }
+        subject { User.connection.with_all(true) { raise "Unknown Error" } }
+
         it { expect { subject }.not_to raise_error }
         it { is_expected.to have(3).items }
-        it "collection " do
-          subject.each do |s|
-            expect(s).to be_instance_of(RuntimeError)
-          end
-        end
+        it { expect(subject).to all(be_instance_of(RuntimeError)) }
       end
     end
   end
 
   context "When calling exists? with shard_key" do
     before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.nickname = "user1"
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.nickname = "user2"
-      @user2.save!
+      @user_in_shard1 = create(:user, id: 1)
+      @user_in_shard2 = create(:user, :in_shard2)
     end
 
     subject { User.exists?(id: 1) }
+
     it { is_expected.to be_truthy }
   end
 
   context "When calling exists? with non-existed shard_key" do
     before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.nickname = "user1"
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.nickname = "user2"
-      @user2.save!
+      @user_in_shard1 = create(:user, id: 1)
+      @user_in_shard2 = create(:user, :in_shard2)
     end
 
     subject { User.exists?(id: 3) }
+
     it { is_expected.to be_falsey }
   end
 
   context "When calling exists? with non shard_key" do
     before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.nickname = "user1"
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.nickname = "user2"
-      @user2.save!
+      @user_in_shard1 = create(:user, id: 1)
+      @user_in_shard2 = create(:user, :in_shard1, nickname: nickname)
     end
 
-    subject { User.exists?(nickname: "user2") }
+    subject { User.exists?(nickname: nickname) }
+
+    let(:nickname) { Faker::Name.unique.name }
+
     it { is_expected.to be_truthy }
   end
 
   context "When calling exists? with non-existed non shard_key" do
     before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.nickname = "user1"
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.nickname = "user2"
-      @user2.save!
+      @user_in_shard1 = create(:user, id: 1)
+      @user_in_shard2 = create(:user, :in_shard1)
     end
 
-    subject { User.exists?(nickname: "user999") }
+    subject { User.exists?(nickname: Faker::Name.unique.name) }
+
     it { is_expected.to be_falsey }
   end
 
   context "#data_source_exists?" do
-    before do
-      @user1 = User.new
-      @user1.id = 1
-      @user1.nickname = "user1"
-      @user1.save!
-      @user2 = User.new
-      @user2.id = 30000
-      @user2.nickname = "user2"
-      @user2.save!
-    end
-
     subject { User.connection.data_source_exists?(:users) }
+
     it { is_expected.to be_truthy }
   end
 

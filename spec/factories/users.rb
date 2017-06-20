@@ -17,6 +17,10 @@ FactoryGirl.define do
       end
     end
 
+    trait :in_shard1 do
+      sequence(:id, 1) { |i| i }
+    end
+
     trait :in_shard2 do
       sequence(:id, 20001) { |i| i }
     end
