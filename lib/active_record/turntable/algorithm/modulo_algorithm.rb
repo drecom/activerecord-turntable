@@ -8,7 +8,7 @@ module ActiveRecord::Turntable::Algorithm
     def calculate(key)
       @config[:shards][key % @config[:shards].size][:connection]
     rescue
-      raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key}"
+      raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key.inspect}"
     end
   end
 end

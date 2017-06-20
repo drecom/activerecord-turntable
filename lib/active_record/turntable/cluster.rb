@@ -40,7 +40,7 @@ module ActiveRecord::Turntable
       @shards[@algorithm.calculate(key)]
     rescue
       raise ActiveRecord::Turntable::CannotSpecifyShardError,
-            "cannot select_shard for key:#{key}"
+            "cannot select shard for key:#{key.inspect}"
     end
 
     def select_shard(key)
