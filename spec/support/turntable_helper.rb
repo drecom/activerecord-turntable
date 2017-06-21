@@ -16,18 +16,6 @@ module TurntableHelper
 
   # Helper methods below come from rails test helpers
   #
-  def capture_log_output
-    output = StringIO.new
-    old = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = ActiveSupport::Logger.new(output)
-
-    begin
-      yield output
-    ensure
-      ActiveRecord::Base.logger = old
-    end
-  end
-
   def capture_sql
     SQLCounter.clear_log
     yield
