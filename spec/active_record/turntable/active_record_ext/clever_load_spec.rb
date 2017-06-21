@@ -3,14 +3,7 @@ require "logger"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::CleverLoad do
   before do
-    @user1 = User.new({ nickname: "user1" })
-    @user1.id = 1
-    @user1.save
-    @user1_status = @user1.create_user_status(hp: 10, mp: 10)
-    @user2 = User.new({ nickname: "user2" })
-    @user2.id = 2
-    @user2.save
-    @user2_status = @user2.create_user_status(hp: 20, mp: 10)
+    create_list(:user, 2)
   end
 
   context "When a model has has_one relation" do

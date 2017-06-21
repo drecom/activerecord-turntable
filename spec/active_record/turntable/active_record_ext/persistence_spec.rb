@@ -2,206 +2,132 @@ require "spec_helper"
 require "logger"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
-  around do |example|
-    old = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = Logger.new("/dev/null")
-    example.run
-    ActiveRecord::Base.logger = old
-  end
+  context "#reload" do
+    subject { cards_user.reload }
 
-  let(:user) {
-    u = User.new({ nickname: "foobar" })
-    u.id = 1
-    u.updated_at = Time.current - 1.day
-    u.save
-    u
-  }
+    let(:user) { create(:user, :with_cards_users) }
+    let!(:cards_user) { user.cards_users.first }
 
-  let(:user_status) {
-    stat = user.create_user_status(hp: 10, mp: 10)
-    stat.updated_at = Time.current - 1.day
-    stat.save
-    stat
-  }
+    it { is_expected.to be_instance_of(CardsUser) }
+    it { is_expected.to eq(cards_user) }
 
-  let(:card) {
-    Card.create!(name: "foobar")
-  }
-
-  let(:cards_user) {
-    user.cards_users.create(card: card)
-  }
-
-  context "When creating record" do
-    context "with blob column" do
-      subject { user }
+    context "has blob value" do
+      let(:user) { create(:user, blob: blob_value) }
       let(:blob_value) { "\123\123\123" }
-      let(:user) {
-        u = User.new(nickname: "x", blob: blob_value)
-        u.id = 1
-        u.save
-        u
-      }
-      its(:blob) { is_expected.to eq(user.reload.blob) }
+
+      it { expect(user.blob).to eq(user.reload.blob) }
     end
   end
 
   context "When the model is sharded by surrogate key" do
-    it "doesn't change the behavior when updating" do
-      user.nickname = "fizzbuzz"
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-      expect {
-        user.save!
-      }.not_to raise_error
-      expect(strio.string).to match(/WHERE `users`\.`id` = #{user.id}[^\s]*$/)
+    let(:user) { create(:user, :created_yesterday) }
+
+    context "When updating" do
+      subject { user.update_attributes!(nickname: new_nickname) }
+
+      let(:new_nickname) { Faker::Name.unique.name }
+
+      it { expect { subject }.not_to raise_error }
+      it { expect { subject }.to query_like(/WHERE `users`\.`id` = #{user.id}[^\s]*$/) }
+
+      it do
+        subject
+        expect(user).to be_saved_to(user.turntable_shard)
+      end
+
+      it { expect { subject }.to change(user, :updated_at) }
     end
 
-    it "is saved to target_shard" do
-      expect(user).to be_saved_to(user.turntable_shard)
-    end
+    context "When destroying" do
+      subject { user.destroy }
 
-    it "changes updated_at when updating" do
-      user.nickname = "fizzbuzz"
-
-      expect { user.save! }.to change(user, :updated_at)
-    end
-
-    it "doesn't change the behavior when destroying" do
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-      expect { user.destroy }.not_to raise_error
-      expect(strio.string).to match(/WHERE `users`\.`id` = #{user.id}[^\s]*$/)
+      it { expect { subject }.not_to raise_error }
+      it { expect { subject }.to query_like(/WHERE `users`\.`id` = #{user.id}[^\s]*$/) }
     end
   end
 
-  context "When called Callbacks" do
-    before do
-      class ::User
-        after_destroy :on_destroy
-        after_save    :on_update
-        def on_destroy
-        end
-
-        def on_update
-        end
-      end
-    end
+  context "With a model with callbacks" do
+    let(:user_with_callbacks) { create(:user_with_callbacks) }
 
     context "on update once" do
-      it "callback should be called once" do
-        allow(user).to receive(:on_update)
-        user.save
-        expect(user).to have_received(:on_update).once
+      subject { user_with_callbacks.save }
+
+      it do
+        allow(user_with_callbacks).to receive(:on_update)
+        subject
+        expect(user_with_callbacks).to have_received(:on_update).once
       end
     end
+
     context "on destroy once" do
-      it "callback should be called once" do
-        allow(user).to receive(:on_destroy)
-        user.destroy
-        expect(user).to have_received(:on_destroy).once
+      it do
+        allow(user_with_callbacks).to receive(:on_destroy)
+        user_with_callbacks.destroy
+        expect(user_with_callbacks).to have_received(:on_destroy).once
       end
     end
   end
 
   context "When the model is sharded by other key" do
-    it "appends shard_key condition to queries when updating" do
-      cards_user.num = 10
+    let!(:user) { create(:user, :with_cards_users) }
+    let!(:cards_user) { user.cards_users.first }
 
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-      expect {
-        cards_user.save!
-      }.not_to raise_error
-      expect(strio.string).to match(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/)
-    end
+    context "When updating" do
+      subject { cards_user.update_attributes!(num: 2) }
 
-    it "changes updated_at when updating" do
-      cards_user
+      it { expect { subject }.not_to raise_error }
 
-      Timecop.travel(1.day.from_now) do
-        expect {
-          cards_user.num = 2
-          cards_user.save!
-        }.to change(cards_user, :updated_at)
+      it { expect { subject }.to query_like(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/) }
+
+      it "changes updated_at when updating" do
+        Timecop.travel(1.day.from_now) do
+          expect {
+            cards_user.num = 2
+            subject
+          }.to change(cards_user, :updated_at)
+        end
       end
     end
 
-    it "appends shard_key condition to queries when destroying" do
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-      expect {
-        cards_user.destroy
-      }.not_to raise_error
-      expect(strio.string).to match(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/)
+    context "When destroying" do
+      subject { cards_user.destroy! }
+
+      it { expect { subject }.not_to raise_error }
+      it { expect { subject }.to query_like(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/) }
     end
 
     it "warns when creating without shard_key" do
       skip "doesn't need to implemented soon"
     end
 
-    it "executes one query when reloading" do
-      user; cards_user
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-
-      expect { cards_user.reload }.not_to raise_error
-
-      expect(strio.string.split("\n").select { |stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
+    context "#reload" do
+      it { expect { cards_user.reload }.not_to raise_error }
+      it { expect { cards_user.reload }.to have_queried(1) }
     end
 
-    it "executes one query when touching" do
-      user; cards_user
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-
-      expect { cards_user.touch }.not_to raise_error
-      expect(strio.string.split("\n").select { |stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
+    context "#touch" do
+      it { expect { cards_user.touch }.not_to raise_error }
+      it { expect { cards_user.touch }.to have_queried(1) }
     end
 
-    it "executes one query when locking" do
-      user; cards_user
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-
-      expect { cards_user.lock! }.not_to raise_error
-      expect(strio.string.split("\n").select { |stmt| stmt =~ /SELECT/ and stmt !~ /Turntable/ }).to have(1).items
+    context "#lock!" do
+      it { expect { cards_user.lock! }.not_to raise_error }
+      it { expect { cards_user.lock! }.to have_queried(1) }
     end
 
-    it "executes one query when update_columns" do
-      user; cards_user
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-
-      expect { cards_user.update_columns(num: 10) }.not_to raise_error
-      expect(strio.string.split("\n").select { |stmt| stmt =~ /UPDATE/ and stmt !~ /Turntable/ }).to have(1).items
+    context "#update_columns" do
+      it { expect { cards_user.update_columns(num: 10) }.not_to raise_error }
+      it { expect { cards_user.update_columns(num: 10) }.to have_queried(1) }
     end
   end
 
   context "When the model is not sharded" do
-    it "doesn't append shard_key condition to queries when updating" do
-      card.name = "barbaz"
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-      expect {
-        card.save!
-      }.not_to raise_error
-      expect(strio.string).to match(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/)
-    end
+    let(:card) { create(:card) }
 
-    it "doesn't append shard_key condition to queries when destroying" do
-      strio = StringIO.new
-      ActiveRecord::Base.logger = Logger.new(strio)
-      expect {
-        card.destroy
-      }.not_to raise_error
-      expect(strio.string).to match(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/)
-    end
-  end
+    it { expect { card.update_attributes(name: "hoge") }.not_to raise_error }
+    it { expect { card.update_attributes(name: "hoge") }.to query_like(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/) }
 
-  context "When call reload" do
-    subject { cards_user.reload }
-    it { is_expected.to be_instance_of(CardsUser) }
-    it { is_expected.to eq(cards_user) }
+    it { expect { card.destroy! }.not_to raise_error }
+    it { expect { card.destroy! }.to query_like(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/) }
   end
 end

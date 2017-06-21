@@ -1,34 +1,15 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Association do
-  let!(:user) do
-    user = User.new({ nickname: "user1" })
-    user.id = 1
-    user.save
-    user
-  end
-
-  let!(:cards_users) do
-    10.times.map do
-      CardsUser.create(user: user, card_id: 1)
-    end
-  end
-
-  let!(:cards_users_histories) do
-    cards_users.map do |cards_user|
-      CardsUsersHistory.create(cards_user: cards_user, user: user)
-    end
-  end
-
-  let!(:events_users_histories) do
-    cards_users.map do |cards_user|
-      EventsUsersHistory.create(cards_user: cards_user, user: user, events_user_id: user.id)
-    end
+  before do
+    @user = create(:user)
+    @cards_users = create_list(:cards_user, 10, :with_cards_users_history, :with_events_users_history, user: @user)
   end
 
   context "When a model with has_one relation" do
     context "When the has_one associated object doesn't exists" do
-      subject { user.user_status }
+      subject { @user.user_status }
+
       it { expect { subject }.not_to raise_error }
     end
   end
@@ -39,20 +20,27 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
       example.run
       ActiveRecord::Base.turntable_config.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = false
     end
-    let(:cards_user) { CardsUser.where(user: user).first }
-    let(:cards_users_history) { cards_users_histories.find { |history| history.user_id == user.id } }
+
+    let(:cards_user) { CardsUser.where(user: @user).first }
 
     context "associated objects has same turntable_key" do
       context "AssociationRelation#to_a" do
         subject { cards_user.cards_users_histories.to_a }
+
         it { expect { subject }.not_to raise_error }
-        it { is_expected.to include(*cards_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
+        it do
+          expected_histories = CardsUsersHistory.where(user: @user, cards_user: cards_user)
+          is_expected.to match_array(expected_histories)
+        end
       end
 
       context "AssociationRelation#where" do
-        subject { cards_user.cards_users_histories.where(id: cards_users_history.id).to_a }
+        subject { cards_user.cards_users_histories.where(id: first_cards_users_history.id).to_a }
+
+        let(:first_cards_users_history) { CardsUsersHistory.where(user: @user, cards_user: cards_user).first }
+
         it { expect { subject }.not_to raise_error }
-        it { is_expected.to include(cards_users_history) }
+        it { is_expected.to include(first_cards_users_history) }
       end
     end
 
@@ -61,7 +49,10 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Association do
         subject { cards_user.events_users_histories_with_foreign_shard_key.to_a }
 
         it { expect { subject }.not_to raise_error }
-        it { is_expected.to include(*events_users_histories.select { |history| history.cards_user_id == cards_user.id }) }
+        it do
+          expected_histories = EventsUsersHistory.where(events_user_id: @user, cards_user: cards_user)
+          is_expected.to match_array(expected_histories)
+        end
       end
 
       context "when foreign_shard_key option is not passed" do
