@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Sequencer do
   end
 
   context "With sequencer disabled model" do
-    subject { Card }
+    subject { Item }
     its(:sequence_name) { is_expected.to be_nil }
   end
 end

@@ -47,73 +47,7 @@ namespace :turntable do
 
       configurations.each do |configuration|
         ActiveRecord::Base.establish_connection configuration
-
-        ActiveRecord::Base.connection.create_table :users, comment: "comment" do |t|
-          t.string :nickname
-          t.string :thumbnail_url
-          t.binary :blob
-          t.datetime :joined_at
-          t.datetime :deleted_at
-          t.timestamps
-        end
-        ActiveRecord::Base.connection.create_sequence_for :users, comment: "comment"
-
-        ActiveRecord::Base.connection.create_table :user_statuses do |t|
-          t.belongs_to :user, :null => false
-          t.integer    :hp,   :null => false, :default => 0
-          t.integer    :mp,   :null => false, :default => 0
-          t.text       :data
-          t.integer    :lock_version, :null => false, :default => 0
-          t.datetime   :deleted_at, :default => nil
-          t.timestamps
-        end
-        ActiveRecord::Base.connection.create_sequence_for :user_statuses
-
-        ActiveRecord::Base.connection.create_table :cards do |t|
-          t.string :name, :null => false
-          t.integer :hp,  :null => false, :default => 0
-          t.integer :mp,  :null => false, :default => 0
-          t.timestamps
-        end
-        ActiveRecord::Base.connection.create_table :archived_cards do |t|
-          t.string :name, :null => false
-          t.integer :hp,  :null => false, :default => 0
-          t.integer :mp,  :null => false, :default => 0
-          t.timestamps
-          t.datetime :deleted_at, :default => nil
-        end
-
-        ActiveRecord::Base.connection.create_table :cards_users do |t|
-          t.belongs_to :card,    :null => false
-          t.belongs_to :user,    :null => false
-          t.integer    :num,     :default => 1, :null => false
-          t.timestamps
-        end
-        ActiveRecord::Base.connection.create_sequence_for :cards_users
-
-        ActiveRecord::Base.connection.create_table :archived_cards_users do |t|
-          t.belongs_to :card,    :null => false
-          t.belongs_to :user,    :null => false
-          t.timestamps
-          t.datetime   :deleted_at, :default => nil
-        end
-        ActiveRecord::Base.connection.create_sequence_for :archived_cards_users
-
-        ActiveRecord::Base.connection.create_table :cards_users_histories do |t|
-          t.belongs_to :cards_user,    :null => false
-          t.belongs_to :user, :null => false
-          t.timestamps
-        end
-        ActiveRecord::Base.connection.create_sequence_for :cards_users_histories
-
-        ActiveRecord::Base.connection.create_table :events_users_histories do |t|
-          t.belongs_to :events_user, :null => false
-          t.belongs_to :cards_user,    :null => false
-          t.belongs_to :user, :null => false
-          t.string :type, :default => nil
-          t.timestamps
-        end
-        ActiveRecord::Base.connection.create_sequence_for :events_users_histories
+        load File.expand_path("spec/migrations/schema.rb", __dir__)
       end
     end
 

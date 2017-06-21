@@ -1,1 +1,0 @@
-class SpecialEventsUsersHistory < EventsUsersHistory; end

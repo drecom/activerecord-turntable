@@ -3,13 +3,13 @@ require "logger"
 
 describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   context "#reload" do
-    subject { cards_user.reload }
+    subject { user_item.reload }
 
-    let(:user) { create(:user, :with_cards_users) }
-    let!(:cards_user) { user.cards_users.first }
+    let(:user) { create(:user, :with_user_items) }
+    let!(:user_item) { user.user_items.first }
 
-    it { is_expected.to be_instance_of(CardsUser) }
-    it { is_expected.to eq(cards_user) }
+    it { is_expected.to be_instance_of(UserItem) }
+    it { is_expected.to eq(user_item) }
 
     context "has blob value" do
       let(:user) { create(:user, blob: blob_value) }
@@ -69,31 +69,31 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   end
 
   context "When the model is sharded by other key" do
-    let!(:user) { create(:user, :with_cards_users) }
-    let!(:cards_user) { user.cards_users.first }
+    let!(:user) { create(:user, :with_user_items) }
+    let!(:user_item) { user.user_items.first }
 
     context "When updating" do
-      subject { cards_user.update_attributes!(num: 2) }
+      subject { user_item.update_attributes!(num: 2) }
 
       it { expect { subject }.not_to raise_error }
 
-      it { expect { subject }.to query_like(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/) }
+      it { expect { subject }.to query_like(/`user_items`\.`user_id` = #{user_item.user_id}[^\s]*($|\s)/) }
 
       it "changes updated_at when updating" do
         Timecop.travel(1.day.from_now) do
           expect {
-            cards_user.num = 2
+            user_item.num = 2
             subject
-          }.to change(cards_user, :updated_at)
+          }.to change(user_item, :updated_at)
         end
       end
     end
 
     context "When destroying" do
-      subject { cards_user.destroy! }
+      subject { user_item.destroy! }
 
       it { expect { subject }.not_to raise_error }
-      it { expect { subject }.to query_like(/`cards_users`\.`user_id` = #{cards_user.user_id}[^\s]*($|\s)/) }
+      it { expect { subject }.to query_like(/`user_items`\.`user_id` = #{user_item.user_id}[^\s]*($|\s)/) }
     end
 
     it "warns when creating without shard_key" do
@@ -101,33 +101,33 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     end
 
     context "#reload" do
-      it { expect { cards_user.reload }.not_to raise_error }
-      it { expect { cards_user.reload }.to have_queried(1) }
+      it { expect { user_item.reload }.not_to raise_error }
+      it { expect { user_item.reload }.to have_queried(1) }
     end
 
     context "#touch" do
-      it { expect { cards_user.touch }.not_to raise_error }
-      it { expect { cards_user.touch }.to have_queried(1) }
+      it { expect { user_item.touch }.not_to raise_error }
+      it { expect { user_item.touch }.to have_queried(1) }
     end
 
     context "#lock!" do
-      it { expect { cards_user.lock! }.not_to raise_error }
-      it { expect { cards_user.lock! }.to have_queried(1) }
+      it { expect { user_item.lock! }.not_to raise_error }
+      it { expect { user_item.lock! }.to have_queried(1) }
     end
 
     context "#update_columns" do
-      it { expect { cards_user.update_columns(num: 10) }.not_to raise_error }
-      it { expect { cards_user.update_columns(num: 10) }.to have_queried(1) }
+      it { expect { user_item.update_columns(num: 10) }.not_to raise_error }
+      it { expect { user_item.update_columns(num: 10) }.to have_queried(1) }
     end
   end
 
   context "When the model is not sharded" do
-    let(:card) { create(:card) }
+    let(:item) { create(:item) }
 
-    it { expect { card.update_attributes(name: "hoge") }.not_to raise_error }
-    it { expect { card.update_attributes(name: "hoge") }.to query_like(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/) }
+    it { expect { item.update_attributes(name: "hoge") }.not_to raise_error }
+    it { expect { item.update_attributes(name: "hoge") }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }
 
-    it { expect { card.destroy! }.not_to raise_error }
-    it { expect { card.destroy! }.to query_like(/WHERE `cards`\.`id` = #{card.id}[^\s]*$/) }
+    it { expect { item.destroy! }.not_to raise_error }
+    it { expect { item.destroy! }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }
   end
 end

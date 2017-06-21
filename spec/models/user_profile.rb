@@ -1,4 +1,4 @@
-class UserStatus < ActiveRecord::Base
+class UserProfile < ActiveRecord::Base
   # shard by other key
   turntable :user_cluster, :user_id
   sequencer :user_seq

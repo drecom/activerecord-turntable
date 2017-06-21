@@ -1,3 +1,5 @@
+require "models/user"
+
 class UserWithCallbacks < User
   self.table_name = "users"
 

@@ -1,19 +1,19 @@
 FactoryGirl.define do
   factory :user do
     sequence(:id, 1)
-    sequence(:nickname) { |i| "nickname-#{i}" }
+    nickname { Faker::Name.name }
 
     after(:build) do |user, _evaluator|
-      create(:user_status, user: user)
+      create(:user_profile, user: user)
     end
 
-    trait :with_cards_users do
+    trait :with_user_items do
       transient do
-        cards_users_count 10
+        user_items_count 10
       end
 
       after(:build) do |user, evaluator|
-        create_list(:cards_user, evaluator.cards_users_count, user: user)
+        create_list(:user_item, evaluator.user_items_count, user: user)
       end
     end
 
