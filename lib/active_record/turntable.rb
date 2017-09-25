@@ -22,7 +22,6 @@ module ActiveRecord::Turntable
     autoload :Base
     autoload :Cluster
     autoload :ClusterHelperMethods
-    autoload :Config
     autoload :ClusterRegistry
     autoload :Configuration
     autoload :ConfigurationMethods
