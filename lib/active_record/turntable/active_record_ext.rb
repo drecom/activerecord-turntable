@@ -21,7 +21,7 @@ module ActiveRecord::Turntable
 
     included do
       include Transactions
-      ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(Sequencer)
+      ActiveRecord::Base.prepend(Sequencer)
       ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(AbstractAdapter)
       ActiveRecord::LogSubscriber.prepend(LogSubscriber)
       ActiveRecord::Persistence.include(Persistence)

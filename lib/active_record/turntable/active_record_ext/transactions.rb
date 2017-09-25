@@ -3,12 +3,13 @@ module ActiveRecord::Turntable
     module Transactions
       # @note Override to start transaction on current shard
       def with_transaction_returning_status
-        return super unless self.class.turntable_enabled?
+        klass = self.class
+        return super unless klass.turntable_enabled?
 
         status = nil
-        if self.new_record? && self.turntable_shard_key.to_s == self.class.primary_key &&
-            self.id.nil? && self.class.connection.prefetch_primary_key?(self.class.table_name)
-          self.id = self.class.connection.next_sequence_value(self.class.sequence_name)
+        if self.new_record? && self.turntable_shard_key.to_s == klass.primary_key &&
+            self.id.nil? && klass.prefetch_primary_key?
+          self.id = klass.next_sequence_value
         end
         self.class.connection.shards_transaction([self.turntable_shard]) do
           add_to_transaction

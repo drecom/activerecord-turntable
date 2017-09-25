@@ -1,23 +1,23 @@
 module ActiveRecord::Turntable::ActiveRecordExt
   module Sequencer
-    def default_sequence_name(table_name, pk = nil)
-      if ActiveRecord::Turntable::Sequencer.has_sequencer?(table_name)
-        ActiveRecord::Turntable::Sequencer.sequence_name(table_name, pk)
-      else
-        super
-      end
+    def next_sequence_value
+      return super unless sequencer_enabled?
+
+      turntable_sequencer.next_sequence_value(sequence_name)
     end
 
-    def prefetch_primary_key?(table_name = nil)
-      ActiveRecord::Turntable::Sequencer.has_sequencer?(table_name)
+    def reset_sequence_name
+      return super unless sequencer_enabled?
+
+      turntable_sequencer.sequence_name(table_name, primary_key)
     end
 
-    def next_sequence_value(sequence_name)
-      ActiveRecord::Turntable::Sequencer.sequences[sequence_name].next_sequence_value(sequence_name)
+    def prefetch_primary_key?
+      sequencer_enabled? || super
     end
 
     def current_sequence_value(sequence_name)
-      ActiveRecord::Turntable::Sequencer.sequences[sequence_name].current_sequence_value(sequence_name)
+      turntable_sequencer.current_sequence_value(sequence_name)
     end
   end
 end
