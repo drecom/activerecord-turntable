@@ -23,6 +23,8 @@ module ActiveRecord::Turntable
     autoload :Cluster
     autoload :ClusterHelperMethods
     autoload :Config
+    autoload :ClusterRegistry
+    autoload :Configuration
     autoload :ConfigurationMethods
     autoload :ConnectionProxy
     autoload :Compatibility
@@ -33,8 +35,10 @@ module ActiveRecord::Turntable
     autoload :PoolProxy
     autoload :Shard
     autoload :ShardingCondition
+    autoload :ShardRegistry
     autoload :SeqShard
     autoload :Sequencer
+    autoload :SequencerRegistry
   end
 
   included do
