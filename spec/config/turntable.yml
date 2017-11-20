@@ -1,10 +1,14 @@
 test:
+  sequencers:
+    user_seq:
+      type: mysql
+      connection: user_seq
   clusters:
     user_cluster:
       algorithm: range_bsearch
       seq:
         user_seq:
-          connection: turntable_user_seq_test
+          connection: user_seq
       shards:
         - connection: user_shard_1
           less_than: 20000
@@ -20,7 +24,7 @@ test:
       algorithm: range_bsearch
       seq:
         user_seq:
-          connection: turntable_user_seq_test
+          connection: user_seq
       shards:
         - connection: user_shard_4
           less_than: 20000
@@ -36,10 +40,8 @@ test:
       algorithm: modulo
       seq:
         user_seq:
-          connection: turntable_user_seq_test
+          connection: user_seq
       shards:
-        - connection: user_shard_1
-        - connection: user_shard_2
         - connection: user_shard_1
         - connection: user_shard_2
         - connection: user_shard_3
@@ -52,5 +54,6 @@ test:
       shards:
         - connection: user_shard_1
         - connection: user_shard_2
-        - connection: user_shard_2
- 
+        - connection: user_shard_3
+  raise_on_not_specified_shard_query: false
+  raise_on_not_specified_shard_update: false

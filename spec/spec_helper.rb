@@ -41,7 +41,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
 
   config.before(:suite) do
-    reload_turntable!(File.join(File.dirname(__FILE__), "config/turntable.yml"), :test)
+    reload_turntable!(File.join(File.dirname(__FILE__), "config/turntable.rb"), :test)
   end
 
   config.include FactoryGirl::Syntax::Methods
