@@ -27,18 +27,16 @@ module ActiveRecord::Turntable
       # @param [Symbol] shard_key_name shard key attribute name
       # @param [Hash] options
       def turntable(cluster_name, shard_key_name, options = {})
-        class_attribute :turntable_shard_key,
-                        :turntable_cluster, :turntable_cluster_name
+        class_attribute :turntable_shard_key, :turntable_cluster_name
 
         self.turntable_enabled = true
         self.turntable_cluster_name = cluster_name
         self.turntable_shard_key = shard_key_name
-        self.turntable_cluster =
-          self.turntable_clusters[cluster_name] ||= Cluster.new(
-            turntable_configuration[:clusters][cluster_name],
-            options
-          )
         turntable_replace_connection_pool
+      end
+
+      def turntable_cluster
+        turntable_clusters[turntable_cluster_name]
       end
 
       def turntable_replace_connection_pool
