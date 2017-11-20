@@ -7,34 +7,17 @@ module ActiveRecord::Turntable
       "algorithm" => "range",
     }.with_indifferent_access
 
-    def initialize(cluster_spec, options = {})
-      @config = DEFAULT_CONFIG.merge(cluster_spec)
-      @options = options.with_indifferent_access
-      @shards = {}.with_indifferent_access
+    attr_accessor :algorithm, :shard_registry, :sequencer_registry
 
-      # setup sequencer
-      seq = (@options[:seq] || @config[:seq])
-      if seq
-        if seq.values.size > 0 && seq.values.first[:seq_type] == "mysql"
-          @seq_shard = SeqShard.new(seq.values.first)
-        end
+    def self.build(sequencer_registry)
+      self.new.tap do |instance|
+        instance.shard_registry = ShardRegistry.new
+        instance.sequencer_registry = sequencer_registry
+        yield instance
       end
-
-      # setup shards
-      @config[:shards].each do |spec|
-        @shards[spec[:connection]] ||= Shard.new(spec)
-      end
-
-      # setup algorithm
-      alg_name = "ActiveRecord::Turntable::Algorithm::#{@config[:algorithm].camelize}Algorithm"
-      @algorithm = alg_name.constantize.new(@config)
     end
 
-    def seq
-      @seq_shard
-    end
-
-    attr_reader :shards
+    delegate :shards, :shard_maps, :release!, to: :shard_registry
 
     def shard_for(key)
       @shards[@algorithm.calculate(key)]
@@ -52,7 +35,7 @@ module ActiveRecord::Turntable
       unless in_recursion
         shards = Array.wrap(shards).dup
         if shards.blank?
-          shards = @shards.values.dup
+          shards = self.shards.dup
         end
       end
       shard = to_shard(shards.shift)
