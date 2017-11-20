@@ -18,10 +18,9 @@ module ActiveRecord::Turntable
       defined?(::Rails.root) ? ::Rails.root.to_s : DEFAULT_PATH
     end
 
-    def turntable_configuration
-      ActiveRecord::Turntable::Config.instance
+    def turntable_config
+      turntable_configuration
     end
-    alias_method :turntable_config, :turntable_configuration
     deprecate turntable_config: "use turntable_configuration instead", deprecator: ActiveRecord::Turntable::Deprecation.instance
   end
 end
