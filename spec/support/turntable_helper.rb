@@ -5,7 +5,12 @@ module TurntableHelper
     ActiveRecord::Base.include(ActiveRecord::Turntable)
     ActiveRecord::SchemaDumper.prepend(ActiveRecord::Turntable::ActiveRecordExt::SchemaDumper)
     ActiveRecord::Base.turntable_configuration_file = config_file_name
-    ActiveRecord::Turntable::Config.load!(ActiveRecord::Base.turntable_configuration_file, :test)
+    configuration =
+      ActiveRecord::Turntable::Configuration.load(
+        ActiveRecord::Base.turntable_configuration_file,
+        env
+      )
+    ActiveRecord::Base.reset_turntable_configuration(configuration)
     ActiveRecord::Base.logger = Logger.new("/dev/null")
     ActiveRecord::Base.establish_connection(env)
   end
