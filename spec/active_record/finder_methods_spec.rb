@@ -2,21 +2,14 @@ require "spec_helper"
 
 describe ActiveRecord::FinderMethods do
   before do
-    user
+    @user = User.create!(id: 10)
   end
 
-  let(:user) {
-    u = User.new
-    u.id = 1
-    u.save
-    u
-  }
-
-  context "#find" do
+  context ".find" do
     context "pass an ID that exists" do
-      subject { User.find(1) }
+      subject { User.find(10) }
 
-      it { is_expected.to eq(user) }
+      it { is_expected.to eq(@user) }
     end
 
     context "pass an ID that doesn't exist" do
