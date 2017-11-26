@@ -20,7 +20,7 @@ module ActiveRecord::Turntable
     delegate :shards, :shard_maps, :release!, to: :shard_registry
 
     def shard_for(key)
-      @shards[@algorithm.calculate(key)]
+      algorithm.choose(shard_maps, key)
     rescue
       raise ActiveRecord::Turntable::CannotSpecifyShardError,
             "cannot select shard for key:#{key.inspect}"
@@ -67,9 +67,7 @@ module ActiveRecord::Turntable
     end
 
     def weighted_shards(key = nil)
-      Hash[@algorithm.calculate_used_shards_with_weight(key).map do |k, v|
-        [@shards[k], v]
-      end]
+      @algorithm.shard_weights(shard_maps, key)
     end
   end
 end

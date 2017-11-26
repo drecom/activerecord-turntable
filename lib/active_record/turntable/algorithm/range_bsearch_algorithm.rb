@@ -1,40 +1,28 @@
-# -*- coding: utf-8 -*-
-require "bsearch"
 module ActiveRecord::Turntable::Algorithm
   class RangeBsearchAlgorithm < Base
-    def initialize(config)
-      @config = config
-      @config[:shards].sort_by! { |a| a[:less_than] }
+    def choose(shard_maps, key)
+      shard_map = shard_maps.bsearch { |shard| key <= shard.range.max }
+      raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key.inspect}" unless shard_map
+      shard_map.shard
     end
 
-    def calculate(key)
-      idx = calculate_idx(key)
-      @config[:shards][idx][:connection]
-    rescue
-      raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key.inspect}"
+    def choose_index(shard_maps, key)
+      (0...shard_maps.size).bsearch { |idx| key <= shard_maps[idx].range.max } or
+        raise ActiveRecord::Turntable::CannotSpecifyShardError, "cannot specify shard for key:#{key.inspect}"
     end
 
-    def calculate_idx(key)
-      @config[:shards].bsearch_upper_boundary { |h|
-        h[:less_than] <=> key
-      }
-    end
-
-    # { connection_name => weight, ... }
-    def calculate_used_shards_with_weight(sequence_value)
-      current_shard_idx = calculate_idx(sequence_value)
-      shards = @config[:shards][0..current_shard_idx]
-      weighted_hash = Hash.new { |h, k| h[k] = 0 }
-      prev_max = 0
-      shards.each_with_index do |h, idx|
-        weighted_hash[h[:connection]] += if idx < shards.size - 1
-                                           h[:less_than] - prev_max - 1
+    def shard_weights(shard_maps, current_sequence_value)
+      current_shard_index = choose_index(shard_maps, current_sequence_value)
+      shard_maps = shard_maps[0..current_shard_index]
+      weights_hash = Hash.new { |h, k| h[k] = 0 }
+      shard_maps.each_with_index do |shard_map, idx|
+        weights_hash[shard_map.shard] += if idx < current_shard_index
+                                           shard_map.range.size
                                          else
-                                           sequence_value - prev_max
+                                           current_sequence_value - shard_map.range.min + 1
                                          end
-        prev_max = h[:less_than] - 1
       end
-      weighted_hash
+      weights_hash
     end
   end
 end
