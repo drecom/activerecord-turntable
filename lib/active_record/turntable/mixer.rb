@@ -223,11 +223,11 @@ module ActiveRecord::Turntable
       end
 
       def raise_on_not_specified_shard_query?
-        ActiveRecord::Base.turntable_configuration[:raise_on_not_specified_shard_query]
+        ActiveRecord::Base.turntable_configuration.raise_on_not_specified_shard_query
       end
 
       def raise_on_not_specified_shard_update?
-        ActiveRecord::Base.turntable_configuration[:raise_on_not_specified_shard_update]
+        ActiveRecord::Base.turntable_configuration.raise_on_not_specified_shard_update
       end
   end
 end

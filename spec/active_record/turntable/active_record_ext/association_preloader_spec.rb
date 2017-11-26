@@ -8,9 +8,9 @@ describe ActiveRecord::Turntable::ActiveRecordExt::AssociationPreloader do
 
   context "When preloads has_many association" do
     around do |example|
-      ActiveRecord::Base.turntable_configuration.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = true
+      ActiveRecord::Base.turntable_configuration.raise_on_not_specified_shard_query = true
       example.run
-      ActiveRecord::Base.turntable_configuration.instance_variable_get(:@config)[:raise_on_not_specified_shard_query] = false
+      ActiveRecord::Base.turntable_configuration.raise_on_not_specified_shard_query = false
     end
 
     context "When associated objects has the same shard key" do
