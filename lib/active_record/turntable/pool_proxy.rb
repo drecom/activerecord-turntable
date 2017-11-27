@@ -47,8 +47,10 @@ module ActiveRecord::Turntable
       def connection_pools_list
         pools = []
         pools << proxy.master.connection_pool
-        pools << proxy.seq.try(:connection_pool) if proxy.respond_to?(:seq)
-        pools.concat(proxy.shards.values.map(&:connection_pool))
+        if proxy.respond_to?(:sequencers)
+          pools.concat proxy.cluster.sequencers.values.map { |s| s.try(:connection_pool) }.compact
+        end
+        pools.concat(proxy.cluster.shards.map(&:connection_pool))
         pools.compact
       end
   end

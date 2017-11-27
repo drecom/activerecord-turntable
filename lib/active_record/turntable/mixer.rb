@@ -144,7 +144,7 @@ module ActiveRecord::Turntable
         elsif SQLTree::Node::SelectDeclaration === tree.select.first &&
               tree.select.first.to_sql == '1 AS "one"' # for `SELECT 1 AS one` (AR::Base.exists?)
           return Fader::SelectShardsMergeResult.new(@proxy,
-                                                    build_shards_with_same_query(@proxy.shards.values, query),
+                                                    build_shards_with_same_query(@proxy.shards, query),
                                                     method, query, *args, &block)
         elsif tree.group_by || tree.order_by || tree.limit.try(:value).to_i > 0
           raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
@@ -152,7 +152,7 @@ module ActiveRecord::Turntable
           if SQLTree::Node::SelectDeclaration === tree.select.first &&
              SQLTree::Node::CountAggregrate === tree.select.first.expression
             return Fader::CalculateShardsSumResult.new(@proxy,
-                                                       build_shards_with_same_query(@proxy.shards.values, query),
+                                                       build_shards_with_same_query(@proxy.shards, query),
                                                        method, query, *args, &block)
           else
             return Fader::SelectShardsMergeResult.new(@proxy,
@@ -167,7 +167,7 @@ module ActiveRecord::Turntable
               raise CannotSpecifyShardError, "[Performance Notice] PLEASE FIX: #{tree.to_sql}"
             end
             return Fader::CalculateShardsSumResult.new(@proxy,
-                                                       build_shards_with_same_query(@proxy.shards.values, query),
+                                                       build_shards_with_same_query(@proxy.shards, query),
                                                        method, query, *args, &block)
           elsif SQLTree::Node::AllFieldsDeclaration === tree.select.first ||
                 SQLTree::Node::Expression::Value === tree.select.first.expression ||
@@ -177,7 +177,7 @@ module ActiveRecord::Turntable
               raise CannotSpecifyShardError, "[Performance Notice] PLEASE FIX: #{tree.to_sql}"
             end
             return Fader::SelectShardsMergeResult.new(@proxy,
-                                                      build_shards_with_same_query(@proxy.shards.values, query),
+                                                      build_shards_with_same_query(@proxy.shards, query),
                                                       method, query, *args, &block)
           else
             raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
@@ -190,7 +190,7 @@ module ActiveRecord::Turntable
         shards_with_query = if shard_keys.present?
                               build_shards_with_same_query(shard_keys.map { |k| @proxy.cluster.shard_for(k) }, query)
                             else
-                              build_shards_with_same_query(@proxy.shards.values, query)
+                              build_shards_with_same_query(@proxy.shards, query)
                             end
 
         if shards_with_query.size == 1
