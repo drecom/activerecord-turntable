@@ -2,19 +2,18 @@ require "spec_helper"
 
 describe ActiveRecord::Turntable::Shard do
   context "When initialized" do
-    subject {
-      ActiveRecord::Turntable::Shard.new(ActiveRecord::Base.turntable_configuration[:clusters][:user_cluster][:shards][0])
-    }
-    its(:name) { should == ActiveRecord::Base.turntable_configuration[:clusters][:user_cluster][:shards][0][:connection] }
-    its(:connection) { should be_instance_of(ActiveRecord::ConnectionAdapters::Mysql2Adapter) }
-    its(:connection_pool) { should be_instance_of(ActiveRecord::ConnectionAdapters::ConnectionPool) }
+    subject { ActiveRecord::Turntable::Shard.new("user_shard_1") }
+
+    its(:name) { is_expected.to eq("user_shard_1") }
+    its(:connection) { is_expected.to be_instance_of(ActiveRecord::ConnectionAdapters::Mysql2Adapter) }
+    its(:connection_pool) { is_expected.to be_instance_of(ActiveRecord::ConnectionAdapters::ConnectionPool) }
   end
 
   context "#connection" do
     subject { shard.connection }
-    let(:shard) do
-      ActiveRecord::Turntable::Shard.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][0])
-    end
+
+    let(:shard) { ActiveRecord::Turntable::Shard.new("user_shard_1") }
+
     its(:turntable_shard_name) { is_expected.to eq(shard.name) }
   end
 end

@@ -5,15 +5,10 @@ module ActiveRecord::Turntable
       Connections.constants.map { |name| Connections.const_get(name) }
     end
 
-    DEFAULT_CONFIG = {
-      "connection" => (defined?(Rails) ? Rails.env : "development"),
-    }.with_indifferent_access
+    attr_accessor :name
 
-    attr_reader :name
-
-    def initialize(shard_spec)
-      @config = DEFAULT_CONFIG.merge(shard_spec)
-      @name = @config[:connection]
+    def initialize(name = defined?(Rails) ? Rails.env : "development")
+      @name = name
       ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
