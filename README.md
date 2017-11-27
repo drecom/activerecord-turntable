@@ -87,7 +87,33 @@ three user databases sharded by user_id.
 
 ### Example Configuration
 
-Edit turntable.yml and database.yml. See below example config.
+Edit DSL type configuration file(config/turntable.rb) or YAML configuration file(turntable.yml).
+And add database connection settings to database.yml.
+
+See below example config.
+
+* example turntable.rb
+
+```ruby
+cluster :user_cluster do
+  # algorithm [algorithm name symbol(range|range_bsearch|modulo)]
+  algorithm :range_bsearch
+
+  # sequencer [sequence name] [sequence type] [*options hash]
+  sequencer :user_seq, :mysql, connection: :user_seq
+
+  # shard [range], to: [connection names in database.yml]
+  shard   1...100,        to: :user_shard_1
+  shard 100...200,        to: :user_shard_2
+  shard 200...2000000000, to: :user_shard_3
+
+  # If you are using modulo algorithm, pass integer sequence start with zero.
+  #
+  # shard 0, to: :user_shard_1
+  # shard 1, to: :user_shard_2
+  # shard 2, to: :user_shard_3
+end
+```
 
 * example turntable.yml
 
@@ -499,13 +525,19 @@ To notice queries causing performance problem, Turntable has follow options.
 * raise\_on\_not\_specified\_shard\_update - raises on updates executed on all shards
 
 
-Add to turntable.yml:
+Add to turntable.yml or turntable.rb:
 
 ```yaml
 development:
    ....
    raise_on_not_specified_shard_query: true
    raise_on_not_specified_shard_update: true
+```
+
+```ruby
+# Write on top level
+raise_on_not_specified_shard_query true
+raise_on_not_specified_shard_update true
 ```
 
 ## Thanks
