@@ -53,7 +53,7 @@ module ActiveRecord::Turntable
       end
 
       def weighted_random_shard_with(*klasses, &block)
-        shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence)
+        shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence_value(sequence_name))
         sum = shards_weight.values.inject(&:+)
         idx = rand(sum)
         shard, _weight = shards_weight.find { |_k, v|

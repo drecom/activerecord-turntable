@@ -1,10 +1,9 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Barrage do
-  let(:sequencer) { ActiveRecord::Turntable::Sequencer::Barrage.new(klass, options) }
+  let(:sequencer) { ActiveRecord::Turntable::Sequencer::Barrage.new(options) }
   let(:sequence_name) { "hogefuga" }
   let(:options) { { options: { generators: [{ name: "sequence", length: 16 }] } }.with_indifferent_access }
-  let(:klass) { Class.new }
 
   describe "#next_sequence_value" do
     subject { sequencer.next_sequence_value("hogefuga") }

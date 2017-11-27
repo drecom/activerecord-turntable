@@ -4,9 +4,8 @@ module ActiveRecord::Turntable
       class_attribute :unique_barrage_instance
       self.unique_barrage_instance = {}
 
-      def initialize(klass, options = {})
+      def initialize(options = {})
         require "barrage"
-        @klass = klass
         @options = options["options"]
       end
 

@@ -25,6 +25,14 @@ module ActiveRecord::Turntable
     self.sequences = {}
     self.tables = {}
 
+    def sequence_name(table_name, primary_key = 'id')
+      [table_name, primary_key, "seq"].join("_")
+    end
+
+    def release!
+      # Release subclasses if necessary
+    end
+
     class << self
       def build(klass, sequence_name = nil, cluster_name = nil)
         sequence_name ||= current_cluster_config_for(cluster_name || klass).sequencers.first
@@ -33,12 +41,21 @@ module ActiveRecord::Turntable
         tables[klass.table_name] ||= (sequences[sequence_name(klass.table_name, klass.primary_key)] ||= sequence_types[seq_type].new(klass, seq_config))
       end
 
+      def class_for(name_or_class)
+        case name_or_class
+        when Sequencer
+          name_or_class
+        else
+          const_get("#{name_or_class.to_s.classify}")
+        end
+      end
+
       def has_sequencer?(table_name)
         !!tables[table_name]
       end
 
-      def sequence_name(table_name, pk)
-        "#{table_name}_#{pk || 'id'}_seq"
+      def sequence_name(table_name, primary_key = 'id')
+        [table_name, primary_key, "seq"].join("_")
       end
 
       def table_name(seq_name)
@@ -57,11 +74,11 @@ module ActiveRecord::Turntable
         end
     end
 
-    def next_sequence_value
+    def next_sequence_value(sequence_name)
       raise NotImplementedError
     end
 
-    def current_sequence_value
+    def current_sequence_value(sequence_name)
       raise NotImplementedError
     end
   end

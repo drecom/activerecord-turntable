@@ -1,9 +1,8 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Api do
-  let(:sequencer) { ActiveRecord::Turntable::Sequencer::Api.new(klass, options) }
+  let(:sequencer) { ActiveRecord::Turntable::Sequencer::Api.new(options) }
   let(:sequence_name) { "hogefuga" }
-  let(:klass) { Class.new }
   let(:api_host) { "example.example" }
   let(:api_port) { 80 }
   let(:options) { { api_host: api_host, api_port: api_port }.with_indifferent_access }

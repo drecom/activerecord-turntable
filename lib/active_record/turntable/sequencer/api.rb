@@ -10,8 +10,7 @@ module ActiveRecord::Turntable
       API_ENDPOINT = "/sequences/".freeze
       NEXT_VALUE_ENDPOINT = "/new".freeze
 
-      def initialize(klass, options = {})
-        @klass = klass
+      def initialize(options = {})
         @options = options
         @host = @options[:api_host]
         @port = @options[:api_port]
