@@ -11,6 +11,8 @@ ActiveRecord::Turntable is a database sharding extension for ActiveRecord.
 
 activerecord(>=5.0.0, <6.0)
 
+* Current latest stable branch is [stable-3-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-3-x).
+
 If you are using with older activerecord versions, use following versions.
 
 * activerecord 4.x - use activerecord-turntable version 2.x.([stable-2-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-2-x))
