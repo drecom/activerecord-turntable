@@ -10,9 +10,8 @@ module ActiveRecord::Turntable
     attr_reader :klass
     attr_writer :spec
 
-    def initialize(klass, cluster, options = {})
-      @klass   = klass
-      @cluster = cluster
+    def initialize(klass, options = {})
+      @klass = klass
       @master_shard = MasterShard.new(klass)
       @default_current_shard = @master_shard
       @mixer = ActiveRecord::Turntable::Mixer.new(self)
@@ -27,6 +26,10 @@ module ActiveRecord::Turntable
              :remove_index, :initialize_schema_information,
              :dump_schema_information, :execute_ignore_duplicate,
              :query_cache_enabled, to: :master_connection
+
+    def cluster
+      klass.turntable_cluster
+    end
 
     def transaction(options = {}, &block)
       connection.transaction(options, &block)
@@ -107,10 +110,8 @@ module ActiveRecord::Turntable
       master.connection.to_sql(arel, binds)
     end
 
-    attr_reader :cluster
-
     def shards
-      @cluster.shards
+      cluster.shards
     end
 
     def shard_fixed?
@@ -131,10 +132,6 @@ module ActiveRecord::Turntable
 
     def master_connection
       master.connection
-    end
-
-    def seq
-      @cluster.seq || master
     end
 
     def current_shard
@@ -176,7 +173,7 @@ module ActiveRecord::Turntable
     end
 
     def with_recursive_shards(connection_name, *klasses, &block)
-      with_shard(shards[connection_name]) do
+      with_shard(cluster.shard_registry[connection_name]) do
         if klasses.blank?
           yield
         else
@@ -189,7 +186,7 @@ module ActiveRecord::Turntable
     # Send queries to all shards in this cluster
     # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
     def with_all(continue_on_error = false)
-      @cluster.shards.values.map do |shard|
+      cluster.shards.map do |shard|
         begin
           with_shard(shard) {
             yield
@@ -206,7 +203,7 @@ module ActiveRecord::Turntable
     # Send queries to master connection and all shards in this cluster
     # @param [Boolean] continue_on_error when a shard raises error, ignore exception and continue
     def with_master_and_all(continue_on_error = false)
-      ([master] + @cluster.shards.values).map do |shard|
+      ([master] + cluster.shards).map do |shard|
         begin
           with_shard(shard) {
             yield

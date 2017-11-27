@@ -1,30 +1,28 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm::ModuloAlgorithm do
-  context "When initialized" do
-    before do
-      @alg = ActiveRecord::Turntable::Algorithm::ModuloAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:mod_cluster])
+  let(:algorithm) { ActiveRecord::Turntable::Algorithm::ModuloAlgorithm.new }
+  let(:shard_maps) { ActiveRecord::Base.turntable_configuration.cluster(:mod_cluster).shard_maps }
+
+  context "#choose" do
+    subject { algorithm.choose(shard_maps, key) }
+
+    where :key, :target do
+      [
+        [1,  "user_shard_2"],
+        [2,  "user_shard_3"],
+        [3,  "user_shard_1"],
+      ]
     end
 
-    context "#calculate with 1" do
-      subject { @alg.calculate(1) }
-      it { is_expected.to eq(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][1][:connection]) }
+    with_them do
+      its(:name) { is_expected.to eq(target) }
     end
 
-    context "#calculate with 3" do
-      subject { @alg.calculate(3) }
-      it { is_expected.to eq(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][3][:connection]) }
-    end
+    context "with not a number" do
+      subject { algorithm.choose(shard_maps, "a") }
 
-    context "#calculate with 5" do
-      subject { @alg.calculate(5) }
-      it { is_expected.to eq(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][0][:connection]) }
-    end
-
-    context "#calculate with a value that is not a number" do
-      it "raises ActiveRecord::Turntable::CannotSpecifyShardError" do
-        expect { @alg.calculate("a") }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError)
-      end
+      it { expect { subject }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError) }
     end
   end
 end

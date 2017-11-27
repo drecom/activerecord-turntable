@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Sequencer::Mysql do
-  let(:sequencer) { ActiveRecord::Turntable::Sequencer::Mysql.new(klass, options) }
+  let(:sequencer) { ActiveRecord::Turntable::Sequencer::Mysql.new(options) }
   let(:sequence_name) { "users_id_seq" }
-  let(:options) { {} }
+  let(:options) { { connection: "user_seq" } }
   let(:klass) { User }
 
   describe "#next_sequence_value" do

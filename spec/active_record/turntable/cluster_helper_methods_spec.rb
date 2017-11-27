@@ -7,7 +7,7 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
     self.use_transactional_tests = false
 
     let(:all_clusters) { clusters.values }
-    let(:shards) { all_clusters.flat_map { |c| c.shards.values } }
+    let(:shards) { all_clusters.flat_map(&:shards) }
 
     it "all shards should begin transaction" do
       User.all_cluster_transaction {
@@ -28,7 +28,7 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
     self.use_transactional_tests = false
 
     let(:cluster) { clusters[:user_cluster] }
-    let(:shards) { cluster.shards.values }
+    let(:shards) { cluster.shards }
 
     it "all shards in the cluster should begin transaction" do
       User.user_cluster_transaction {
@@ -39,7 +39,7 @@ describe ActiveRecord::Turntable::ClusterHelperMethods do
 
   describe ".weighted_random_shard_with" do
     let(:cluster) { clusters[:user_cluster] }
-    let(:shards) { cluster.shards.values }
+    let(:shards) { cluster.shards }
 
     context "When checking `shard_fixed?` from given block" do
       subject { User.weighted_random_shard_with(&block) }

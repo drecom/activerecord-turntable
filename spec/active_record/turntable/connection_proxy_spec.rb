@@ -3,9 +3,7 @@ require "spec_helper"
 describe ActiveRecord::Turntable::ConnectionProxy do
   context "When initialized" do
     subject { ActiveRecord::Turntable::ConnectionProxy.new(User, cluster) }
-
-    let(:cluster) { ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
-
+    let(:cluster) { ActiveRecord::Base.turntable_configuration.cluster(:user_cluster) }
     its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
@@ -190,7 +188,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
   context "QueryCache functions" do
     let(:connection_proxy) { ActiveRecord::Turntable::ConnectionProxy.new(klass, cluster) }
     let(:klass) { User }
-    let(:cluster) { ActiveRecord::Turntable::Cluster.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster]) }
+    let(:cluster) { ActiveRecord::Base.turntable_configuration.cluster(:user_cluster) }
 
     context "#cache" do
       it "query cache enabled all connections within the block" do
@@ -206,7 +204,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       it "each shard has one cache entry within the block" do
         result = connection_proxy.cache {
           User.all.to_a
-          klass.turntable_cluster.shards.values.map do |shard|
+          klass.turntable_cluster.shards.map do |shard|
             shard.connection.query_cache.dup
           end
         }
@@ -217,7 +215,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
         connection_proxy.cache {
           User.all.to_a
         }
-        result = klass.turntable_cluster.shards.values.map do |shard|
+        result = klass.turntable_cluster.shards.map do |shard|
           shard.connection.query_cache.dup
         end
         expect(result).to all(be_empty)
@@ -245,7 +243,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
       it "each shard has no cache entry within the block" do
         result = connection_proxy.uncached {
           User.all.to_a
-          klass.turntable_cluster.shards.values.map do |shard|
+          klass.turntable_cluster.shards.map do |shard|
             shard.connection.query_cache.dup
           end
         }

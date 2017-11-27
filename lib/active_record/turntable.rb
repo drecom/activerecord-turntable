@@ -22,43 +22,31 @@ module ActiveRecord::Turntable
     autoload :Base
     autoload :Cluster
     autoload :ClusterHelperMethods
-    autoload :Config
+    autoload :ClusterRegistry
+    autoload :Configuration
+    autoload :ConfigurationMethods
     autoload :ConnectionProxy
     autoload :Compatibility
+    autoload :Deprecation
     autoload :MasterShard
     autoload :Migration
     autoload :Mixer
     autoload :PoolProxy
     autoload :Shard
     autoload :ShardingCondition
+    autoload :ShardRegistry
     autoload :SeqShard
     autoload :Sequencer
+    autoload :SequencerRegistry
   end
 
   included do
     include ActiveRecordExt
     include Base
+    extend ConfigurationMethods
   end
 
   module ClassMethods
-    DEFAULT_PATH = File.dirname(File.dirname(__FILE__))
-
-    def turntable_config_file
-      @turntable_config_file ||= File.join(turntable_app_root_path, "config/turntable.yml")
-    end
-
-    def turntable_config_file=(filename)
-      @turntable_config_file = filename
-    end
-
-    def turntable_app_root_path
-      defined?(::Rails.root) ? ::Rails.root.to_s : DEFAULT_PATH
-    end
-
-    def turntable_config
-      ActiveRecord::Turntable::Config.instance
-    end
-
     def turntable_connection_classes
       ActiveRecord::Turntable::Shard.connection_classes
     end

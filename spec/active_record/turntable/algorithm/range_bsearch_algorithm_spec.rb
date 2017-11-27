@@ -1,30 +1,48 @@
 require "spec_helper"
 
 describe ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm do
-  context "When initialized" do
-    before do
-      @alg = ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm.new(ActiveRecord::Base.turntable_config[:clusters][:user_cluster])
+  let(:algorithm) { ActiveRecord::Turntable::Algorithm::RangeBsearchAlgorithm.new }
+  let(:shard_maps) { ActiveRecord::Base.turntable_configuration.cluster(:user_cluster).shard_maps }
+  let(:shards) { ActiveRecord::Base.turntable_configuration.cluster(:user_cluster).shards }
+
+  context "#choose" do
+    subject { algorithm.choose(shard_maps, key) }
+
+    where :key, :target do
+      [
+        [1,      "user_shard_1"],
+        [19999,  "user_shard_1"],
+        [20000,  "user_shard_2"],
+        [100000, "user_shard_3"],
+      ]
     end
 
-    context "#calculate with 1" do
-      subject { @alg.calculate(1) }
-      it { is_expected.to eq(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][0][:connection]) }
+    with_them do
+      its(:name) { is_expected.to eq(target) }
     end
 
-    context "#calculate with 19999" do
-      subject { @alg.calculate(19999) }
-      it { is_expected.to eq(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][0][:connection]) }
-    end
+    context "with a value overflowed range of shard_maps" do
+      subject { algorithm.choose(shard_maps, 10_000_000) }
 
-    context "#calculate with 20000" do
-      subject { @alg.calculate(20000) }
-      it { is_expected.to eq(ActiveRecord::Base.turntable_config[:clusters][:user_cluster][:shards][1][:connection]) }
-    end
-
-    context "#calculate with 10000000" do
-      it "raises ActiveRecord::Turntable::CannotSpecifyShardError" do
-        expect { @alg.calculate(10_000_000) }.to raise_error(ActiveRecord::Turntable::CannotSpecifyShardError)
+      it do
+        expect { subject }.to raise_error(
+          ActiveRecord::Turntable::CannotSpecifyShardError
+        )
       end
+    end
+  end
+
+  context "#shard_weights" do
+    it "called with 10 returns { shards[0] => 10 }" do
+      expect(algorithm.shard_weights(shard_maps, 10)).to eq({ shards[0] => 10 })
+    end
+
+    it "called with 25000 returns { shards[0] => 19999, shards[1] => 5001 }" do
+      expect(algorithm.shard_weights(shard_maps, 25000)).to eq({ shards[0] => 19999, shards[1] => 5001 })
+    end
+
+    it "called with 65000 returns { shards[0] => 39999, shards[1] => 25001 }" do
+      expect(algorithm.shard_weights(shard_maps, 65000)).to eq({ shards[0] => 39999, shards[1] => 25001 })
     end
   end
 end

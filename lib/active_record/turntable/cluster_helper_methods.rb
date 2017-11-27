@@ -3,7 +3,7 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      ActiveSupport.on_load(:turntable_config_loaded) do
+      ActiveSupport.on_load(:turntable_configuration_loaded) do
         turntable_clusters.each do |name, _cluster|
           turntable_define_cluster_methods(name)
         end
@@ -42,8 +42,18 @@ module ActiveRecord::Turntable
         end
       end
 
+      def spec_for(config)
+        begin
+          require "active_record/connection_adapters/#{config["adapter"]}_adapter"
+        rescue LoadError => e
+          raise "Please install the #{config["adapter"]} adapter: `gem install activerecord-#{config["adapter"]}-adapter` (#{e})"
+        end
+        adapter_method = "#{config["adapter"]}_connection"
+        ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
+      end
+
       def weighted_random_shard_with(*klasses, &block)
-        shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence)
+        shards_weight = self.turntable_cluster.weighted_shards(self.current_sequence_value(sequence_name))
         sum = shards_weight.values.inject(&:+)
         idx = rand(sum)
         shard, _weight = shards_weight.find { |_k, v|

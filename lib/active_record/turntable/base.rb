@@ -5,20 +5,33 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :turntable_connections, :turntable_clusters,
-                      :turntable_enabled, :turntable_sequencer_enabled
+      class_attribute :turntable_connections, :turntable_clusters, :turntable_sequencers,
+                      :turntable_enabled, :turntable_sequencer_enabled, :turntable_configuration
 
       self.turntable_connections = {}
       self.turntable_clusters = {}.with_indifferent_access
+      self.turntable_sequencers = {}.with_indifferent_access
       self.turntable_enabled = false
       self.turntable_sequencer_enabled = false
+
       class << self
         delegate :shards_transaction, :with_all, to: :connection
+
+        def reset_turntable_configuration(configuration, reset = true)
+          old = self.turntable_configuration
+          self.turntable_configuration = configuration
+
+          old.release! if old
+
+          if reset
+            # TODO: replace exitsting connection_pool when configurations reloaded
+            self.turntable_clusters = turntable_configuration.clusters
+            self.turntable_sequencers = turntable_configuration.sequencers
+            ActiveSupport.run_load_hooks(:turntable_configuration_loaded, ActiveRecord::Base)
+          end
+        end
       end
 
-      ActiveSupport.on_load(:turntable_config_loaded) do
-        self.initialize_clusters!
-      end
       include ClusterHelperMethods
     end
 
@@ -27,18 +40,16 @@ module ActiveRecord::Turntable
       # @param [Symbol] shard_key_name shard key attribute name
       # @param [Hash] options
       def turntable(cluster_name, shard_key_name, options = {})
-        class_attribute :turntable_shard_key,
-                        :turntable_cluster, :turntable_cluster_name
+        class_attribute :turntable_shard_key, :turntable_cluster_name
 
         self.turntable_enabled = true
         self.turntable_cluster_name = cluster_name
         self.turntable_shard_key = shard_key_name
-        self.turntable_cluster =
-          self.turntable_clusters[cluster_name] ||= Cluster.new(
-            turntable_config[:clusters][cluster_name],
-            options
-          )
         turntable_replace_connection_pool
+      end
+
+      def turntable_cluster
+        turntable_clusters[turntable_cluster_name]
       end
 
       def turntable_replace_connection_pool
@@ -50,31 +61,22 @@ module ActiveRecord::Turntable
         ch.send(:owner_to_pool)[connection_specification_name] = pp
       end
 
-      def initialize_clusters!
-        turntable_config[:clusters].each do |name, spec|
-          self.turntable_clusters[name] ||= Cluster.new(spec)
-        end
-      end
-
-      def spec_for(config)
-        begin
-          require "active_record/connection_adapters/#{config['adapter']}_adapter"
-        rescue LoadError => e
-          raise "Please install the #{config['adapter']} adapter: `gem install activerecord-#{config['adapter']}-adapter` (#{e})"
-        end
-        adapter_method = "#{config['adapter']}_connection"
-        ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
-      end
-
       def clear_all_connections!
         turntable_connections.values.each(&:disconnect!)
       end
 
-      def sequencer(sequence_name, *args)
-        class_attribute :turntable_sequencer
+      def sequencer(sequencer_name, *args)
+        class_attribute :turntable_sequencer_name
+        class << self
+          prepend ActiveRecordExt::Sequencer
+        end
 
         self.turntable_sequencer_enabled = true
-        self.turntable_sequencer = ActiveRecord::Turntable::Sequencer.build(self, sequence_name, *args)
+        self.turntable_sequencer_name = sequencer_name
+      end
+
+      def turntable_sequencer
+        turntable_sequencers[turntable_sequencer_name]
       end
 
       def turntable_enabled?
@@ -85,12 +87,8 @@ module ActiveRecord::Turntable
         turntable_sequencer_enabled
       end
 
-      def current_sequence
-        connection.current_sequence_value(self.sequence_name) if sequencer_enabled?
-      end
-
       def current_last_shard
-        turntable_cluster.select_shard(current_sequence) if sequencer_enabled?
+        turntable_cluster.select_shard(current_sequence_value) if sequencer_enabled?
       end
 
       def with_shard(any_shard)
@@ -106,9 +104,7 @@ module ActiveRecord::Turntable
       end
     end
 
-    def shards_transaction(options = {}, &block)
-      self.class.shards_transaction(options, &block)
-    end
+    delegate :shards_transaction, :turntable_cluster, to: :class
 
     # @return [ActiveRecord::Turntable::Shard] current shard for self
     def turntable_shard

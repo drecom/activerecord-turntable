@@ -1,5 +1,16 @@
 ## activerecord-turntable 4.0.0 (unreleased) ##
 
+### Major Changes
+
+* Configuration
+  * Added `Configuration` object instead of nested `Hash` objects.
+  * Added DSL configuration file
+
+### Incompatible changes
+
+* `RangeAlgorithm` is integrated to `RangeBsearchAlgorithm`.
+
+
 ## activerecord-turntable 3.1.0 ##
 
 ### Major Changes

@@ -4,4 +4,5 @@ module ActiveRecord::Turntable
   class CannotSpecifyShardError < TurntableError; end
   class MasterShardNotConnected < TurntableError; end
   class UnknownOperatorError < TurntableError; end
+  class InvalidConfigurationError < TurntableError; end
 end

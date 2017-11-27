@@ -37,7 +37,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
   end
 
   after do
-    User.connection.cluster.shards.values.map { |s| s.connection.disable_query_cache! }
+    User.connection.cluster.shards.map { |s| s.connection.disable_query_cache! }
   end
 
   it "returns 200 response" do
@@ -48,7 +48,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
   it "each connection has one query cache when queries to all shard" do
     mw = middleware { |env|
       User.all.to_a
-      User.connection.cluster.shards.values.map { |s| s.connection.query_cache.size }
+      User.connection.cluster.shards.map { |s| s.connection.query_cache.size }
     }
     expect(mw.call({})).to all(eq(1))
   end
@@ -58,7 +58,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
       User.find_by(id: 1)
       User.find_by(id: 1)
 
-      User.connection.cluster.shards.values.map { |s| s.connection.query_cache.size }
+      User.connection.cluster.shards.map { |s| s.connection.query_cache.size }
     }
     expect(mw.call({})).to eq([1, 0, 0])
   end
@@ -71,7 +71,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
         mw = middleware {}
         mw.call({})
 
-        enables = User.connection.cluster.shards.values.map { |s| s.connection.query_cache_enabled }
+        enables = User.connection.cluster.shards.map { |s| s.connection.query_cache_enabled }
         expect(enables).to all(be false)
       end
     end
@@ -84,7 +84,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
         mw = middleware {}
         mw.call({})
 
-        enables = User.connection.cluster.shards.values.map { |s| s.connection.query_cache_enabled }
+        enables = User.connection.cluster.shards.map { |s| s.connection.query_cache_enabled }
         expect(enables).to all(be true)
       end
     end
@@ -96,7 +96,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
       User.find_by(id: 1)
       User.find_by(id: 1)
 
-      User.connection.cluster.shards.values.map { |s| s.connection.query_cache.size }
+      User.connection.cluster.shards.map { |s| s.connection.query_cache.size }
     }
     expect(mw.call({})).to eq([1, 0, 0])
   end

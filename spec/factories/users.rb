@@ -35,5 +35,8 @@ FactoryGirl.define do
     end
   end
 
-  factory :user_with_callbacks
+  factory :user_with_callbacks do
+    sequence(:id, 1)
+    nickname { Faker::Name.name }
+  end
 end
