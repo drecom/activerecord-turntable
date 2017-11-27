@@ -12,10 +12,16 @@ development:
       shards:
         - connection: user_shard_1
           less_than: 100
+          slaves:
+            - user_shard_1_1
         - connection: user_shard_2
           less_than: 200
+          slaves:
+            - user_shard_2_1
         - connection: user_shard_3
           less_than: 300
+          slaves:
+            - user_shard_3_1
 
 test:
   clusters:
@@ -27,10 +33,16 @@ test:
       shards:
         - connection: user_shard_1
           less_than: 20000
+          slaves:
+            - user_shard_1_1
         - connection: user_shard_2
           less_than: 40000
+          slaves:
+            - user_shard_2_1
         - connection: user_shard_3
           less_than: 10000000
+          slaves:
+            - user_shard_3_1
 
 production:
   clusters:
@@ -42,7 +54,13 @@ production:
       shards:
         - connection: user_shard_1
           less_than: 20000
+          slaves:
+            - user_shard_1_1
         - connection: user_shard_2
           less_than: 40000
+          slaves:
+            - user_shard_2_1
         - connection: user_shard_3
           less_than: 10000000
+          slaves:
+            - user_shard_3_1
