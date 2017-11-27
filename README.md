@@ -206,6 +206,85 @@ default hash function is `Zlib.crc32(key.to_s)`
   shard 12288...16384, to: :user_shard_4
 ```
 
+### Slave support (experimental)
+
+Slave enabled configuration examples:
+
+* config/turntable.rb
+
+```ruby
+cluster :user_cluster do
+...
+
+  # shard [range], to: [connection names in database.yml]
+  shard   1...100,        to: :user_shard_1, slaves: [:user_shard_1_1]
+  shard 100...200,        to: :user_shard_2, slaves: [:user_shard_2_1]
+  shard 200...2000000000, to: :user_shard_3, slaves: [:user_shard_3_1]
+end
+```
+
+* config/turntable.yml
+
+```yaml
+    development:
+      clusters:
+        user_cluster: # <-- cluster name
+          ...
+          shards:
+            - connection: user_shard_1
+              less_than: 100
+              slaves:
+                - user_shard_1_1
+            - connection: user_shard_2
+              less_than: 200
+              slaves:
+                - user_shard_2_1
+            - connection: user_shard_3
+              less_than: 2000000000
+              slaves:
+                - user_shard_3_1
+```
+
+* config/database.yml
+
+Add slave connection settings under `shards`.
+
+```yaml
+...
+  shards:
+    user_shard_1:
+      <<: *default
+      database: turntable_user_shard_1_test
+    user_shard_1_1:
+      <<: *default
+      database: turntable_user_shard_1_1_test
+    user_shard_2:
+      <<: *default
+      database: turntable_user_shard_2_test
+    user_shard_2_1:
+      <<: *default
+      database: turntable_user_shard_2_1_test
+    user_shard_3:
+      <<: *default
+      database: turntable_user_shard_3_test
+    user_shard_3_1:
+      <<: *default
+      database: turntable_user_shard_3_1_test
+```
+
+Slave usage:
+
+```ruby
+User.with_slave {
+  # `User` model will use slave databases within this block.
+}
+
+User.with_master {
+  # `User` model will use master database within this block.
+}
+```
+
+
 ### Example Migration
 
 Generate a model:
