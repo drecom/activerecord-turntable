@@ -66,6 +66,14 @@ module ActiveRecord::Turntable
       end
     end
 
+    def sequencers
+      sequencer_registry.all
+    end
+
+    def sequencer(name)
+      sequencers[name]
+    end
+
     def weighted_shards(key = nil)
       @algorithm.shard_weights(shard_maps, key)
     end
