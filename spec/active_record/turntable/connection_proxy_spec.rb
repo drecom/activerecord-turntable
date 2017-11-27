@@ -4,7 +4,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
   context "When initialized" do
     subject { ActiveRecord::Turntable::ConnectionProxy.new(User, cluster) }
     let(:cluster) { ActiveRecord::Base.turntable_configuration.cluster(:user_cluster) }
-    its(:master_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
+    its(:default_connection) { is_expected.to eql(ActiveRecord::Base.connection) }
   end
 
   context "User insert with id" do
@@ -248,6 +248,63 @@ describe ActiveRecord::Turntable::ConnectionProxy do
           end
         }
         expect(result).to all(be_empty)
+      end
+    end
+  end
+
+  context "#with_master" do
+    before do
+      @user = User.create!(id: 1)
+    end
+
+    subject { User.with_master { @user.turntable_shard.connection } }
+
+    its(:turntable_shard_name) { is_expected.to eq("user_shard_1") }
+
+    context "inside with_slave block" do
+      subject do
+        User.with_slave do
+          User.with_master do
+            @user.turntable_shard.connection
+          end
+        end
+
+        its(:turntable_shard_name) { is_expected.to eq("user_shard_1") }
+      end
+    end
+  end
+
+  context "#with_slave" do
+    before do
+      @user = User.create!(id: 1)
+    end
+
+    subject { User.with_slave { @user.turntable_shard.connection } }
+
+    its(:turntable_shard_name) { is_expected.to eq("user_shard_1_1") }
+
+    context "inside transaction block" do
+      subject do
+        User.with_slave do
+          User.connection.transaction do
+            @user.turntable_shard.connection
+          end
+        end
+      end
+
+      its(:turntable_shard_name) { is_expected.to eq("user_shard_1") }
+    end
+
+    context "nested with_slave blocks" do
+      context "outside of 2nd with_slave block" do
+        subject do
+          User.with_slave do
+            User.with_slave {}
+            @user.turntable_shard.connection
+          end
+        end
+
+        its(:turntable_shard_name) { is_expected.to eq("user_shard_1_1") }
       end
     end
   end

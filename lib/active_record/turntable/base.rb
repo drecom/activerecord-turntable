@@ -102,6 +102,14 @@ module ActiveRecord::Turntable
                 end
         connection.with_shard(shard) { yield }
       end
+
+      def with_slave
+        connection.with_slave { yield }
+      end
+
+      def with_master
+        connection.with_master { yield }
+      end
     end
 
     delegate :shards_transaction, :turntable_cluster, to: :class

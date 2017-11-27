@@ -59,7 +59,7 @@ module ActiveRecord::Turntable
           @sequencer_settings << [sequencer_name.to_s, type.to_s, options]
         end
 
-        ShardSetting = Struct.new(:name, :range) do
+        ShardSetting = Struct.new(:name, :range, :slaves) do
           def range
             case self[:range]
             when Integer
@@ -70,8 +70,8 @@ module ActiveRecord::Turntable
           end
         end
 
-        def shard(range, to:)
-          @shard_settings << ShardSetting.new(to.to_s, range)
+        def shard(range,  slaves: [], to:)
+          @shard_settings << ShardSetting.new(to.to_s, range, slaves.map(&:to_s))
         end
       end
     end

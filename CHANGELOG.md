@@ -7,6 +7,7 @@
   * Added DSL configuration file
 * New algorithm: `hash_slot`
   * distribute like `redis cluster`
+* Slave support (experimental)
 
 ### Incompatible changes
 

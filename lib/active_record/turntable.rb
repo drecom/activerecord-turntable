@@ -28,13 +28,15 @@ module ActiveRecord::Turntable
     autoload :ConnectionProxy
     autoload :Compatibility
     autoload :Deprecation
-    autoload :MasterShard
+    autoload :DefaultShard
     autoload :Migration
     autoload :Mixer
     autoload :PoolProxy
     autoload :Shard
     autoload :ShardingCondition
     autoload :ShardRegistry
+    autoload :SlaveRegistry
+    autoload :SlaveShard
     autoload :SeqShard
     autoload :Sequencer
     autoload :SequencerRegistry

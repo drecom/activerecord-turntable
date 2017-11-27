@@ -43,9 +43,9 @@ module ActiveRecord::Turntable
       when SQLTree::Node::InsertQuery
         build_insert_fader(tree, method, query, *args, &block)
       else
-        # send to master shard
+        # send to default shard
         Fader::SpecifiedShard.new(@proxy,
-                                  { @proxy.master => query },
+                                  { @proxy.default_shard => query },
                                   method, query, *args, &block)
       end
     rescue Exception => err
@@ -119,7 +119,7 @@ module ActiveRecord::Turntable
         query = sql.is_a?(String) ? sql : @proxy.to_sql(sql, binds)
         if query.include?("\0") && binds.is_a?(Array) && binds[0].is_a?(Array) && binds[0][0].is_a?(ActiveRecord::ConnectionAdapters::Column)
           binds = binds.dup
-          query.gsub("\0") { @proxy.master.connection.quote(*binds.shift.reverse) }
+          query.gsub("\0") { @proxy.default_shard.connection.quote(*binds.shift.reverse) }
         else
           query
         end

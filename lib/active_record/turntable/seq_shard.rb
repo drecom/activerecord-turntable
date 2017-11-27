@@ -1,5 +1,13 @@
 module ActiveRecord::Turntable
   class SeqShard < Shard
+    def initialize(name = defined?(Rails) ? Rails.env : "development")
+      super(nil, name)
+    end
+
+    def support_slave?
+      false
+    end
+
     private
 
       def create_connection_class

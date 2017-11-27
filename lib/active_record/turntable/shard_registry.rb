@@ -4,17 +4,17 @@ module ActiveRecord::Turntable
       delegate :connection, :connection_pool, :name, to: :shard
     end
 
-    attr_reader :shard_maps
+    attr_reader :cluster, :shard_maps
 
-    def initialize
+    def initialize(cluster)
+      @cluster = cluster
       @shards_names_hash = {}.with_indifferent_access
       @shard_maps = []
     end
 
     def add(setting)
-      shard = (@shards_names_hash[setting.name] ||= Shard.new(setting.name))
+      shard = (@shards_names_hash[setting.name] ||= Shard.new(cluster, setting.name, setting.slaves))
       @shard_maps << ShardMap.new(setting.range, shard)
-
       @shard_maps.sort_by! { |m| m.range.min }
     end
 

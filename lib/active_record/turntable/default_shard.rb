@@ -1,8 +1,8 @@
 module ActiveRecord::Turntable
-  class MasterShard < Shard
+  class DefaultShard < Shard
     def initialize(klass)
       (klass and original_connection_pool(klass)) or
-        raise MasterShardNotConnected, "connection_pool is nil"
+        raise DefaultShardNotConnected, "connection_pool is nil"
       @klass = klass
       @name  = "master"
     end
@@ -14,6 +14,10 @@ module ActiveRecord::Turntable
         # use original parent class connection which is turntable disabled
         original_connection_pool
       end
+    end
+
+    def support_slave?
+      false
     end
 
     private

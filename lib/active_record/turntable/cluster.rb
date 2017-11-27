@@ -1,4 +1,5 @@
 require "active_support/core_ext/hash/indifferent_access"
+require "concurrent/atomic/thread_local_var"
 
 module ActiveRecord::Turntable
   class Cluster
@@ -9,9 +10,13 @@ module ActiveRecord::Turntable
 
     attr_accessor :algorithm, :shard_registry, :sequencer_registry
 
+    def initialize
+      @slave_enabled = Concurrent::ThreadLocalVar.new(false)
+    end
+
     def self.build(sequencer_registry)
       self.new.tap do |instance|
-        instance.shard_registry = ShardRegistry.new
+        instance.shard_registry = ShardRegistry.new(instance)
         instance.sequencer_registry = sequencer_registry
         yield instance
       end
@@ -64,6 +69,14 @@ module ActiveRecord::Turntable
         raise ActiveRecord::Turntable::TurntableError,
               "transaction cannot call to object: #{shard_or_object}"
       end
+    end
+
+    def slave_enabled?
+      @slave_enabled.value
+    end
+
+    def set_slave_enabled(enabled)
+      @slave_enabled.value = enabled
     end
 
     def sequencers
