@@ -42,5 +42,15 @@ cluster :mysql_mod_cluster do
   shard 2, to: :user_shard_3
 end
 
+cluster :hash_slot_cluster do
+  algorithm :hash_slot
+
+  sequencer :user_seq, :mysql, connection: :user_seq
+  shard     0...4096,  to: :user_shard_1
+  shard  4096...8192,  to: :user_shard_2
+  shard  8192...12288, to: :user_shard_3
+  shard 12288...16384, to: :user_shard_4
+end
+
 raise_on_not_specified_shard_query false
 raise_on_not_specified_shard_update false

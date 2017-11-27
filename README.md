@@ -167,6 +167,45 @@ end
           database: sample_app_user3_development
 ```
 
+#### About algorithms
+
+* range, range_bsearch - distribute records by key range
+
+```ruby
+  algorithm :range_bsearch
+
+  shard      1...20_000,     to: :user_shard_1
+  shard 20_000...40_000,     to: :user_shard_2
+  shard 40_000...60_000,     to: :user_shard_1
+  shard 60_000...80_000,     to: :user_shard_2
+  shard 80_000...10_000_000, to: :user_shard_3
+```
+
+* modulo - distribute records by key modulo
+
+```ruby
+  algorithm :modulo
+
+  shard 0, to: :user_shard_1
+  shard 1, to: :user_shard_2
+  shard 2, to: :user_shard_3
+```
+
+* hash_slot - distribute records by key hashes
+
+default hash function is `Zlib.crc32(key.to_s)`
+
+```ruby
+  algorithm :hash_slot
+  # Or specify hash function
+  # algorithm :hash_slot, hash_func: ->(key) { Zlib.adler32(key.to_s) }
+
+  shard     0...4096,  to: :user_shard_1
+  shard  4096...8192,  to: :user_shard_2
+  shard  8192...12288, to: :user_shard_3
+  shard 12288...16384, to: :user_shard_4
+```
+
 ### Example Migration
 
 Generate a model:

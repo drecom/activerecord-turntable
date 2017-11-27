@@ -5,6 +5,8 @@
 * Configuration
   * Added `Configuration` object instead of nested `Hash` objects.
   * Added DSL configuration file
+* New algorithm: `hash_slot`
+  * distribute like `redis cluster`
 
 ### Incompatible changes
 
