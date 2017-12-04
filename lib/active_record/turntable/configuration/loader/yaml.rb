@@ -30,7 +30,7 @@ module ActiveRecord::Turntable
 
               if conf[:seq]
                 conf[:seq].each do |sequence_name, sequence_conf|
-                  sequencer(sequence_name, (sequence_conf[:type] || :mysql), sequence_conf)
+                  sequencer(sequence_name, (sequence_conf[:seq_type] || :mysql), sequence_conf)
                 end
               end
 

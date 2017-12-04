@@ -16,7 +16,7 @@ describe ActiveRecord::Turntable::Configuration do
 
       it { expect { subject }.not_to raise_error }
       its(:clusters) { is_expected.to have(5).items }
-      its(:sequencers) { is_expected.to have(1).item }
+      its(:sequencers) { is_expected.to have(2).item }
     end
 
     context "when turntable ruby dsl file passed" do
