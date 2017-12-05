@@ -22,8 +22,7 @@ module ActiveRecord::Turntable
         self.turntable_configuration_file = path
 
         if File.exist?(path)
-          self.turntable_configuration =
-            ActiveRecord::Turntable::Configuration.load(turntable_configuration_file, Rails.env)
+          reset_turntable_configuration(Configuration.load(turntable_configuration_file, Rails.env))
         else
           warn("[activerecord-turntable] config/turntable.{rb,yml} is not found. skipped initliazing cluster.")
         end
