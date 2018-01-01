@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "activerecord-import"
   spec.add_development_dependency "barrage"
   spec.add_development_dependency "coveralls"
-  spec.add_development_dependency "factory_girl"
+  spec.add_development_dependency "factory_bot"
   spec.add_development_dependency "faker"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "guard-rubocop"

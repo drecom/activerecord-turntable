@@ -18,7 +18,7 @@ require "rspec/rails"
 require "webmock/rspec"
 require "timecop"
 require "pry-byebug"
-require "factory_girl"
+require "factory_bot"
 require "faker"
 
 require "coveralls"
