@@ -44,9 +44,9 @@ RSpec.configure do |config|
     reload_turntable!(File.join(File.dirname(__FILE__), "config/turntable.rb"), :test)
   end
 
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.before(:suite) do
-    FactoryGirl.find_definitions
+    FactoryBot.find_definitions
   end
 
   config.before(:each) do
