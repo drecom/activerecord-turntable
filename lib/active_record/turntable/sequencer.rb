@@ -6,6 +6,7 @@ module ActiveRecord::Turntable
       autoload :Api
       autoload :Mysql
       autoload :Barrage
+      autoload :Katsubushi
     end
 
     def sequence_name(table_name, primary_key = 'id')

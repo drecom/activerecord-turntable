@@ -29,7 +29,16 @@ env:
   - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
   - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
 
-before_install: gem update --system
+services:
+  - docker
+
+before_install:
+  # TODO: use Docker container katsubushi/katsubushi
+  # In this test, memcached is used as a dummy katsubushi.
+  # Since a binary protocol pull request for katsubushi is not merged yet.
+  # After the pull request merged, katsubushi container is available for test.
+  - docker run -d --name turntable-memcached -p 11212:11211 memcached:1.5-alpine
+  - gem update --system
 
 before_script:
   - bundle exec rake $SETUP_TASK
