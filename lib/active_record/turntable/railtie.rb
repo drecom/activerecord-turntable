@@ -21,9 +21,10 @@ module ActiveRecord::Turntable
         path = app.paths["config/turntable"].existent.first
         self.turntable_configuration_file = path
 
-        if File.exist?(path)
+        if path
           reset_turntable_configuration(Configuration.load(turntable_configuration_file, Rails.env))
         else
+          # FIXME: suppress this warning during rails g turntable:install
           warn("[activerecord-turntable] config/turntable.{rb,yml} is not found. skipped initliazing cluster.")
         end
       end
