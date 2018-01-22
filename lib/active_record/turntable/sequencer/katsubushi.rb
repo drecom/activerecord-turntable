@@ -9,6 +9,7 @@ module ActiveRecord::Turntable
           "#{server["host"]}:#{server["port"]}"
         end
 
+        require "dalli"
         dalli_opts = opts.with_indifferent_access
         @client = Dalli::Client.new(servers, dalli_opts)
       end
