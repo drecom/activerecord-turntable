@@ -33,11 +33,7 @@ services:
   - docker
 
 before_install:
-  # TODO: use Docker container katsubushi/katsubushi
-  # In this test, memcached is used as a dummy katsubushi.
-  # Since a binary protocol pull request for katsubushi is not merged yet.
-  # After the pull request merged, katsubushi container is available for test.
-  - docker run -d --name turntable-memcached -p 11212:11211 memcached:1.5-alpine
+  - docker run -d --name turntable-katsubushi -p 11212:11212 gussan/katsubushi:latest
   - gem update --system
 
 before_script:
