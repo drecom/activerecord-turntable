@@ -104,6 +104,37 @@ namespace :turntable do
             EOS
           end
         end
+
+        # Ignore some failing tests with ruby 2.5
+        if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5") &&
+           ActiveRecord.gem_version.release <= Gem::Version.new("5.1.4")
+          ignores = [
+            ["aggregations_test.rb", "AggregationsTest", ["test_immutable_value_objects"]],
+            ["query_cache_test.rb",  "QueryCacheTest", ["test_query_cache_does_not_allow_sql_key_mutation"]],
+            ["transactions_test.rb", "TransactionTest", ["test_rollback_when_saving_a_frozen_record"]],
+            ["migrator_test.rb", "MigratorTest", ["test_migrator_verbosity"]],
+            ["log_subscriber_test.rb", "LogSubscriberTest",
+             %w[test_basic_payload_name_logging_coloration_generic_sql
+                test_basic_payload_name_logging_coloration_named_sql
+                test_query_logging_coloration_with_nested_select
+                test_query_logging_coloration_with_multi_line_nested_select
+                test_query_logging_coloration_with_lock]],
+          ]
+
+          ignores.each do |file_name, class_name, method_names|
+            path = File.join("test/cases", file_name)
+            next unless File.exist?(path)
+
+            File.open(File.join("test/cases", file_name), "a") do |f|
+              f << <<-EOS.strip_heredoc
+                class #{class_name}
+                  #{method_names.map { |method_name| "undef_method :#{method_name} if method_defined?(:#{method_name})" }.join("\n") }
+
+                end
+              EOS
+            end
+          end
+        end
       end
 
       task :db => :rails do

@@ -24,7 +24,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
     end
 
     def duration
-      0
+      0.7
     end
   end
 
@@ -44,14 +44,14 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
     context "When payload name is `SQL`" do
       it "logs in MAGENTA color" do
         subscriber.sql(TestEvent.new(name: "SQL", turntable_shard_name: "shard_1"))
-        expect(subscriber.debugs.first).to match(/#{REGEXP_MAGENTA}SQL \(0\.0ms\) \[Shard: shard_1\]#{REGEXP_CLEAR}/)
+        expect(subscriber.debugs.first).to match(/#{REGEXP_MAGENTA}SQL \(0\.7ms\) \[Shard: shard_1\]#{REGEXP_CLEAR}/)
       end
     end
 
     context "When payload name is `Model Load`" do
       it "logs in CYAN color" do
         subscriber.sql(TestEvent.new(name: "Model Load", turntable_shard_name: "shard_1"))
-        expect(subscriber.debugs.first).to match(/#{REGEXP_CYAN}Model Load \(0\.0ms\) \[Shard: shard_1\]#{REGEXP_CLEAR}/)
+        expect(subscriber.debugs.first).to match(/#{REGEXP_CYAN}Model Load \(0\.7ms\) \[Shard: shard_1\]#{REGEXP_CLEAR}/)
       end
     end
 

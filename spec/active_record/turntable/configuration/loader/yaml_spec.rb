@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe ActiveRecord::Turntable::Configuration::DSL::YAML do
+describe ActiveRecord::Turntable::Configuration::Loader::YAML do
   let(:yaml_configuration) { ActiveRecord::Turntable::Configuration::Loader::YAML.load(yaml_path, "test") }
   let(:yaml_path) { File.expand_path("../../../../config/turntable.yml", __dir__) }
 
