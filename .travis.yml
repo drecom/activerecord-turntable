@@ -41,7 +41,7 @@ before_script:
 
 script:
   - bundle exec rake $BUILD_TASK
-  - bundle exec rake $BUILD_TASK --tag with_katsubushi
+  - bundle exec rake $BUILD_TASK SPEC_OPTS="--tag with_katsubushi"
 
 matrix:
   exclude:
