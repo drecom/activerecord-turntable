@@ -27,9 +27,15 @@ gemfile:
 
 env:
   - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
+  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec SPEC_OPTS="--tag with_katsubushi"
   - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
 
-before_install: gem update --system
+services:
+  - docker
+
+before_install:
+  - docker run -d --name turntable-katsubushi -p 11212:11212 gussan/katsubushi:latest
+  - gem update --system
 
 before_script:
   - bundle exec rake $SETUP_TASK

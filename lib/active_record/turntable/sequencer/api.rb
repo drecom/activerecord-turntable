@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 #
 # Sequencer via HTTP API
 #
-require "httpclient"
-
 module ActiveRecord::Turntable
   class Sequencer
     class Api < Sequencer
@@ -11,6 +8,8 @@ module ActiveRecord::Turntable
       NEXT_VALUE_ENDPOINT = "/new".freeze
 
       def initialize(options = {})
+        require "httpclient"
+
         @options = options
         @host = @options[:api_host]
         @port = @options[:api_port]

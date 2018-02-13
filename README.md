@@ -494,6 +494,47 @@ Next, add sequencer definition to the model:
   end
 ```
 
+### Katsubushi example
+
+[katsubushi](https://github.com/kayac/go-katsubushi) is available as a sequence server.
+ActiveRecord::Turntable accesses katsubushi via Dalli.
+
+First, add dalli gem to your Gemfile:
+
+```ruby
+gem 'dalli'
+```
+
+Then, add configuration to turntable.yml:
+
+* turntable.yml
+
+```yaml
+    development:
+      clusters:
+        user_cluster: # <-- cluster name
+          ....
+          seq:
+            katsubushi_seq: # <-- sequencer name
+              seq_type: katsubushi # <-- sequencer type
+              options: # <-- options passed to dalli
+                servers:
+                  - host: localhost
+                    port: 11212
+                  - host: localhost
+                    port: 11213
+```
+
+Next, add sequencer definition to the model:
+
+```ruby
+  class User < ApplicationRecord
+    turntable :id
+    sequencer :katsubushi_seq # <-- this line enables sequencer module
+    has_one :status
+  end
+```
+
 ## Transactions
 Turntable has some transaction support methods.
 
