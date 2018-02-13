@@ -27,6 +27,7 @@ gemfile:
 
 env:
   - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
+  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec SPEC_OPTS="--tag with_katsubushi"
   - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
 
 services:
@@ -41,7 +42,6 @@ before_script:
 
 script:
   - bundle exec rake $BUILD_TASK
-  - bundle exec rake $BUILD_TASK SPEC_OPTS="--tag with_katsubushi"
 
 matrix:
   exclude:
