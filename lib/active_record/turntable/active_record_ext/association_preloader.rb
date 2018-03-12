@@ -4,14 +4,24 @@ module ActiveRecord::Turntable
   module ActiveRecordExt
     module AssociationPreloader
       include ShardingCondition
+      if Util.ar52_or_later?
+        def build_scope
+          returning_scope = super
+          if should_use_shard_key?
+            returning_scope = returning_scope.where(klass.turntable_shard_key => owners.map(&foreign_shard_key.to_sym).uniq)
+          end
+          returning_scope
 
-      # @note Override to add sharding condition on preload
-      def records_for(ids)
-        returning_scope = super
-        if should_use_shard_key?
-          returning_scope = returning_scope.where(klass.turntable_shard_key => owners.map(&foreign_shard_key.to_sym).uniq)
         end
-        returning_scope
+      else
+        # @note Override to add sharding condition on preload
+        def records_for(ids)
+          returning_scope = super
+          if should_use_shard_key?
+            returning_scope = returning_scope.where(klass.turntable_shard_key => owners.map(&foreign_shard_key.to_sym).uniq)
+          end
+          returning_scope
+        end
       end
     end
   end

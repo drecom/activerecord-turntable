@@ -23,10 +23,15 @@ module ActiveRecord::Turntable
       ar_version_equals_or_later?("5.1")
     end
 
+    def ar52_or_later?
+      ar_version_equals_or_later?("5.2")
+    end
+
     module_function :ar_version_equals_or_later?,
                     :ar_version_earlier_than?,
                     :ar_version,
                     :ar_version_satisfy?,
-                    :ar51_or_later?
+                    :ar51_or_later?,
+                    :ar52_or_later?
   end
 end
