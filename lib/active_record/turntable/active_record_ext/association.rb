@@ -24,8 +24,14 @@ module ActiveRecord::Turntable
 
       private
 
-        def skip_statement_cache?(scope)
-          super || should_use_shard_key?
+        if Util.ar52_or_later?
+          def skip_statement_cache?(scope)
+            super || should_use_shard_key?
+          end
+        else
+          def skip_statement_cache?
+            super || should_use_shard_key?
+          end
         end
     end
   end
