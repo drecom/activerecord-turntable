@@ -55,10 +55,11 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
       end
     end
 
-    context "When payload includes `:binds`" do
+    context "When payload includes `:binds` and `:type_casted_binds`" do
       it "logs binds parameters" do
         binds = [ActiveRecord::Relation::QueryAttribute.new("id", 10, ActiveRecord::Type::Value.new)]
-        subscriber.sql(TestEvent.new(name: "Model Load", binds: binds))
+        type_casted_binds = [10]
+        subscriber.sql(TestEvent.new(name: "Model Load", binds: binds, type_casted_binds: type_casted_binds))
         expect(subscriber.debugs.first).to match(/\[\["id", 10\]\]/)
       end
     end

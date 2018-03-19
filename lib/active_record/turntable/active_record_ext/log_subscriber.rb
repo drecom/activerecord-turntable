@@ -20,7 +20,11 @@ module ActiveRecord::Turntable
 
         unless (payload[:binds] || []).empty?
           if Util.ar_version_equals_or_later?("5.0.3")
-            casted_params = type_casted_binds(payload[:binds], payload[:type_casted_binds])
+            casted_params = if Util.ar_version_equals_or_later?("5.1.5")
+                              type_casted_binds(payload[:type_casted_binds])
+                            else
+                              type_casted_binds(payload[:binds], payload[:type_casted_binds])
+                            end
             binds = "  " + payload[:binds].zip(casted_params).map { |attr, value|
               render_bind(attr, value)
             }.inspect
