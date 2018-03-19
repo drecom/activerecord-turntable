@@ -106,7 +106,7 @@ namespace :turntable do
         end
 
         # Ignore failing migrator test
-        if ActiveRecord.gem_version.release <= Gem::Version.new("5.1.4")
+        if ActiveRecord.gem_version.release <= Gem::Version.new("5.1.5")
           File.open("test/cases/migrator_test.rb", "a") do |f|
             f << <<-EOS.strip_heredoc
               class MigratorTest
