@@ -40,8 +40,7 @@ module ActiveRecord::Turntable
             end
           end
         EOD
-
-      elsif Util.ar51_or_later?
+      elsif Util.ar51?
         ::ActiveRecord::Locking::Optimistic.class_eval <<-EOD
           private
           # @note Override to add sharding condition on optimistic locking
@@ -91,7 +90,7 @@ module ActiveRecord::Turntable
             end
           end
         EOD
-      else
+      elsif Util.earlier_than_ar51?
         ::ActiveRecord::Locking::Optimistic.class_eval <<-EOD
           private
           # @note Override to add sharding condition on optimistic locking
