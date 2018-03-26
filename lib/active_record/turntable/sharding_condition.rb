@@ -8,7 +8,8 @@ module ActiveRecord::Turntable
 
       def foreign_target_model
         return model if respond_to?(:model)
-        return @model if @model
+        return @model if instance_variable_defined?(:@model) && @model
+
         owner
       end
 
