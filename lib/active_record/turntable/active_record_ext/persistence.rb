@@ -4,24 +4,6 @@ module ActiveRecord::Turntable
       extend ActiveSupport::Concern
       extend Compatibility
 
-      if Util.ar52_or_later?
-        ::ActiveRecord::Persistence::ClassMethods.class_eval do
-          # @note Override to add sharding scope on updating
-          def _update_record(values, id, id_was, turntable_scope = nil) # :nodoc:
-          bind = predicate_builder.build_bind_attribute(primary_key, id_was || id)
-          relation = arel_table.where(
-            arel_attribute(primary_key).eq(bind)
-          )
-          if turntable_scope
-            relation = relation.where(turntable_scope)
-          end
-          um = relation.compile_update(_substitute_values(values), primary_key)
-
-          connection.update(um, "#{self} Update")
-          end
-        end
-      end
-
       ::ActiveRecord::Persistence.class_eval do
         # @note Override to add sharding scope on reloading
         def reload(options = nil)
@@ -141,33 +123,16 @@ module ActiveRecord::Turntable
           end
 
           if Util.ar52_or_later?
-            def _relation_for_itself
-              klass = self.class
-              relation = klass.unscoped.where(klass.primary_key => id)
-              unless klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
-                return relation
+            def _update_row(attribute_names, attempted_action = "update")
+              constraints = { self.class.primary_key => id_in_database }
+              if self.class.sharding_condition_needed?
+                constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
               end
 
-              relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
-            end
-
-            def _update_record(attribute_names = self.attribute_names)
-              attributes_values = arel_attributes_with_values_for_update(attribute_names)
-              if attributes_values.empty?
-                rows_affected = 0
-                @_trigger_update_callback = true
-              else
-                klass = self.class
-                scope = if klass.turntable_enabled? && (klass.primary_key != klass.turntable_shard_key.to_s)
-                          klass.arel_attribute(klass.turntable_shard_key).eq(self.send(turntable_shard_key))
-                        end
-                rows_affected = klass._update_record(attributes_values, id, id_in_database, scope)
-                @_trigger_update_callback = rows_affected > 0
-              end
-
-              yield(self) if block_given?
-
-              rows_affected
+              self.class._update_record(
+                attributes_with_values(attribute_names),
+                constraints,
+              )
             end
           elsif Util.ar_version_equals_or_later?("5.1.6")
             def _update_row(attribute_names, attempted_action = "update")
