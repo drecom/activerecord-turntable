@@ -96,8 +96,8 @@ module ActiveRecord::Turntable
               true
             end
           end
+          # rubocop:enable Style/UnlessElse
         end
-        # rubocop:enable Style/UnlessElse
 
         # @note Override to add sharding scope on `update_columns`
         unless Util.ar52_or_later?
@@ -128,14 +128,16 @@ module ActiveRecord::Turntable
         private
 
           # @note Override to add sharding scope on destroying
-          def relation_for_destroy
-            klass = self.class
-            relation = klass.unscoped.where(klass.primary_key => id)
+          unless Util.ar52_or_later?
+            def relation_for_destroy
+              klass = self.class
+              relation = klass.unscoped.where(klass.primary_key => id)
 
-            if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
-              relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
+              if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
+                relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
+              end
+              relation
             end
-            relation
           end
 
           if Util.ar52_or_later?
@@ -180,26 +182,26 @@ module ActiveRecord::Turntable
               )
             end
           else
-          # @note Override to add sharding scope on updating
-          def _update_record(attribute_names = self.attribute_names)
-            klass = self.class
-            attributes_values = arel_attributes_with_values_for_update(attribute_names)
-            if attributes_values.empty?
-              rows_affected = 0
-              @_trigger_update_callback = true
-            else
-              scope = if klass.turntable_enabled? && (klass.primary_key != klass.turntable_shard_key.to_s)
-                        klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
-                      end
-              previous_id = Util.ar51_or_later? ? id_in_database : id_was
-              rows_affected = klass.unscoped._update_record attributes_values, id, previous_id, scope
-              @_trigger_update_callback = rows_affected > 0
+            # @note Override to add sharding scope on updating
+            def _update_record(attribute_names = self.attribute_names)
+              klass = self.class
+              attributes_values = arel_attributes_with_values_for_update(attribute_names)
+              if attributes_values.empty?
+                rows_affected = 0
+                @_trigger_update_callback = true
+              else
+                scope = if klass.turntable_enabled? && (klass.primary_key != klass.turntable_shard_key.to_s)
+                          klass.unscoped.where(klass.turntable_shard_key => self.send(turntable_shard_key))
+                        end
+                previous_id = Util.ar51_or_later? ? id_in_database : id_was
+                rows_affected = klass.unscoped._update_record attributes_values, id, previous_id, scope
+                @_trigger_update_callback = rows_affected > 0
+              end
+
+              yield(self) if block_given?
+
+              rows_affected
             end
-
-            yield(self) if block_given?
-
-            rows_affected
-          end
           end
       end
     end
