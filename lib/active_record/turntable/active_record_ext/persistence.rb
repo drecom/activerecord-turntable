@@ -82,7 +82,32 @@ module ActiveRecord::Turntable
         end
 
         # @note Override to add sharding scope on `update_columns`
-        unless Util.ar52_or_later?
+        if Util.ar52_or_later?
+          def update_columns(attributes)
+            raise ActiveRecordError, "cannot update a new record" if new_record?
+            raise ActiveRecordError, "cannot update a destroyed record" if destroyed?
+
+            attributes.each_key do |key|
+              verify_readonly_attribute(key.to_s)
+            end
+
+            constraints = { self.class.primary_key => id_in_database }
+            if self.class.sharding_condition_needed?
+              constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
+            end
+
+            affected_rows = self.class._update_record(
+              attributes,
+              constraints,
+            )
+
+            attributes.each do |k, v|
+              write_attribute_without_type_cast(k, v)
+            end
+
+            affected_rows == 1
+          end
+        else
           def update_columns(attributes)
             raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
             raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
@@ -109,19 +134,6 @@ module ActiveRecord::Turntable
 
         private
 
-          # @note Override to add sharding scope on destroying
-          unless Util.ar52_or_later?
-            def relation_for_destroy
-              klass = self.class
-              relation = klass.unscoped.where(klass.primary_key => id)
-
-              if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
-                relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
-              end
-              relation
-            end
-          end
-
           if Util.ar52_or_later?
             def _update_row(attribute_names, attempted_action = "update")
               constraints = { self.class.primary_key => id_in_database }
@@ -146,7 +158,27 @@ module ActiveRecord::Turntable
                 constraints,
               )
             end
+
+            def _delete_row
+              constraints = { self.class.primary_key => id_in_database }
+              if self.class.sharding_condition_needed?
+                constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
+              end
+
+              self.class._delete_record(constraints)
+            end
           else
+            # @note Override to add sharding scope on destroying
+            def relation_for_destroy
+              klass = self.class
+              relation = klass.unscoped.where(klass.primary_key => id)
+
+              if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
+                relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
+              end
+              relation
+            end
+
             # @note Override to add sharding scope on updating
             def _update_record(attribute_names = self.attribute_names)
               klass = self.class
