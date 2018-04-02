@@ -84,8 +84,8 @@ module ActiveRecord::Turntable
         # @note Override to add sharding scope on `update_columns`
         if Util.ar52_or_later?
           def update_columns(attributes)
-            raise ActiveRecordError, "cannot update a new record" if new_record?
-            raise ActiveRecordError, "cannot update a destroyed record" if destroyed?
+            raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
+            raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
 
             attributes.each_key do |key|
               verify_readonly_attribute(key.to_s)
