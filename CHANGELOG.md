@@ -1,4 +1,4 @@
-## activerecord-turntable 4.0.0 (unreleased) ##
+## activerecord-turntable 4.0.0 ##
 
 ### Major Changes
 
