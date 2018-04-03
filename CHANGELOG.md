@@ -2,17 +2,26 @@
 
 ### Major Changes
 
+* Supported rails versions are
+  * 5.0.0 to 5.0.5
+  * 5.1.0 to 5.1.5
 * Configuration
-  * Added `Configuration` object instead of nested `Hash` objects.
-  * Added DSL configuration file
-* New algorithm: `hash_slot`
-  * distribute like `redis cluster`
-* Slave support (experimental)
+  * Added DSL configuration file: config/turntable.rb
+* Added a new algorithm: `hash_slot`
+  * distributes like redis cluster.
+* Added a new sequencer: `katsubushi`
+  * Support [katsubushi](https://github.com/kayac/go-katsubushi) as a sequencer backend.
+* Support slave(read replica) connection. (Experimental feature)
 
 ### Incompatible changes
 
 * `RangeAlgorithm` is integrated to `RangeBsearchAlgorithm`.
+* Changed `ConnectionProxy#with_master` behavior to `Fix connection to primary master database`.
+  * Old `ConnectionProxy#with_master` behavior(default model connection) is renamed to `ConnectionProxy#with_default_shard`
 
+### Internal Change
+
+* Changed `AR::Base.turntable_configuration` to use `ActiveRecord::Turntable::Configuration` class instead of Hash.
 
 ## activerecord-turntable 3.1.0 ##
 

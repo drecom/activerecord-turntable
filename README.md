@@ -11,16 +11,16 @@ ActiveRecord::Turntable is a database sharding extension for ActiveRecord.
 
 activerecord(>=5.0.0, <6.0)
 
-* Current latest stable branch is [stable-3-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-3-x).
+* Current latest stable branch is [stable branch](https://github.com/drecom/activerecord-turntable/tree/stable).
 
 If you are using with older activerecord versions, use following versions.
 
 * activerecord 4.x - use activerecord-turntable version 2.x.([stable-2-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-2-x))
 * activerecord 3.x - use activerecord-turntable version 1.x.([stable-1-x branch](https://github.com/drecom/activerecord-turntable/tree/stable-1-x))
 
-## Supported Database
+## Supported DBMS
 
-Currently supports mysql only.
+MySQL only.
 
 ## Installation
 
@@ -401,10 +401,11 @@ end
 
 Sequencer provides generating global IDs.
 
-Turntable has follow 2 sequencers currently:
+Turntable has follow 3 sequencers currently:
 
 * :mysql - Use database table to generate ids.
 * :barrage - Use [barrage](https://github.com/drecom/barrage) gem to generate ids
+* :katsubushi - [katsubushi](https://github.com/kayac/go-katsubushi) sequencer backend
 
 ### Mysql example
 
