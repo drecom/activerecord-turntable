@@ -28,6 +28,7 @@ module ActiveRecord::Turntable
                   attributes_with_values(attribute_names),
                   constraints,
                 )
+              else
                 affected_rows = self.class.unscoped._update_record(
                   arel_attributes_with_values(attribute_names),
                   constraints,
