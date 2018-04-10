@@ -93,7 +93,7 @@ namespace :turntable do
                 undef :test_migration_sets_internal_metadata_even_when_fully_migrated,
                       :test_internal_metadata_stores_environment
               end
-            UNDEF
+            EOS
           end
 
           File.open("test/cases/validations_test.rb", "a") do |f|
