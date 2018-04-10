@@ -83,6 +83,10 @@ module ActiveRecord::Turntable
         turntable_enabled
       end
 
+      def sharding_condition_needed?
+        turntable_enabled? && primary_key != turntable_shard_key.to_s
+      end
+
       def sequencer_enabled?
         turntable_sequencer_enabled
       end

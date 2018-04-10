@@ -18,12 +18,15 @@ gemfile:
   - gemfiles/rails5_0_3.gemfile
   - gemfiles/rails5_0_4.gemfile
   - gemfiles/rails5_0_5.gemfile
+  - gemfiles/rails5_0_6.gemfile
+  - gemfiles/rails5_0_7.gemfile
   - gemfiles/rails5_1_0.gemfile
   - gemfiles/rails5_1_1.gemfile
   - gemfiles/rails5_1_2.gemfile
   - gemfiles/rails5_1_3.gemfile
   - gemfiles/rails5_1_4.gemfile
   - gemfiles/rails5_1_5.gemfile
+  - gemfiles/rails5_1_6.gemfile
   - gemfiles/rails_edge.gemfile
 
 env:
@@ -52,9 +55,9 @@ matrix:
     - rvm: 2.4.3
   include:
     - rvm: 2.3.6
-      gemfile: gemfiles/rails5_1_5.gemfile
+      gemfile: gemfiles/rails5_1_6.gemfile
     - rvm: 2.4.3
-      gemfile: gemfiles/rails5_1_5.gemfile
+      gemfile: gemfiles/rails5_1_6.gemfile
     - rvm: 2.5.0
       gemfile: gemfiles/rails_edge.gemfile
     - rvm: ruby-head
