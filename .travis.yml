@@ -40,6 +40,7 @@ services:
 before_install:
   - docker run -d --name turntable-katsubushi -p 11212:11212 katsubushi/katsubushi:latest -worker-id 1
   - gem update --system
+  - gem install bundler --no-doc
 
 before_script:
   - bundle exec rake $SETUP_TASK
