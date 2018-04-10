@@ -27,7 +27,7 @@ module ActiveRecord::Turntable
       ActiveRecord::Persistence.include(Persistence)
       ActiveRecord::Locking::Optimistic.include(LockingOptimistic)
       ActiveRecord::Relation.include(CleverLoad)
-      ActiveRecord::Relation.prepend(Relation)
+      ActiveRecord::Relation.prepend(Relation) unless Util.ar_version_equals_or_later?("5.1.6")
       ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
       ActiveRecord::ConnectionAdapters::ConnectionHandler.prepend(ConnectionHandlerExtension)
       ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
