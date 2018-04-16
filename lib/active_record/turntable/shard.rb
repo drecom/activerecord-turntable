@@ -42,14 +42,7 @@ module ActiveRecord::Turntable
     private
 
       def connection_klass
-        @connection_klass ||= create_connection_class
-      end
-
-      def create_connection_class
-        klass = connection_class_instance
-        klass.remove_connection
-        klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
-        klass
+        @connection_klass ||= connection_class_instance
       end
 
       def connection_class_instance
@@ -59,6 +52,7 @@ module ActiveRecord::Turntable
           klass = Class.new(ActiveRecord::Base)
           Connections.const_set(name.classify, klass)
           klass.abstract_class = true
+          klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
         end
         klass
       end

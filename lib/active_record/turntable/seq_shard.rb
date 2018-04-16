@@ -10,10 +10,15 @@ module ActiveRecord::Turntable
 
     private
 
-      def create_connection_class
-        klass = connection_class_instance
-        klass.remove_connection
-        klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:seq][name].with_indifferent_access
+      def connection_class_instance
+        if Connections.const_defined?(name.classify)
+          klass = Connections.const_get(name.classify)
+        else
+          klass = Class.new(ActiveRecord::Base)
+          Connections.const_set(name.classify, klass)
+          klass.abstract_class = true
+          klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:seq][name].with_indifferent_access
+        end
         klass
       end
   end
