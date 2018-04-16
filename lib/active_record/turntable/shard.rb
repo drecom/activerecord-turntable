@@ -11,7 +11,6 @@ module ActiveRecord::Turntable
       @cluster = cluster
       @name = name
       @slaves = slaves.map { |s| SlaveShard.new(cluster, s) }
-      ActiveRecord::Base.turntable_connections[name] = connection_pool
     end
 
     def connection_pool

@@ -5,10 +5,9 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :turntable_connections, :turntable_clusters, :turntable_sequencers,
+      class_attribute :turntable_clusters, :turntable_sequencers,
                       :turntable_enabled, :turntable_sequencer_enabled, :turntable_configuration
 
-      self.turntable_connections = {}
       self.turntable_clusters = {}.with_indifferent_access
       self.turntable_sequencers = {}.with_indifferent_access
       self.turntable_enabled = false
@@ -50,6 +49,10 @@ module ActiveRecord::Turntable
 
       def turntable_cluster
         turntable_clusters[turntable_cluster_name]
+      end
+
+      def turntable_pool_list
+        turntable_clusters.values.map { |cluster| cluster.shards.map(&:connection_pool) }.flatten
       end
 
       def turntable_replace_connection_pool
