@@ -193,7 +193,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     context "#cache" do
       it "query cache enabled all connections within the block" do
         result = connection_proxy.cache {
-          klass.turntable_connections.values.map do |pool|
+          klass.turntable_cluster.shards.map do |pool|
             pool.connection.query_cache_enabled
           end
         }
@@ -233,7 +233,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
       it "query cache disabled all connections within the block" do
         result = connection_proxy.uncached {
-          klass.turntable_connections.values.map do |pool|
+          klass.turntable_cluster.shards.map do |pool|
             pool.connection.query_cache_enabled
           end
         }
