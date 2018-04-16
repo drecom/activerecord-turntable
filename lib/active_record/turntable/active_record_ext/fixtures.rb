@@ -133,10 +133,5 @@ module ActiveRecord
       instantiate_fixtures if use_instantiated_fixtures
     end
     # rubocop:enable Style/ClassVars, Style/RedundantException
-
-    def enlist_fixture_connections
-      ActiveRecord::Base.connection_handler.connection_pool_list.map(&:connection) +
-        ActiveRecord::Base.turntable_connections.values.map(&:connection)
-    end
   end
 end
