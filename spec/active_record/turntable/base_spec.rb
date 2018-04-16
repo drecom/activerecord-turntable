@@ -22,4 +22,17 @@ describe ActiveRecord::Turntable::Base do
       its(:connection) { expect { subject }.not_to raise_error }
     end
   end
+
+  context ".clear_all_connections!" do
+    before do
+      ActiveRecord::Base.force_connect_all_shards!
+    end
+
+    subject { ActiveRecord::Base.clear_all_connections! }
+
+    it "closes all connections" do
+      expect { subject }.to change {
+        ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::Mysql2Adapter).count { |conn| conn.active? } }.to(0)
+    end
+  end
 end

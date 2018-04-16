@@ -61,10 +61,6 @@ module ActiveRecord::Turntable
         ch.send(:owner_to_pool)[connection_specification_name] = pp
       end
 
-      def clear_all_connections!
-        turntable_connections.values.each(&:disconnect!)
-      end
-
       def sequencer(sequencer_name, *args)
         class_attribute :turntable_sequencer_name
         class << self
