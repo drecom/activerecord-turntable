@@ -1,3 +1,15 @@
+## activerecord-turntable 4.1.0 ##
+
+### Major Changes
+
+* Support activerecord versions v5.0.6, v5.0.7 and v5.1.6
+* Remove unneeded monkey patches
+* Add `ActiveRecord::Base.turntable_pool_list` instead of `ActiveRecord::Base.turntable_connections`
+
+### BugFixes
+
+* Fix connection leaks on fork
+
 ## activerecord-turntable 4.0.0 ##
 
 ### Major Changes
