@@ -14,7 +14,7 @@ module ActiveRecord::Turntable
           def run
             result = super
 
-            pools = ActiveRecord::Base.turntable_connections.values
+            pools = ActiveRecord::Base.turntable_pool_list
             pools.each do |pool|
               pool.enable_query_cache!
             end
@@ -36,7 +36,7 @@ module ActiveRecord::Turntable
           def run
             result = super
 
-            pools = ActiveRecord::Base.turntable_connections.values
+            pools = ActiveRecord::Base.turntable_pool_list
             pools.each do |pool|
               pool.enable_query_cache!
             end
@@ -58,7 +58,7 @@ module ActiveRecord::Turntable
           def run
             result = super
 
-            pools = ActiveRecord::Base.turntable_connections.values
+            pools = ActiveRecord::Base.turntable_pool_list
             pools.each do |k|
               k.connection.enable_query_cache!
             end
@@ -70,7 +70,7 @@ module ActiveRecord::Turntable
             enabled, _connection_id = state
             super
 
-            klasses = ActiveRecord::Base.turntable_connections.values
+            klasses = ActiveRecord::Base.turntable_pool_list
             klasses.each do |k|
               k.connection.clear_query_cache
               k.connection.disable_query_cache! unless enabled

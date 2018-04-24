@@ -13,9 +13,9 @@ module ActiveRecord::Turntable
     module ClassMethods
       def force_transaction_all_shards!(options = {}, &block)
         force_connect_all_shards!
-        shards = turntable_connections.values
-        shards += [ActiveRecord::Base.connection_pool]
-        recursive_transaction(shards, options, &block)
+        pools = turntable_pool_list
+        pools += [ActiveRecord::Base.connection_pool]
+        recursive_transaction(pools, options, &block)
       end
 
       def recursive_transaction(pools, options, &block)
@@ -30,16 +30,7 @@ module ActiveRecord::Turntable
       end
 
       def force_connect_all_shards!
-        conf = configurations[::ActiveRecord::ConnectionHandling::DEFAULT_ENV.call.to_sym]
-        return unless conf
-
-        shards = HashWithIndifferentAccess.new
-        shards = shards.merge(conf[:shards]) if conf[:shards]
-        shards = shards.merge(conf[:seq]) if conf[:seq]
-        shards.each do |name, config|
-          turntable_connections[name] ||=
-            ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec_for(config))
-        end
+        turntable_pool_list.each(&:connection)
       end
 
       def spec_for(config)

@@ -5,10 +5,9 @@ module ActiveRecord::Turntable
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :turntable_connections, :turntable_clusters, :turntable_sequencers,
+      class_attribute :turntable_clusters, :turntable_sequencers,
                       :turntable_enabled, :turntable_sequencer_enabled, :turntable_configuration
 
-      self.turntable_connections = {}
       self.turntable_clusters = {}.with_indifferent_access
       self.turntable_sequencers = {}.with_indifferent_access
       self.turntable_enabled = false
@@ -52,6 +51,10 @@ module ActiveRecord::Turntable
         turntable_clusters[turntable_cluster_name]
       end
 
+      def turntable_pool_list
+        turntable_clusters.values.map { |cluster| cluster.shards.map(&:connection_pool) }.flatten.uniq
+      end
+
       def turntable_replace_connection_pool
         ch = connection_handler
         cp = ConnectionProxy.new(self, turntable_cluster)
@@ -59,10 +62,6 @@ module ActiveRecord::Turntable
 
         self.connection_specification_name = "turntable_pool_proxy::#{name}"
         ch.send(:owner_to_pool)[connection_specification_name] = pp
-      end
-
-      def clear_all_connections!
-        turntable_connections.values.each(&:disconnect!)
       end
 
       def sequencer(sequencer_name, *args)

@@ -59,16 +59,16 @@ module ActiveRecord::Turntable
     def enable_query_cache!
       default_connection.enable_query_cache!
 
-      klass.turntable_connections.each do |_k, v|
-        v.connection.enable_query_cache!
+      cluster.shards.each do |shard|
+        shard.connection.enable_query_cache!
       end
     end
 
     def disable_query_cache!
       default_connection.disable_query_cache!
 
-      klass.turntable_connections.each do |_k, v|
-        v.connection.disable_query_cache!
+      cluster.shards.each do |shard|
+        shard.connection.disable_query_cache!
       end
     end
 
@@ -79,11 +79,10 @@ module ActiveRecord::Turntable
     def clear_query_cache
       default_connection.clear_query_cache
 
-      klass.turntable_connections.each do |_k, v|
-        v.connection.clear_query_cache
+      cluster.shards.each do |shard|
+        shard.connection.clear_query_cache
       end
     end
-
 
     # rubocop:disable Style/MethodMissing
     def method_missing(method, *args, &block)

@@ -11,12 +11,12 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
   def disable_query_cache
     if ActiveRecord::Turntable::Util.ar_version_equals_or_later?("5.0.1")
       ActiveRecord::Base.connection_pool.disable_query_cache!
-      ActiveRecord::Base.turntable_connections.values.each do |pool|
+      ActiveRecord::Base.turntable_pool_list.each do |pool|
         pool.disable_query_cache!
       end
     else
       ActiveRecord::Base.connection.disable_query_cache!
-      ActiveRecord::Base.turntable_connections.values.each do |pool|
+      ActiveRecord::Base.turntable_pool_list.each do |pool|
         pool.connection.disable_query_cache!
       end
     end
@@ -25,12 +25,12 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
   def enable_query_cache
     if ActiveRecord::Turntable::Util.ar_version_equals_or_later?("5.0.1")
       ActiveRecord::Base.connection_pool.enable_query_cache!
-      ActiveRecord::Base.turntable_connections.values.each do |pool|
+      ActiveRecord::Base.turntable_pool_list.each do |pool|
         pool.enable_query_cache!
       end
     else
       ActiveRecord::Base.connection.enable_query_cache!
-      ActiveRecord::Base.turntable_connections.values.each do |pool|
+      ActiveRecord::Base.turntable_pool_list.each do |pool|
         pool.connection.enable_query_cache!
       end
     end
