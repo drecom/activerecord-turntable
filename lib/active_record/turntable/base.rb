@@ -52,7 +52,7 @@ module ActiveRecord::Turntable
       end
 
       def turntable_pool_list
-        turntable_clusters.values.map { |cluster| cluster.shards.map(&:connection_pool) }.flatten
+        turntable_clusters.values.map { |cluster| cluster.shards.map(&:connection_pool) }.flatten.uniq
       end
 
       def turntable_replace_connection_pool
