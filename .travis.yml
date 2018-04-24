@@ -29,15 +29,19 @@ gemfile:
   - gemfiles/rails5_1_6.gemfile
   - gemfiles/rails_edge.gemfile
 
+git:
+  submodules: false
+
 env:
   - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
   - SETUP_TASK=turntable:db:reset BUILD_TASK=spec SPEC_OPTS="--tag with_katsubushi"
-  - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
+  - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test UPDATE_SUBMODULE=1
 
 services:
   - docker
 
 before_install:
+  - git submodule update --init --recursive --depth 1
   - docker run -d --name turntable-katsubushi -p 11212:11212 katsubushi/katsubushi:latest -worker-id 1
   - gem update --system
   - gem install bundler --no-doc
