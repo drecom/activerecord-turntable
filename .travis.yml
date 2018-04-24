@@ -3,6 +3,7 @@ sudo: false
 
 cache:
   bundler: true
+  directories:
 
 rvm:
   - 2.2.10
@@ -32,11 +33,6 @@ gemfile:
 git:
   submodules: false
 
-env:
-  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
-  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec SPEC_OPTS="--tag with_katsubushi"
-  - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test UPDATE_SUBMODULE=1
-
 services:
   - docker
 
@@ -47,10 +43,13 @@ before_install:
   - gem install bundler --no-doc
 
 before_script:
-  - bundle exec rake $SETUP_TASK
+  - bundle exec rake turntable:db:reset
+  - bundle exec rake turntable:activerecord:setup
 
 script:
-  - bundle exec rake $BUILD_TASK
+  - bundle exec rake spec
+  - bundle exec rake spec SPEC_OPTS="--tag with_katsubushi"
+  - bundle exec rake turntable:activerecord:test
 
 matrix:
   exclude:
