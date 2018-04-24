@@ -34,5 +34,34 @@ describe ActiveRecord::Turntable::Base do
       expect { subject }.to change {
         ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::Mysql2Adapter).count { |conn| conn.active? } }.to(0)
     end
+
+    context "In forked child process" do
+      self.use_transactional_tests = false
+
+      before do
+        # release all connection on parent process
+        ActiveRecord::Base.clear_all_connections!
+      end
+
+      it "closes all connections" do
+        rd, wr = IO.pipe
+
+        pid = fork {
+          User.user_cluster_transaction {}
+          ActiveRecord::Base.clear_all_connections!
+          connected_count = ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::ConnectionPool).count { |pool| pool.connected? }
+
+          wr.write connected_count
+          wr.close
+          exit!
+        }
+
+        wr.close
+        Process.waitpid pid
+        connected_count = rd.read.to_i
+        expect(connected_count).to eq(0)
+        rd.close
+      end
+    end
   end
 end
