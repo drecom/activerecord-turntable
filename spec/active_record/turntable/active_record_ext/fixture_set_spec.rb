@@ -10,6 +10,7 @@ describe ActiveRecord::FixtureSet do
 
   before do
     ActiveRecord::FixtureSet.reset_cache
+    Item.delete_all
   end
 
   describe ".create_fixtures" do
