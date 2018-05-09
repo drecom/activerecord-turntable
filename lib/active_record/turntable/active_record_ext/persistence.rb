@@ -148,7 +148,9 @@ module ActiveRecord::Turntable
                 constraints,
               )
             end
+          end
 
+          if Util.ar52_or_later?
             def _delete_row
               constraints = { self.class.primary_key => id_in_database }
               if self.class.sharding_condition_needed?
@@ -168,7 +170,9 @@ module ActiveRecord::Turntable
               end
               relation
             end
+          end
 
+          if Util.ar_version_earlier_than?("5.1.6")
             # @note Override to add sharding scope on updating
             def _update_record(attribute_names = self.attribute_names)
               klass = self.class
