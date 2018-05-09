@@ -42,6 +42,10 @@ module ActiveRecord::Turntable
       end
     end
 
+    def discard!
+      # Nothing to do
+    end
+
     private
 
       def connection_pools_list
