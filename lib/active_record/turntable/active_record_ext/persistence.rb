@@ -134,27 +134,17 @@ module ActiveRecord::Turntable
 
         private
 
-          if Util.ar52_or_later?
+          if Util.ar_version_equals_or_later?("5.1.6")
             def _update_row(attribute_names, attempted_action = "update")
               constraints = { self.class.primary_key => id_in_database }
               if self.class.sharding_condition_needed?
                 constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
               end
 
-              self.class._update_record(
-                attributes_with_values(attribute_names),
-                constraints,
-              )
-            end
-          elsif Util.ar_version_equals_or_later?("5.1.6")
-            def _update_row(attribute_names, attempted_action = "update")
-              constraints = { self.class.primary_key => id_in_database }
-              if self.class.sharding_condition_needed?
-                constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
-              end
+              attributes = Util.ar52_or_later? ? attributes_with_values(attribute_names) : arel_attributes_with_values(attribute_names)
 
               self.class.unscoped._update_record(
-                arel_attributes_with_values(attribute_names),
+                attributes,
                 constraints,
               )
             end
