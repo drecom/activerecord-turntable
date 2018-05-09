@@ -116,19 +116,19 @@ describe ActiveRecord::Turntable::ConnectionProxy do
 
     context "With false argument" do
       context "When block raises error" do
-        subject { User.connection.with_all(false) { raise "Unknown Error" } }
+        subject { User.connection.with_all(false) { raise StandardError, "Unknown Error" } }
 
-        it { expect { subject }.to raise_error }
+        it { expect { subject }.to raise_error(StandardError) }
       end
     end
 
     context "With false argument" do
       context "block raises error" do
-        subject { User.connection.with_all(true) { raise "Unknown Error" } }
+        subject { User.connection.with_all(true) { raise StandardError, "Unknown Error" } }
 
         it { expect { subject }.not_to raise_error }
         it { is_expected.to have(3).items }
-        it { expect(subject).to all(be_instance_of(RuntimeError)) }
+        it { expect(subject).to all(be_instance_of(StandardError)) }
       end
     end
   end
