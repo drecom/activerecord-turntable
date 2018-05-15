@@ -3,7 +3,7 @@ require "active_record/turntable/version"
 Gem::Specification.new do |spec|
   spec.name = "activerecord-turntable"
   spec.version = ActiveRecord::Turntable::VERSION
-  spec.authors     = %w(gussan sue445)
+  spec.authors     = %w[gussan sue445]
   spec.homepage    = "https://github.com/drecom/activerecord-turntable"
   spec.summary = "ActiveRecord sharding extension"
   spec.description = "ActiveRecord sharding extension"

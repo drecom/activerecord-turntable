@@ -76,7 +76,7 @@ namespace :turntable do
         system(*%w|git submodule update --init|)
         system(*%w|git submodule foreach git fetch origin|)
         Dir.chdir("tmp/rails") do
-          system(*%W|git checkout #{ENV['ARVERSION']}|)
+          system(*%W|git checkout #{ENV["ARVERSION"]}|)
         end
         FileUtils.rm_r("test") if File.directory?("test")
         FileUtils.cp_r("tmp/rails/activerecord/test", ".")
@@ -93,7 +93,7 @@ namespace :turntable do
                 undef :test_migration_sets_internal_metadata_even_when_fully_migrated,
                       :test_internal_metadata_stores_environment
               end
-            EOS
+            UNDEF
           end
 
           File.open("test/cases/validations_test.rb", "a") do |f|
