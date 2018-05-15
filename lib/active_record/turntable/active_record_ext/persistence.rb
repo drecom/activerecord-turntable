@@ -4,6 +4,19 @@ module ActiveRecord::Turntable
       extend ActiveSupport::Concern
 
       ::ActiveRecord::Persistence.class_eval do
+
+        # @note Override to add sharding scope on updating
+        def _update_record(values, id, id_was, turntable_scope = nil) # :nodoc:
+          bind = predicate_builder.build_bind_attribute(primary_key, id_was || id)
+          relation = arel_table.where(
+            arel_attribute(primary_key).eq(bind)
+          )
+          relation = relation.merge(turntable_scope) if turntable_scope
+          um = relation.compile_update(_substitute_values(values), primary_key)
+
+          connection.update(um, "#{self} Update")
+        end
+
         # @note Override to add sharding scope on reloading
         def reload(options = nil)
           self.class.connection.clear_query_cache
