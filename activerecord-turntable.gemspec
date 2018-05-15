@@ -58,7 +58,7 @@ Gem::Specification.new do |spec|
   # activerecord testing dependencies
   spec.add_development_dependency "actionview"
   spec.add_development_dependency "bcrypt", "~> 3.1.11"
-  spec.add_development_dependency "minitest", "< 5.3.4"
-  spec.add_development_dependency "mocha", "~> 0.14"
+  spec.add_development_dependency "minitest"
+  spec.add_development_dependency "mocha"
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
 end
