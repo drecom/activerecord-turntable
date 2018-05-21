@@ -1,3 +1,9 @@
+## activerecord-turntable 4.2.0 ##
+
+### Major Changes
+
+* Support activerecord v5.2.0
+
 ## activerecord-turntable 4.1.0 ##
 
 ### Major Changes
