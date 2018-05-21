@@ -2,6 +2,7 @@ module ActiveRecord::Turntable
   module ActiveRecordExt
     module Persistence
       extend ActiveSupport::Concern
+      extend Compatibility
 
       ::ActiveRecord::Persistence.class_eval do
         # @note Override to add sharding scope on reloading
@@ -77,45 +78,61 @@ module ActiveRecord::Turntable
               true
             end
           end
+          # rubocop:enable Style/UnlessElse
         end
-        # rubocop:enable Style/UnlessElse
 
         # @note Override to add sharding scope on `update_columns`
-        def update_columns(attributes)
-          raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
-          raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
+        if Util.ar52_or_later?
+          def update_columns(attributes)
+            raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
+            raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
 
-          attributes.each_key do |key|
-            verify_readonly_attribute(key.to_s)
+            attributes.each_key do |key|
+              verify_readonly_attribute(key.to_s)
+            end
+
+            constraints = { self.class.primary_key => id_in_database }
+            if self.class.sharding_condition_needed?
+              constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
+            end
+
+            affected_rows = self.class._update_record(
+              attributes,
+              constraints,
+            )
+
+            attributes.each do |k, v|
+              write_attribute_without_type_cast(k, v)
+            end
+
+            affected_rows == 1
           end
+        else
+          def update_columns(attributes)
+            raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
+            raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
 
-          update_scope = if turntable_enabled? && self.class.primary_key != self.class.turntable_shard_key.to_s
-                           self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
-                         else
-                           self.class.unscoped
-                         end
+            attributes.each_key do |key|
+              verify_readonly_attribute(key.to_s)
+            end
 
-          updated_count = update_scope.where(self.class.primary_key => id).update_all(attributes)
+            update_scope = if turntable_enabled? && self.class.primary_key != self.class.turntable_shard_key.to_s
+                             self.class.unscoped.where(self.class.turntable_shard_key => self.send(turntable_shard_key))
+                           else
+                             self.class.unscoped
+                           end
 
-          attributes.each do |k, v|
-            raw_write_attribute(k, v)
+            updated_count = update_scope.where(self.class.primary_key => id).update_all(attributes)
+
+            attributes.each do |k, v|
+              raw_write_attribute(k, v)
+            end
+
+            updated_count == 1
           end
-
-          updated_count == 1
         end
 
         private
-
-          # @note Override to add sharding scope on destroying
-          def relation_for_destroy
-            klass = self.class
-            relation = klass.unscoped.where(klass.primary_key => id)
-
-            if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
-              relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
-            end
-            relation
-          end
 
           if Util.ar_version_equals_or_later?("5.1.6")
             def _update_row(attribute_names, attempted_action = "update")
@@ -124,12 +141,38 @@ module ActiveRecord::Turntable
                 constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
               end
 
+              attributes = Util.ar52_or_later? ? attributes_with_values(attribute_names) : arel_attributes_with_values(attribute_names)
+
               self.class.unscoped._update_record(
-                arel_attributes_with_values(attribute_names),
+                attributes,
                 constraints,
               )
             end
+          end
+
+          if Util.ar52_or_later?
+            def _delete_row
+              constraints = { self.class.primary_key => id_in_database }
+              if self.class.sharding_condition_needed?
+                constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
+              end
+
+              self.class._delete_record(constraints)
+            end
           else
+            # @note Override to add sharding scope on destroying
+            def relation_for_destroy
+              klass = self.class
+              relation = klass.unscoped.where(klass.primary_key => id)
+
+              if klass.turntable_enabled? && klass.primary_key != klass.turntable_shard_key.to_s
+                relation = relation.where(klass.turntable_shard_key => self[klass.turntable_shard_key])
+              end
+              relation
+            end
+          end
+
+          if Util.ar_version_earlier_than?("5.1.6")
             # @note Override to add sharding scope on updating
             def _update_record(attribute_names = self.attribute_names)
               klass = self.class

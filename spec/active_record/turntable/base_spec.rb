@@ -49,7 +49,7 @@ describe ActiveRecord::Turntable::Base do
         pid = fork {
           User.user_cluster_transaction {}
           ActiveRecord::Base.clear_all_connections!
-          connected_count = ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::ConnectionPool).count { |pool| pool.connected? }
+          connected_count = ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::ConnectionPool).count { |pool| pool.connections && pool.connected? }
 
           wr.write connected_count
           wr.close

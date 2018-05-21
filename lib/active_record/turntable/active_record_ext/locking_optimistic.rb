@@ -4,6 +4,7 @@ module ActiveRecord::Turntable
       if Util.ar_version_equals_or_later?("5.1.6")
         ::ActiveRecord::Locking::Optimistic.class_eval <<-EOD
           private
+
           def _update_row(attribute_names, attempted_action = "update")
             return super unless locking_enabled?
 
@@ -22,10 +23,17 @@ module ActiveRecord::Turntable
                 constraints[self.class.turntable_shard_key] = self[self.class.turntable_shard_key]
               end
 
-              affected_rows = self.class.unscoped._update_record(
-                arel_attributes_with_values(attribute_names),
-                constraints,
-              )
+              if Util.ar52_or_later?
+                affected_rows = self.class._update_record(
+                  attributes_with_values(attribute_names),
+                  constraints,
+                )
+              else
+                affected_rows = self.class.unscoped._update_record(
+                  arel_attributes_with_values(attribute_names),
+                  constraints,
+                )
+              end
 
               if affected_rows != 1
                 raise ActiveRecord::StaleObjectError.new(self, attempted_action)
@@ -40,8 +48,7 @@ module ActiveRecord::Turntable
             end
           end
         EOD
-
-      elsif Util.ar51_or_later?
+      elsif Util.ar51?
         ::ActiveRecord::Locking::Optimistic.class_eval <<-EOD
           private
           # @note Override to add sharding condition on optimistic locking
@@ -91,7 +98,7 @@ module ActiveRecord::Turntable
             end
           end
         EOD
-      else
+      elsif Util.earlier_than_ar51?
         ::ActiveRecord::Locking::Optimistic.class_eval <<-EOD
           private
           # @note Override to add sharding condition on optimistic locking

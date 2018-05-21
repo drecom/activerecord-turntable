@@ -12,7 +12,7 @@ module ActiveRecord::Turntable
     end
 
     delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
-             :spec, :connections, :size, :reaper, :table_exists?, to: :proxy
+             :spec, :connections, :size, :reaper, :table_exists?, :query_cache_enabled, :enable_query_cache!, to: :proxy
 
     %w(columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
@@ -40,6 +40,10 @@ module ActiveRecord::Turntable
       define_method(name.to_sym) do
         connection_pools_list.each { |cp| cp.public_send(name.to_sym) }
       end
+    end
+
+    def discard!
+      # Nothing to do
     end
 
     private

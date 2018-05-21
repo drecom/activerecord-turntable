@@ -5,4 +5,7 @@ gem "activesupport", "5.0.1"
 
 gem "mysql2", "~> 0.4.4"
 
+gem "minitest", "< 5.3.4"
+gem "mocha", "~> 0.14", require: false
+
 gemspec :path => '../'

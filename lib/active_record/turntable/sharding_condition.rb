@@ -3,15 +3,18 @@ module ActiveRecord::Turntable
     private
 
       def foreign_shard_key
-        options[:foreign_shard_key] || foreign_target_model.turntable_shard_key
+        reflection.options[:foreign_shard_key] || foreign_target_model.turntable_shard_key
       end
 
       def foreign_target_model
-        respond_to?(:model) ? model : owner
+        return model if respond_to?(:model)
+        return @model if instance_variable_defined?(:@model) && @model
+
+        owner
       end
 
       def should_use_shard_key?
-        sharded_by_same_key? || !!options[:foreign_shard_key]
+        sharded_by_same_key? || !!reflection.options[:foreign_shard_key]
       end
 
       def sharded_by_same_key?

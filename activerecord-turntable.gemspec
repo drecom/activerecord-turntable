@@ -3,7 +3,7 @@ require "active_record/turntable/version"
 Gem::Specification.new do |spec|
   spec.name = "activerecord-turntable"
   spec.version = ActiveRecord::Turntable::VERSION
-  spec.authors     = %w(gussan sue445)
+  spec.authors     = %w[gussan sue445]
   spec.homepage    = "https://github.com/drecom/activerecord-turntable"
   spec.summary = "ActiveRecord sharding extension"
   spec.description = "ActiveRecord sharding extension"
@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "guard-rubocop"
   spec.add_development_dependency "httpclient", ">= 0"
-  spec.add_development_dependency "mysql2"
+  spec.add_development_dependency "mysql2", "~> 0.4.4"
   spec.add_development_dependency "onkcop"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-byebug"
@@ -58,7 +58,7 @@ Gem::Specification.new do |spec|
   # activerecord testing dependencies
   spec.add_development_dependency "actionview"
   spec.add_development_dependency "bcrypt", "~> 3.1.11"
-  spec.add_development_dependency "minitest", "< 5.3.4"
-  spec.add_development_dependency "mocha", "~> 0.14"
+  spec.add_development_dependency "minitest"
+  spec.add_development_dependency "mocha"
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
 end

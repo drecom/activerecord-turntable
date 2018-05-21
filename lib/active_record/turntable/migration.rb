@@ -7,7 +7,11 @@ module ActiveRecord::Turntable::Migration
     class_attribute :target_shards, :current_shard
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.include(SchemaStatementsExt)
     ::ActiveRecord::Migration::CommandRecorder.include(CommandRecorder)
-    ::ActiveRecord::Migrator.prepend(Migrator)
+    if ActiveRecord::Turntable::Util.ar52_or_later?
+      ::ActiveRecord::MigrationContext.prepend(MigrationContext)
+    else
+      ::ActiveRecord::Migrator.prepend(Migrator)
+    end
   end
 
   module ShardDefinition
@@ -87,6 +91,43 @@ module ActiveRecord::Turntable::Migration
       def invert_rename_sequence_for(args)
         [:rename_sequence_for, args.reverse]
       end
+  end
+
+  module MigrationContext
+    extend ActiveSupport::Concern
+
+    def up(target_version = nil)
+      result = super
+
+      ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected(current_environment) do |name, configuration|
+        puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+        super(target_version)
+      end
+
+      result
+    end
+
+    def down(target_version = nil)
+      result = super
+
+      ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected(current_environment) do |name, configuration|
+        puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+        super(target_version)
+      end
+
+      result
+    end
+
+    def run(direction, target_version)
+      result = super
+
+      ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected(current_environment) do |name, configuration|
+        puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+        super(target_version)
+      end
+
+      result
+    end
   end
 
   module Migrator

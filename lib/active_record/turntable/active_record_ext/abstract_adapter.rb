@@ -23,6 +23,28 @@ module ActiveRecord::Turntable
 
       # @note override for append current shard name
       # rubocop:disable Style/HashSyntax, Style/MultilineMethodCallBraceLayout
+      module V5_2
+        def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil)
+          @instrumenter.instrument(
+            "sql.active_record",
+            sql:                  sql,
+            name:                 name,
+            binds:                binds,
+            type_casted_binds:    type_casted_binds,
+            statement_name:       statement_name,
+            connection_id:        object_id,
+            turntable_shard_name: turntable_shard_name) do
+            begin
+              @lock.synchronize do
+                yield
+              end
+            rescue => e
+              raise translate_exception_class(e, sql)
+            end
+          end
+        end
+      end
+
       module V5_1
         def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil)
           @instrumenter.instrument(
