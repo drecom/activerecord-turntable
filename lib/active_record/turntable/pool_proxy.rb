@@ -11,8 +11,8 @@ module ActiveRecord::Turntable
       yield proxy
     end
 
-    delegate :connected?, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :dead_connection_timeout,
-             :spec, :connections, :size, :reaper, :table_exists?, :query_cache_enabled, :enable_query_cache!, to: :proxy
+    delegate :connected?, :checkout_timeout, :automatic_reconnect, :automatic_reconnect=, :checkout_timeout, :checkout_timeout=, :dead_connection_timeout,
+             :spec, :connections, :size, :reaper, :table_exists?, :query_cache_enabled, :enable_query_cache!, :schema_cache, :schema_cache=, to: :proxy
 
     %w(columns_hash column_defaults primary_keys).each do |name|
       define_method(name.to_sym) do
@@ -30,15 +30,29 @@ module ActiveRecord::Turntable
       connection_pools_list.any?(&:active_connection?)
     end
 
-    %w(disconnect!
-       release_connection
-       clear_all_connections!
-       clear_active_connections!
-       clear_reloadable_connections!
-       clear_stale_cached_connections!
-       verify_active_connections!).each do |name|
+    %w[
+      clear_active_connections!
+      clear_all_connections!
+      clear_reloadable_connections!
+      clear_stale_cached_connections!
+      disconnect
+      disconnect!
+      flush!
+      reap
+      release_connection
+      verify_active_connections!
+    ].each do |name|
       define_method(name.to_sym) do
         connection_pools_list.each { |cp| cp.public_send(name.to_sym) }
+      end
+    end
+
+    %w[
+      clear_reloadable_connections
+      flush
+    ].each do |name|
+      define_method(name.to_sym) do |args|
+        connection_pools_list.each { |cp| cp.public_send(name.to_sym, *args) }
       end
     end
 
