@@ -1,3 +1,10 @@
+## activerecord-turntable 4.3.0 ##
+
+### Bugfixes
+
+* Fix `NoMethodError` on boot with production env
+* Fix not working patches for activerecord-import
+
 ## activerecord-turntable 4.2.0 ##
 
 ### Major Changes
