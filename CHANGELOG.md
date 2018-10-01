@@ -1,3 +1,13 @@
+## activerecord-turntable 4.4.0 ##
+
+### Major Changes
+
+* Support activerecord v5.2.1
+
+### Bugfixes
+
+* Fix sql parser error when inserting boolean value with rails version 5.2.0 or later
+
 ## activerecord-turntable 4.3.0 ##
 
 ### Bugfixes
