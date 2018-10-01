@@ -27,6 +27,18 @@ describe ActiveRecord::Turntable::Mixer do
     end
   end
 
+  context "#build_insert_fader" do
+    context "with boolean `TRUE` column value" do
+      subject { UserProfile.create(user: user, published: true) }
+
+      let(:user) { create(:user) }
+
+      it { expect { subject }.not_to raise_error }
+      its(:errors) { is_expected.to be_empty }
+      its(:published) { is_expected.to eq(true) }
+    end
+  end
+
   context "#find_shard_keys" do
     subject { @mixer.find_shard_keys(sql_tree.where, "users", "id") }
 
