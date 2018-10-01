@@ -10,7 +10,7 @@ module SQLTree
 end
 
 class SQLTree::Token
-  extended_keywords = %w(BINARY LIMIT OFFSET INDEX KEY USE FORCE IGNORE)
+  extended_keywords = %w(BINARY LIMIT OFFSET INDEX KEY USE FORCE IGNORE TRUE FALSE)
   KEYWORDS.concat(extended_keywords)
 
   extended_keywords.each do |kwd|
@@ -264,6 +264,34 @@ module SQLTree::Node
 
     class Value
       leaf :escape
+
+      def to_sql(options = {})
+        case value
+        when nil;            'NULL'
+        when true;           'TRUE'
+        when false;          'FALSE'
+        when String;         quote_str(@value)
+        when Numeric;        @value.to_s
+        when Date;           @value.strftime("'%Y-%m-%d'")
+        when DateTime, Time; @value.strftime("'%Y-%m-%d %H:%M:%S'")
+        else raise "Don't know how te represent this value in SQL!"
+        end
+      end
+
+      def self.parse(tokens)
+        case tokens.next
+        when SQLTree::Token::String, SQLTree::Token::Number
+          SQLTree::Node::Expression::Value.new(tokens.current.literal)
+        when SQLTree::Token::NULL
+          SQLTree::Node::Expression::Value.new(nil)
+        when SQLTree::Token::TRUE
+          SQLTree::Node::Expression::Value.new(true)
+        when SQLTree::Token::FALSE
+          SQLTree::Node::Expression::Value.new(false)
+        else
+          raise SQLTree::Parser::UnexpectedToken.new(tokens.current, :literal)
+        end
+      end
     end
 
     class EscapedValue < Value

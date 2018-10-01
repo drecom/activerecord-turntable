@@ -13,6 +13,7 @@ ActiveRecord::Schema.define do
     t.belongs_to :user, null: false
     t.date       :birthday
     t.text       :data
+    t.boolean    :published, null: false, default: false
     t.integer    :lock_version, null: false, default: 0
     t.datetime   :deleted_at, default: nil
     t.timestamps
