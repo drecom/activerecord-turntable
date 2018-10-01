@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "guard-rubocop"
   spec.add_development_dependency "httpclient", ">= 0"
-  spec.add_development_dependency "mysql2", "~> 0.4.4"
+  spec.add_development_dependency "mysql2", ">= 0.4.4", "< 0.6.0"
   spec.add_development_dependency "onkcop"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-byebug"
