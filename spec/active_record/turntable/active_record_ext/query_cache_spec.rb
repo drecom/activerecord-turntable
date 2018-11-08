@@ -100,4 +100,15 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
     }
     expect(mw.call({})).to eq([1, 0, 0])
   end
+
+  context "After QueryCache middleware calls" do
+    self.use_transactional_tests = false
+
+    it "releases all active connections" do
+      mw = middleware {}
+
+      ActiveRecord::Base.all_cluster_transaction {}
+      expect { mw.call({}) }.to change { ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::ConnectionPool).any? { |c| c.active_connection? } }.to(false)
+    end
+  end
 end
