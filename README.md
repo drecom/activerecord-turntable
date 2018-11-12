@@ -27,7 +27,7 @@ MySQL only.
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-turntable', '~> 4.4.0'
+gem 'activerecord-turntable', '~> 4.4.1'
 ```
 
 Run a bundle install:

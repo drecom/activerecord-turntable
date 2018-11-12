@@ -1,3 +1,9 @@
+## activerecord-turntable 4.4.1 ##
+
+### Bugfix
+
+* Fix performance degragation about handling connection on v4.4.0 and earlier v4 releases.
+
 ## activerecord-turntable 4.4.0 ##
 
 ### Major Changes
