@@ -61,7 +61,7 @@ module ActiveRecord::Turntable
         pp = PoolProxy.new(cp)
 
         self.connection_specification_name = "turntable_pool_proxy::#{name}"
-        ch.send(:owner_to_pool)[connection_specification_name] = pp
+        ch.owner_to_turntable_pool[connection_specification_name] = pp
       end
 
       def sequencer(sequencer_name, *args)
