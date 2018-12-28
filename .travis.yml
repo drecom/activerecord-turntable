@@ -5,10 +5,9 @@ cache:
   bundler: true
 
 rvm:
-  - 2.2.10
-  - 2.3.7
-  - 2.4.4
-  - 2.5.1
+  - 2.3.8
+  - 2.5.3
+  - 2.6.0
   - ruby-head
 
 gemfile:
@@ -53,21 +52,15 @@ matrix:
   exclude:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_edge.gemfile
-    - rvm: 2.2.10
-    - rvm: 2.3.7
-    - rvm: 2.4.4
+    - rvm: 2.3.8
   include:
-    - rvm: 2.2.10
+    - rvm: 2.3.8
       gemfile: gemfiles/rails5_0_7.gemfile
-    - rvm: 2.2.10
+    - rvm: 2.3.8
       gemfile: gemfiles/rails5_1_6.gemfile
-    - rvm: 2.2.10
-      gemfile: gemfiles/rails5_2_1.gemfile
-    - rvm: 2.3.7
-      gemfile: gemfiles/rails5_2_1.gemfile
-    - rvm: 2.4.4
-      gemfile: gemfiles/rails5_2_1.gemfile
-    - rvm: 2.5.1
+    - rvm: 2.3.8
+      gemfile: gemfiles/rails5_2_2.gemfile
+    - rvm: 2.5.3
       gemfile: gemfiles/rails_edge.gemfile
     - rvm: ruby-head
       gemfile: gemfiles/rails_edge.gemfile
