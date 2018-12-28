@@ -29,6 +29,7 @@ gemfile:
   - gemfiles/rails5_1_6.gemfile
   - gemfiles/rails5_2_0.gemfile
   - gemfiles/rails5_2_1.gemfile
+  - gemfiles/rails5_2_2.gemfile
   - gemfiles/rails_edge.gemfile
 
 env:
