@@ -3,8 +3,17 @@ require "rubygems"
 
 require "rspec/core"
 require "rspec/core/rake_task"
+
 RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList["spec/**/*_spec.rb"]
+  spec.rspec_opts = "--tag ~with_katsubushi"
+end
+
+namespace :spec do
+  desc "Run all specs"
+  ::RSpec::Core::RakeTask.new(:all) do |spec|
+    spec.pattern = FileList["spec/**/*_spec.rb"]
+  end
 end
 
 require "active_record"

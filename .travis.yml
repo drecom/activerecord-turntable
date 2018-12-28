@@ -32,8 +32,7 @@ gemfile:
   - gemfiles/rails_edge.gemfile
 
 env:
-  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec
-  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec SPEC_OPTS="--tag with_katsubushi"
+  - SETUP_TASK=turntable:db:reset BUILD_TASK=spec:all
   - SETUP_TASK=turntable:activerecord:setup BUILD_TASK=turntable:activerecord:test
 
 services:

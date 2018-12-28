@@ -37,7 +37,6 @@ RSpec.configure do |config|
   include TurntableHelper
 
   config.filter_run focus: true
-  config.filter_run_excluding with_katsubushi: true
   config.run_all_when_everything_filtered = true
   config.use_transactional_fixtures = true
 
