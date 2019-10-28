@@ -9,7 +9,7 @@ FactoryBot.define do
 
     trait :with_user_items do
       transient do
-        user_items_count 10
+        user_items_count { 10 }
       end
 
       after(:build) do |user, evaluator|
@@ -30,8 +30,8 @@ FactoryBot.define do
     end
 
     trait :created_yesterday do
-      created_at 1.day.ago
-      updated_at 1.day.ago
+      created_at { 1.day.ago }
+      updated_at { 1.day.ago }
     end
   end
 
