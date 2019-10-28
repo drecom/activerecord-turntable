@@ -38,6 +38,7 @@ env:
 
 services:
   - docker
+  - mysql
 
 before_install:
   - docker run -d --name turntable-katsubushi -p 11212:11212 katsubushi/katsubushi:latest -worker-id 1
