@@ -7,8 +7,8 @@ describe ActiveRecord::Turntable::ActiveRecordExt::ActiverecordImportExt do
 
     let(:rows) do
       [
-        build(:user_item, user: create(:user, :in_shard1)),
-        build(:user_item, user: create(:user, :in_shard2)),
+        build(:user_item, item: create(:item), user: create(:user, :in_shard1)),
+        build(:user_item, item: create(:item), user: create(:user, :in_shard2)),
       ]
     end
 
