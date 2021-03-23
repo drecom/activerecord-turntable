@@ -13,6 +13,10 @@ module ActiveRecord::Turntable
           end
 
           begin
+            if Util.ar60_or_later?
+              self.table_name = table
+            end
+
             tbl = StringIO.new
 
             tbl.print "  create_sequence_for #{remove_prefix_and_suffix(matchdata[1]).inspect}"
@@ -38,6 +42,10 @@ module ActiveRecord::Turntable
             stream.puts "# Could not dump table #{table.inspect} because of following #{e.class}"
             stream.puts "#   #{e.message}"
             stream.puts
+          ensure
+            if Util.ar60_or_later?
+              self.table_name = nil
+            end
           end
 
           stream
