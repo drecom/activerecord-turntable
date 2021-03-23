@@ -10,6 +10,9 @@ module ActiveRecord::Turntable
       module ClassMethods
         extend Compatibility
 
+        module V6_0
+        end
+
         module V5_2
         end
 
