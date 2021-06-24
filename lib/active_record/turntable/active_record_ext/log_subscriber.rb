@@ -34,7 +34,7 @@ module ActiveRecord::Turntable
         end
 
         name = colorize_payload_name(name, payload[:name])
-        sql  = color(sql, sql_color(sql), true)
+        sql  = color(sql, sql_color(sql), true) if Util.ar60_or_later? && colorize_logging
 
         debug "  #{name}  #{sql}#{binds}"
       end

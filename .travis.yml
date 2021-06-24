@@ -29,6 +29,7 @@ gemfile:
   - gemfiles/rails5_1_6.gemfile
   - gemfiles/rails5_2_0.gemfile
   - gemfiles/rails5_2_1.gemfile
+  - gemfiles/rails6_0_0.gemfile
   - gemfiles/rails_edge.gemfile
 
 env:
@@ -66,6 +67,8 @@ matrix:
       gemfile: gemfiles/rails5_2_1.gemfile
     - rvm: 2.4.4
       gemfile: gemfiles/rails5_2_1.gemfile
+    - rvm: 2.5.1
+      gemfile: gemfiles/rails6_0_0.gemfile
     - rvm: 2.5.1
       gemfile: gemfiles/rails_edge.gemfile
     - rvm: ruby-head

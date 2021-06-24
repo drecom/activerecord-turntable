@@ -87,8 +87,13 @@ module ActiveRecord::Turntable
             raise ActiveRecord::ActiveRecordError, "cannot update a new record" if new_record?
             raise ActiveRecord::ActiveRecordError, "cannot update a destroyed record" if destroyed?
 
+            attributes = attributes.transform_keys do |key|
+              name = key.to_s
+              self.class.attribute_aliases[name] || name
+            end
+
             attributes.each_key do |key|
-              verify_readonly_attribute(key.to_s)
+              verify_readonly_attribute(key)
             end
 
             constraints = { self.class.primary_key => id_in_database }
