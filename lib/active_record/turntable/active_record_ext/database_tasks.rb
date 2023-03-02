@@ -41,7 +41,11 @@ module ActiveRecord
           yield(name, configuration)
         end
         ActiveRecord::Base.clear_active_connections!
-        ActiveRecord::Base.establish_connection old_connection_pool.spec.config
+        if ActiveRecord::Turntable::Util.ar61_or_later?
+          ActiveRecord::Base.establish_connection old_connection_pool.db_config
+        else
+          ActiveRecord::Base.establish_connection old_connection_pool.spec.config
+        end
       end
 
       def each_current_turntable_cluster_configuration(environment)
@@ -70,10 +74,21 @@ module ActiveRecord
       def current_turntable_cluster_configurations(*environments)
         configurations = []
         environments.each do |environ|
-          config = ActiveRecord::Base.configurations[environ]
+          if ActiveRecord::Turntable::Util.ar61_or_later?
+            config = ActiveRecord::Base.configurations.configs_for(env_name: environ, name: "primary")
+          else
+            config = ActiveRecord::Base.configurations[environ]
+          end
           next unless config
-          %w(shards seq).each do |name|
-            configurations += config[name].to_a if config.has_key?(name)
+
+          if ActiveRecord::Turntable::Util.ar61_or_later?
+            [:shards, :seq].each do |name|
+              configurations += config.configuration_hash[name].to_a if config.configuration_hash.has_key?(name)
+            end
+          else
+            %w(shards seq).each do |name|
+              configurations += config[name].to_a if config.has_key?(name)
+            end
           end
         end
         configurations

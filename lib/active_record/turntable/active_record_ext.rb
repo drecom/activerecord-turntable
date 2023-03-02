@@ -13,6 +13,7 @@ module ActiveRecord::Turntable
       autoload :Sequencer
       autoload :Relation
       autoload :Transactions
+      autoload :AssociationBuilder
       autoload :AssociationPreloader
       autoload :Association
       autoload :LockingOptimistic
@@ -30,6 +31,7 @@ module ActiveRecord::Turntable
       ActiveRecord::Relation.prepend(Relation) unless Util.ar_version_equals_or_later?("5.1.6")
       ActiveRecord::Migration.include(ActiveRecord::Turntable::Migration)
       ActiveRecord::ConnectionAdapters::ConnectionHandler.prepend(ConnectionHandlerExtension)
+      ActiveRecord::Associations::Builder::Association.prepend(AssociationBuilder) if Util.ar61_or_later?
       ActiveRecord::Associations::Preloader::Association.prepend(AssociationPreloader)
       ActiveRecord::Associations::Association.prepend(Association)
       ActiveRecord::QueryCache.prepend(QueryCache)

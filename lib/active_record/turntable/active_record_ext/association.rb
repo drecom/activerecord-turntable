@@ -5,8 +5,10 @@ module ActiveRecord::Turntable
     module Association
       include ShardingCondition
 
-      def self.prepended(mod)
-        ActiveRecord::Associations::Builder::Association::VALID_OPTIONS << :foreign_shard_key
+      unless Util.ar61_or_later?
+        def self.prepended(mod)
+          ActiveRecord::Associations::Builder::Association::VALID_OPTIONS << :foreign_shard_key
+        end
       end
 
       protected

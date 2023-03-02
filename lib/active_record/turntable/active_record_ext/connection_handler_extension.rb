@@ -6,9 +6,17 @@ module ActiveRecord::Turntable
       end
 
       # @note Override not to establish_connection destroy existing connection pool proxy object
-      def retrieve_connection_pool(spec_name)
-        owner_to_turntable_pool.fetch(spec_name) do
-          super
+      if Util.ar61_or_later?
+        def retrieve_connection_pool(owner, role: ActiveRecord::Base.current_role, shard: ActiveRecord::Base.current_shard)
+          owner_to_turntable_pool.fetch(owner) do
+            super
+          end
+        end
+      else
+        def retrieve_connection_pool(spec_name)
+          owner_to_turntable_pool.fetch(spec_name) do
+            super
+          end
         end
       end
     end

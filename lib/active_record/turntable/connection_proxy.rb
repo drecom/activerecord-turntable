@@ -280,11 +280,11 @@ module ActiveRecord::Turntable
     private
 
       def fixed_shard_entry
-        Thread.current[:turntable_fixed_shard] ||= ThreadSafe::Cache.new
+        Thread.current[:turntable_fixed_shard] ||= Concurrent::Map.new
       end
 
       def current_shard_entry
-        Thread.current[:turntable_current_shard] ||= ThreadSafe::Cache.new
+        Thread.current[:turntable_current_shard] ||= Concurrent::Map.new
       end
   end
 end
