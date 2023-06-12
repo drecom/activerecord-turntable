@@ -83,6 +83,8 @@ module ActiveRecord
       @fixture_connections = []
       @@already_loaded_fixtures ||= {}
       @connection_subscriber = nil
+      @legacy_saved_pool_configs = Hash.new { |hash, key| hash[key] = {} }
+      @saved_pool_configs = Hash.new { |hash, key| hash[key] = {} }
 
       # Load fixtures once and begin transaction.
       if run_in_transaction?
@@ -107,18 +109,32 @@ module ActiveRecord
           # When connections are established in the future, begin a transaction too
           @connection_subscriber = ActiveSupport::Notifications.subscribe("!connection.active_record") do |_, _, _, _, payload|
             spec_name = payload[:spec_name] if payload.key?(:spec_name)
+            if ActiveRecord::Turntable::Util.ar61_or_later?
+              shard = payload[:shard] if payload.key?(:shard)
+              setup_shared_connection_pool if ActiveRecord::Base.legacy_connection_handling
+            end
 
             if spec_name
               begin
-                connection = ActiveRecord::Base.connection_handler.retrieve_connection(spec_name)
+                if ActiveRecord::Turntable::Util.ar61_or_later?
+                  connection = ActiveRecord::Base.connection_handler.retrieve_connection(spec_name, shard: shard)
+                else
+                  connection = ActiveRecord::Base.connection_handler.retrieve_connection(spec_name)
+                end
               rescue ConnectionNotEstablished
                 connection = nil
               end
 
-              if connection && !@fixture_connections.include?(connection)
-                connection.begin_transaction joinable: false
-                connection.pool.lock_thread = true
-                @fixture_connections << connection
+              if connection
+                if ActiveRecord::Turntable::Util.ar61_or_later?
+                  setup_shared_connection_pool unless ActiveRecord::Base.legacy_connection_handling
+                end
+
+                if !@fixture_connections.include?(connection)
+                  connection.begin_transaction joinable: false
+                  connection.pool.lock_thread = true
+                  @fixture_connections << connection
+                end
               end
             end
           end

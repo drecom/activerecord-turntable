@@ -7,6 +7,12 @@ module SQLTree
     attr_accessor :identifier_quote_field_char
   end
   self.identifier_quote_field_char = "`"
+
+  COMMENT_PATTERN = %r{\/\*[\s\S]*?\*\/}.freeze
+  def self.[](query, options = {})
+    sql = query.kind_of?(String) ? query.gsub(COMMENT_PATTERN, "") : query
+    SQLTree::Parser.parse(sql)
+  end
 end
 
 class SQLTree::Token

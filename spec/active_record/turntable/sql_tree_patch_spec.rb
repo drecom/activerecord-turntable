@@ -23,6 +23,11 @@ describe SQLTree do
     it { expect { subject }.not_to raise_error }
   end
 
+  context "Select query with inspect" do
+    subject { SQLTree["SELECT * FROM table WHERE field = 'value' /* loading for inspect */ LIMIT 11"] }
+    it { expect { subject }.not_to raise_error }
+  end
+
   context "Delete query" do
     subject { SQLTree["DELETE FROM table"] }
     it { expect { subject }.not_to raise_error }

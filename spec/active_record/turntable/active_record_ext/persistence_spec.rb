@@ -23,7 +23,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     let(:user) { create(:user, :created_yesterday) }
 
     context "When updating" do
-      subject { user.update_attributes!(nickname: new_nickname) }
+      subject { user.update!(nickname: new_nickname) }
 
       let(:new_nickname) { Faker::Name.unique.name }
 
@@ -73,7 +73,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     let!(:user_item) { user.user_items.first }
 
     context "When updating" do
-      subject { user_item.update_attributes!(num: 2) }
+      subject { user_item.update!(num: 2) }
 
       it { expect { subject }.not_to raise_error }
 
@@ -124,8 +124,8 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
   context "When the model is not sharded" do
     let(:item) { create(:item) }
 
-    it { expect { item.update_attributes(name: "hoge") }.not_to raise_error }
-    it { expect { item.update_attributes(name: "hoge") }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }
+    it { expect { item.update(name: "hoge") }.not_to raise_error }
+    it { expect { item.update(name: "hoge") }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }
 
     it { expect { item.destroy! }.not_to raise_error }
     it { expect { item.destroy! }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }

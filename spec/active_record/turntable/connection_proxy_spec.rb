@@ -68,7 +68,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     context "When updating user in shard1" do
-      subject { @user_in_shard1.update_attributes!(nickname: new_nickname) }
+      subject { @user_in_shard1.update!(nickname: new_nickname) }
 
       let(:new_nickname) { Faker::Name.unique.name }
 
@@ -76,7 +76,7 @@ describe ActiveRecord::Turntable::ConnectionProxy do
     end
 
     context "When updating user in shard2" do
-      subject { @user_in_shard2.update_attributes!(nickname: new_nickname) }
+      subject { @user_in_shard2.update!(nickname: new_nickname) }
 
       let(:new_nickname) { Faker::Name.unique.name }
 

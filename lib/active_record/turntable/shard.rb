@@ -52,7 +52,11 @@ module ActiveRecord::Turntable
           klass = Class.new(ActiveRecord::Base)
           Connections.const_set(name.classify, klass)
           klass.abstract_class = true
-          klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
+          if Util.ar61_or_later?
+            klass.establish_connection ActiveRecord::Base.connection_pool.db_config.configuration_hash[:shards][name].with_indifferent_access
+          else
+            klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:shards][name].with_indifferent_access
+          end
         end
         klass
       end
