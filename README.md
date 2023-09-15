@@ -344,9 +344,7 @@ end
 
 ```
     > User.create(name: "hoge")
-      (0.0ms) [Shard: user_seq_1] BEGIN
       (0.3ms) [Shard: user_seq_1] UPDATE `users_id_seq` SET id=LAST_INSERT_ID(id+1)
-      (0.8ms) [Shard: user_seq_1] COMMIT
       (0.1ms) [Shard: user_seq_1] SELECT LAST_INSERT_ID()
       (0.1ms) [Shard: user_shard_1] BEGIN
     [ActiveRecord::Turntable] Sending method: insert, sql: #<Arel::InsertManager:0x007f8503685b48>, shards: ["user_shard_1"]
